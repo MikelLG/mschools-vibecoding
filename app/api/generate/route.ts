@@ -1,6 +1,8 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextRequest, NextResponse } from 'next/server';
 
+export const maxDuration = 60;
+
 function generateId() {
   return crypto.randomUUID().replace(/-/g, '').slice(0, 16);
 }
