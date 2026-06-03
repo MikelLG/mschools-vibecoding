@@ -58,21 +58,47 @@ export default function WarmupPage() {
           </p>
         </div>
 
-        {/* Example tabs */}
-        <div className="flex gap-2 mb-6 justify-center flex-wrap">
-          {EXAMPLES.map((e, i) => (
-            <button
-              key={e.id}
-              onClick={() => setActive(i)}
-              className="rounded-full px-4 py-2 text-sm font-medium transition-all"
-              style={active === i
-                ? { background: 'var(--heading)', color: 'white' }
-                : { background: '#f7f4f7', color: 'var(--muted)', border: '1px solid var(--border)' }
-              }
-            >
-              {i + 1}. {e.title}
-            </button>
-          ))}
+        {/* Example navigation */}
+        <div className="flex items-center justify-between mb-6 gap-4">
+          <button
+            onClick={() => { setActive(i => Math.max(0, i - 1)); }}
+            disabled={active === 0}
+            className="rounded-xl px-4 py-2 text-sm font-medium transition-all flex items-center gap-2"
+            style={active === 0
+              ? { background: '#f0eaf0', color: 'var(--border)', cursor: 'not-allowed' }
+              : { background: '#f7f4f7', color: 'var(--heading)', border: '1px solid var(--border)' }
+            }
+          >
+            ← Anterior
+          </button>
+
+          <div className="flex gap-2 flex-wrap justify-center">
+            {EXAMPLES.map((e, i) => (
+              <button
+                key={e.id}
+                onClick={() => setActive(i)}
+                className="rounded-full px-4 py-2 text-sm font-medium transition-all"
+                style={active === i
+                  ? { background: 'var(--heading)', color: 'white' }
+                  : { background: '#f7f4f7', color: 'var(--muted)', border: '1px solid var(--border)' }
+                }
+              >
+                {i + 1}. {e.title}
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={() => { setActive(i => Math.min(EXAMPLES.length - 1, i + 1)); }}
+            disabled={active === EXAMPLES.length - 1}
+            className="rounded-xl px-4 py-2 text-sm font-medium transition-all flex items-center gap-2"
+            style={active === EXAMPLES.length - 1
+              ? { background: '#f0eaf0', color: 'var(--border)', cursor: 'not-allowed' }
+              : { background: '#f7f4f7', color: 'var(--heading)', border: '1px solid var(--border)' }
+            }
+          >
+            Següent →
+          </button>
         </div>
 
         {/* Webapp iframe */}
@@ -131,13 +157,21 @@ export default function WarmupPage() {
         </div>
 
         {/* CTA */}
-        <div className="mt-8 text-center">
+        <div className="mt-8 flex items-center justify-between">
+          <button
+            onClick={() => router.push('/')}
+            className="text-sm px-4 py-2 rounded-lg"
+            style={{ color: 'var(--muted)' }}
+          >
+            ← Tornar a l&apos;inici
+          </button>
           <button
             onClick={() => router.push('/create')}
-            className="rounded-xl px-8 py-4 font-bold text-white text-lg transition-all hover:opacity-90"
+            className="rounded-xl px-8 py-4 font-bold text-white text-lg transition-all hover:opacity-90 flex items-center gap-2"
             style={{ background: 'var(--heading)' }}
           >
-            Ara crea el teu recurs →
+            Ara crea el teu recurs
+            <span>→</span>
           </button>
         </div>
       </div>

@@ -130,9 +130,21 @@ export default function Home() {
         </section>
 
         {/* Footer note */}
-        <p className="text-center text-xs" style={{ color: 'var(--muted)' }}>
+        <p className="text-center text-xs mb-8" style={{ color: 'var(--muted)' }}>
           ~15 minuts · Gemini (aprovat pel Dept. d&apos;Educació)
         </p>
+
+        {/* Next step CTA */}
+        <div className="flex justify-center">
+          <Link
+            href="/warmup"
+            className="inline-flex items-center gap-3 rounded-2xl px-8 py-4 text-lg font-bold text-white transition-all hover:opacity-90"
+            style={{ background: 'var(--heading)' }}
+          >
+            Següent: Warm-up
+            <span className="text-xl">→</span>
+          </Link>
+        </div>
 
       </div>
     </main>
