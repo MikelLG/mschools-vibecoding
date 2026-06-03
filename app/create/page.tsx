@@ -4,119 +4,125 @@ import { useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Submission } from '@/lib/types';
 
-// ── Card groups ────────────────────────────────────────────────────────────────
+// ── Card definitions ───────────────────────────────────────────────────────────
 
+const EIXOS = [
+  { value: 'Benestar social', emoji: '🤝' },
+  { value: 'Educació mediàtica', emoji: '📱' },
+  { value: 'Consciència social', emoji: '🌍' },
+  { value: 'Art i creativitat', emoji: '🎨' },
+  { value: 'Equitat i inclusió', emoji: '🌈' },
+  { value: 'Cultura i diversitat', emoji: '🏛️' },
+];
+
+const USUARIS = [
+  { value: 'Docent', emoji: '👨‍🏫' },
+  { value: 'Alumnat', emoji: '👧' },
+  { value: 'Famílies', emoji: '👨‍👩‍👧' },
+  { value: 'Equip del centre', emoji: '🏫' },
+];
+
+const REPTES_PER_USUARI: Record<string, { value: string; emoji: string }[]> = {
+  'Docent': [
+    { value: 'Gestió d\'aula', emoji: '📋' },
+    { value: 'Organització del temps', emoji: '⏰' },
+    { value: 'Comunicació amb famílies', emoji: '📨' },
+    { value: 'Seguiment de l\'alumnat', emoji: '📊' },
+    { value: 'Preparació de classes', emoji: '📝' },
+    { value: 'Avaluació', emoji: '✅' },
+    { value: 'Benestar del grup', emoji: '💚' },
+    { value: 'Inclusió i accessibilitat', emoji: '♿' },
+  ],
+  'Alumnat': [
+    { value: 'Practicar un contingut', emoji: '🔁' },
+    { value: 'Visualitzar un fenomen', emoji: '🔬' },
+    { value: 'Autoavaluar-se', emoji: '🪞' },
+    { value: 'Regular emocions', emoji: '🧘' },
+    { value: 'Col·laborar en grup', emoji: '🤝' },
+    { value: 'Explorar un concepte', emoji: '💡' },
+    { value: 'Jugar per aprendre', emoji: '🎮' },
+  ],
+  'Famílies': [
+    { value: 'Rebre informació', emoji: '📩' },
+    { value: 'Omplir formularis', emoji: '📋' },
+    { value: 'Preparar entrevistes', emoji: '🗣️' },
+    { value: 'Comprendre rutines', emoji: '🗓️' },
+    { value: 'Acompanyar el benestar', emoji: '💙' },
+  ],
+  'Equip del centre': [
+    { value: 'Recollir dades', emoji: '📊' },
+    { value: 'Organitzar torns', emoji: '🔄' },
+    { value: 'Visualitzar informació', emoji: '📈' },
+    { value: 'Coordinar equips', emoji: '🔗' },
+    { value: 'Planificar activitats', emoji: '🗓️' },
+  ],
+};
+
+const ACCIONS = [
+  { value: 'Generar grups', emoji: '👥' },
+  { value: 'Crear horaris', emoji: '📅' },
+  { value: 'Recollir dades', emoji: '📊' },
+  { value: 'Mostrar un checklist', emoji: '✅' },
+  { value: 'Enviar un missatge', emoji: '📨' },
+  { value: 'Visualitzar informació', emoji: '📈' },
+  { value: 'Simular un fenomen', emoji: '⚗️' },
+  { value: 'Crear un formulari', emoji: '📝' },
+  { value: 'Generar retroalimentació', emoji: '💬' },
+  { value: 'Organitzar torns', emoji: '🔄' },
+  { value: 'Crear un mini-joc', emoji: '🎮' },
+  { value: 'Comparar opcions', emoji: '⚖️' },
+];
+
+const ESTILS = [
+  { value: 'Minimalista', emoji: '⬜' },
+  { value: 'Alt contrast', emoji: '◼' },
+  { value: 'Infantil', emoji: '🎈' },
+  { value: 'Científic', emoji: '🔬' },
+  { value: 'Mode pissarra', emoji: '🖊️' },
+  { value: 'Colors suaus', emoji: '🎨' },
+  { value: 'Tipografia gran', emoji: '🔠' },
+  { value: 'Amb animacions', emoji: '✨' },
+  { value: 'Amb dibuixos', emoji: '🖼️' },
+  { value: 'Interactiva / gamificada', emoji: '🕹️' },
+  { value: 'Estil fitxa / sobri', emoji: '📄' },
+];
+
+// Groups metadata for the prompt preview bar
 const GROUPS = [
-  {
-    id: 'eixos',
-    label: 'Eixos',
-    question: 'Per a quina àrea temàtica?',
-    color: '#0d9488', bg: '#f0fdfb', emoji: '🎯',
-    fragment: (v: string) => `l'àrea de ${v}`,
-    cards: [
-      { value: 'matemàtiques', label: 'Matemàtiques', emoji: '🔢' },
-      { value: 'llengua catalana', label: 'Llengua', emoji: '📖' },
-      { value: 'ciències naturals', label: 'Ciències naturals', emoji: '🔬' },
-      { value: 'ciències socials', label: 'Ciències socials', emoji: '🌍' },
-      { value: 'educació emocional', label: 'Educació emocional', emoji: '💚' },
-      { value: 'arts i creativitat', label: 'Arts i creativitat', emoji: '🎨' },
-    ],
-  },
-  {
-    id: 'persona',
-    label: 'Persona',
-    question: 'Per a qui és?',
-    color: '#7c3aed', bg: '#f5f3ff', emoji: '👤',
-    fragment: (v: string) => `adreçat a ${v}`,
-    cards: [
-      { value: 'alumnat de primària (6-12 anys)', label: 'Alumnat primària', emoji: '👧' },
-      { value: 'alumnat d\'ESO (12-16 anys)', label: 'Alumnat ESO', emoji: '🧑' },
-      { value: 'el docent', label: 'El docent', emoji: '👨‍🏫' },
-      { value: 'les famílies', label: 'Les famílies', emoji: '👨‍👩‍👧' },
-      { value: 'tot el grup classe', label: 'Grup classe', emoji: '🏫' },
-      { value: 'alumnat amb necessitats específiques', label: 'Alumnat NEE', emoji: '♿' },
-    ],
-  },
-  {
-    id: 'repte',
-    label: 'Repte',
-    question: 'Quin és el repte educatiu?',
-    color: '#ea580c', bg: '#fff7ed', emoji: '💡',
-    fragment: (v: string) => `per ${v}`,
-    cards: [
-      { value: 'l\'autoavaluació de l\'alumnat', label: 'Autoavaluació', emoji: '📝' },
-      { value: 'reforçar continguts treballats', label: 'Reforç de continguts', emoji: '🎯' },
-      { value: 'facilitar el treball cooperatiu', label: 'Treball cooperatiu', emoji: '🤝' },
-      { value: 'l\'avaluació formativa del docent', label: 'Avaluació formativa', emoji: '✅' },
-      { value: 'millorar la comunicació amb les famílies', label: 'Comunicació famílies', emoji: '📣' },
-      { value: 'activar els coneixements previs', label: 'Activació coneixements', emoji: '🧠' },
-    ],
-  },
-  {
-    id: 'estil',
-    label: 'Estil',
-    question: 'Quin estil ha de tenir?',
-    color: '#2563eb', bg: '#eff6ff', emoji: '🎨',
-    fragment: (v: string) => `amb un format ${v}`,
-    cards: [
-      { value: 'lúdic i gamificat', label: 'Lúdic i gamificat', emoji: '🎮' },
-      { value: 'visual i gràfic', label: 'Visual i gràfic', emoji: '🖼️' },
-      { value: 'estructurat i clar', label: 'Estructurat i clar', emoji: '📋' },
-      { value: 'inclusiu i accessible', label: 'Inclusiu i accessible', emoji: '🌈' },
-      { value: 'ràpid i directe', label: 'Ràpid i directe', emoji: '⚡' },
-      { value: 'narratiu i creatiu', label: 'Narratiu i creatiu', emoji: '✍️' },
-    ],
-  },
-  {
-    id: 'restriccions',
-    label: 'Restriccions',
-    question: 'Alguna restricció tècnica?',
-    color: '#16a34a', bg: '#f0fdf4', emoji: '⚙️',
-    fragment: (v: string) => `que sigui ${v}`,
-    cards: [
-      { value: 'compatible amb mòbil i tauleta', label: 'Compatible mòbil', emoji: '📱' },
-      { value: 'imprimible en paper', label: 'Imprimible', emoji: '🖨️' },
-      { value: 'usable en menys de 10 minuts', label: 'Màxim 10 minuts', emoji: '⏱️' },
-      { value: 'sense necessitat de login', label: 'Sense login', emoji: '🔓' },
-      { value: 'sense efectes de so', label: 'Sense so', emoji: '🔇' },
-      { value: 'disponible en català i castellà', label: 'Bilingüe', emoji: '🌐' },
-    ],
-  },
-] as const;
-
-const FORMAT_OPTIONS = [
-  { value: 'quiz', label: 'Quiz interactiu', emoji: '🎯', desc: 'Preguntes amb resposta i feedback' },
-  { value: 'activitat', label: 'Activitat per a l\'aula', emoji: '📚', desc: 'Fitxa o exercici interactiu' },
-  { value: 'rubrica', label: 'Rúbrica d\'avaluació', emoji: '✅', desc: 'Criteris amb puntuació' },
-  { value: 'formulari', label: 'Formulari per a famílies', emoji: '📝', desc: 'Comunicat o enquesta' },
-  { value: 'joc', label: 'Joc educatiu', emoji: '🎮', desc: 'Dinàmica lúdica amb objectiu pedagògic' },
-  { value: 'suport', label: 'Material de suport', emoji: '🔧', desc: 'Recurs visual o guia pràctica' },
-] as const;
+  { id: 'eix', label: 'Eix', color: '#0d9488', bg: '#f0fdfb', emoji: '🎯' },
+  { id: 'usuari', label: 'Usuari', color: '#7c3aed', bg: '#f5f3ff', emoji: '👤' },
+  { id: 'repte', label: 'Repte', color: '#ea580c', bg: '#fff7ed', emoji: '💡' },
+  { id: 'accio', label: 'Acció', color: '#2563eb', bg: '#eff6ff', emoji: '⚡' },
+  { id: 'estil', label: 'Estil', color: '#be185d', bg: '#fdf2f8', emoji: '🎨' },
+];
 
 // ── Component ──────────────────────────────────────────────────────────────────
 
-type Selections = Record<string, string>;
-
 export default function CreatePage() {
   const router = useRouter();
-  const [selections, setSelections] = useState<Selections>({});
+  const [eix, setEix] = useState('');
+  const [usuari, setUsuari] = useState('');
+  const [repte, setRepte] = useState('');
+  const [accio, setAccio] = useState('');
+  const [estil, setEstil] = useState('');
   const [pairName, setPairName] = useState('');
   const [extraContext, setExtraContext] = useState('');
-  const [format, setFormat] = useState('');
-  const [formatLabel, setFormatLabel] = useState('');
   const [listening, setListening] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState('');
   const recognitionRef = useRef<SpeechRecognition | null>(null);
 
-  const completedGroups = GROUPS.filter(g => selections[g.id]).length;
-  const canGenerate = completedGroups === GROUPS.length && !!format;
+  const selections = { eix, usuari, repte, accio, estil };
+  const completedGroups = GROUPS.filter(g => selections[g.id as keyof typeof selections]).length;
+  const canGenerate = completedGroups === GROUPS.length;
 
-  // Build live prompt preview sentence
-  const promptPreview = GROUPS.map(g => {
-    const val = selections[g.id];
-    return val ? g.fragment(val) : `[${g.label.toLowerCase()}]`;
-  }).join(', ');
+  // When usuari changes, clear repte if it no longer applies
+  const handleUsuari = (val: string) => {
+    setUsuari(val);
+    setRepte('');
+  };
+
+  const currentReptes = usuari ? REPTES_PER_USUARI[usuari] ?? [] : [];
 
   const startVoice = useCallback(() => {
     const SR = (window as unknown as { SpeechRecognition?: typeof SpeechRecognition; webkitSpeechRecognition?: typeof SpeechRecognition }).SpeechRecognition
@@ -145,10 +151,14 @@ export default function CreatePage() {
     setGenerating(true);
     setError('');
     try {
-      const selectedCards = GROUPS.map(g => ({
-        group: g.label,
-        value: selections[g.id],
-      }));
+      const selectedCards = [
+        { group: 'Eix', value: eix },
+        { group: 'Usuari final', value: usuari },
+        { group: 'Repte', value: repte },
+        { group: 'Acció principal', value: accio },
+        { group: 'Estil', value: estil },
+      ];
+      const promptPreview = `${eix} · ${usuari} · ${repte} · ${accio} · ${estil}`;
 
       const res = await fetch('/api/generate', {
         method: 'POST',
@@ -157,8 +167,8 @@ export default function CreatePage() {
           selectedCards,
           promptPreview,
           extraContext,
-          format,
-          formatLabel,
+          format: accio.toLowerCase().replace(/\s/g, '_'),
+          formatLabel: accio,
           pairName,
           sessionId: process.env.NEXT_PUBLIC_SESSION_ID ?? 'mschools-2026',
         }),
@@ -174,6 +184,7 @@ export default function CreatePage() {
     }
   };
 
+  // ── Generating screen ────────────────────────────────────────────────────────
   if (generating) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center text-center px-6" style={{ background: 'var(--bg)' }}>
@@ -186,120 +197,162 @@ export default function CreatePage() {
         <p className="max-w-sm mb-8" style={{ color: 'var(--muted)' }}>
           Gemini està creant la webapp educativa a partir del teu prompt.
         </p>
-        {/* Show the assembled prompt */}
         <div className="max-w-lg w-full rounded-2xl p-5 text-left" style={{ background: '#f7f4f7', border: '1px solid var(--border)' }}>
-          <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--heading)' }}>El prompt enviat</div>
-          <p className="text-sm leading-relaxed" style={{ color: 'var(--body)' }}>
-            Crea una eina educativa per a {promptPreview}.{extraContext ? ` ${extraContext}` : ''} Format: {formatLabel}.
-          </p>
+          <div className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--heading)' }}>El teu prompt</div>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { label: eix, color: '#0d9488', bg: '#f0fdfb' },
+              { label: usuari, color: '#7c3aed', bg: '#f5f3ff' },
+              { label: repte, color: '#ea580c', bg: '#fff7ed' },
+              { label: accio, color: '#2563eb', bg: '#eff6ff' },
+              { label: estil, color: '#be185d', bg: '#fdf2f8' },
+            ].map(chip => (
+              <span key={chip.label} className="px-3 py-1 rounded-full text-sm font-semibold" style={{ background: chip.bg, color: chip.color }}>
+                {chip.label}
+              </span>
+            ))}
+          </div>
+          {extraContext && (
+            <p className="mt-3 text-sm" style={{ color: 'var(--muted)' }}>+ {extraContext}</p>
+          )}
         </div>
       </div>
     );
   }
 
+  // ── Main form ────────────────────────────────────────────────────────────────
   return (
     <main className="min-h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
+
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4 border-b sticky top-0 z-20 bg-white" style={{ borderColor: 'var(--border)' }}>
-        <button onClick={() => router.push('/warmup')} className="text-sm" style={{ color: 'var(--muted)' }}>
-          ← Warm-up
-        </button>
+        <button onClick={() => router.push('/warmup')} className="text-sm" style={{ color: 'var(--muted)' }}>← Warm-up</button>
         <span className="font-black" style={{ color: 'var(--heading)' }}>Vibe Coding</span>
-        <div className="text-xs font-mono" style={{ color: 'var(--muted)' }}>
-          {completedGroups}/{GROUPS.length} targetes
-        </div>
+        <span className="text-xs font-mono px-2 py-1 rounded-full" style={{ background: '#f7f4f7', color: 'var(--muted)' }}>
+          {completedGroups}/{GROUPS.length}
+        </span>
       </header>
 
-      {/* Live prompt preview bar */}
+      {/* Live prompt preview */}
       <div className="sticky top-[57px] z-10 px-6 py-3 border-b" style={{ background: '#f7f4f7', borderColor: 'var(--border)' }}>
         <div className="max-w-3xl mx-auto">
-          <div className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: 'var(--heading)' }}>
-            📝 Prompt en construcció
-          </div>
-          <p className="text-sm leading-relaxed" style={{ color: completedGroups > 0 ? 'var(--body)' : 'var(--muted)' }}>
-            Crea una eina educativa per a{' '}
+          <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--heading)' }}>📝 Prompt en construcció</p>
+          <div className="flex flex-wrap gap-1.5 items-center">
             {GROUPS.map((g, i) => {
-              const val = selections[g.id];
+              const val = selections[g.id as keyof typeof selections];
               return (
-                <span key={g.id}>
+                <span key={g.id} className="inline-flex items-center gap-1">
                   <span
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold"
+                    className="px-2.5 py-1 rounded-full text-xs font-semibold"
                     style={val
                       ? { background: g.bg, color: g.color, border: `1px solid ${g.color}40` }
-                      : { background: '#ede8ed', color: 'var(--muted)' }
+                      : { background: '#ede8ed', color: '#999' }
                     }
                   >
-                    {val ? `${g.emoji} ${g.fragment(val)}` : `[${g.label}]`}
+                    {val ? `${g.emoji} ${val}` : `[${g.label}]`}
                   </span>
-                  {i < GROUPS.length - 1 && <span style={{ color: 'var(--muted)' }}>, </span>}
+                  {i < GROUPS.length - 1 && <span style={{ color: 'var(--border)' }}>·</span>}
                 </span>
               );
             })}
-            .
-          </p>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto w-full px-6 py-6 flex flex-col gap-8">
+      <div className="max-w-3xl mx-auto w-full px-6 py-6 flex flex-col gap-10">
 
         {/* Pair name */}
-        <div>
-          <input
-            placeholder="Nom de la parella (opcional)"
-            value={pairName}
-            onChange={e => setPairName(e.target.value)}
-            className="w-full rounded-xl px-4 py-3 text-sm focus:outline-none"
-            style={{ background: '#f7f4f7', border: '1.5px solid var(--border)', color: 'var(--body)' }}
-          />
-        </div>
+        <input
+          placeholder="Nom de la parella (opcional)"
+          value={pairName}
+          onChange={e => setPairName(e.target.value)}
+          className="w-full rounded-xl px-4 py-3 text-sm focus:outline-none"
+          style={{ background: '#f7f4f7', border: '1.5px solid var(--border)', color: 'var(--body)' }}
+        />
 
-        {/* 5 Card groups */}
-        {GROUPS.map(g => (
-          <section key={g.id}>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-xl">{g.emoji}</span>
-              <div>
-                <h2 className="font-black text-base" style={{ color: g.color }}>{g.label}</h2>
-                <p className="text-xs" style={{ color: 'var(--muted)' }}>{g.question}</p>
-              </div>
-              {selections[g.id] && (
-                <span className="ml-auto text-xs font-bold px-2 py-1 rounded-full" style={{ background: g.bg, color: g.color }}>
-                  ✓ {g.cards.find(c => c.value === selections[g.id])?.label}
-                </span>
-              )}
+        {/* 1. Eixos */}
+        <CardGroup
+          number="1" label="Eix" color="#0d9488" bg="#f0fdfb" emoji="🎯"
+          description="Des de quin marc volem emmarcar l'app. L'eix dona sentit, valors i enfocament."
+          selected={eix}
+        >
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {EIXOS.map(c => (
+              <Card key={c.value} card={c} selected={eix === c.value} color="#0d9488" bg="#f0fdfb" onClick={() => setEix(c.value)} />
+            ))}
+          </div>
+        </CardGroup>
+
+        {/* 2. Usuari final */}
+        <CardGroup
+          number="2" label="Usuari final" color="#7c3aed" bg="#f5f3ff" emoji="👤"
+          description="Qui interactuarà amb l'app. Canvia completament el to, la interfície i la complexitat."
+          selected={usuari}
+        >
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {USUARIS.map(c => (
+              <Card key={c.value} card={c} selected={usuari === c.value} color="#7c3aed" bg="#f5f3ff" onClick={() => handleUsuari(c.value)} />
+            ))}
+          </div>
+        </CardGroup>
+
+        {/* 3. Repte — dynamic based on usuari */}
+        <CardGroup
+          number="3" label="Repte" color="#ea580c" bg="#fff7ed" emoji="💡"
+          description={usuari ? `Necessitat concreta del/la ${usuari.toLowerCase()} dins d'aquest eix.` : 'Primer selecciona l\'usuari final per veure els reptes disponibles.'}
+          selected={repte}
+        >
+          {!usuari ? (
+            <div className="rounded-xl p-6 text-center text-sm" style={{ background: '#fff7ed', border: '1.5px dashed #ea580c50', color: '#ea580c' }}>
+              👆 Selecciona primer l&apos;usuari final
             </div>
+          ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {g.cards.map(card => (
-                <button
-                  key={card.value}
-                  type="button"
-                  onClick={() => setSelections(s => ({ ...s, [g.id]: card.value }))}
-                  className="flex items-center gap-3 rounded-xl p-4 text-left transition-all"
-                  style={selections[g.id] === card.value
-                    ? { background: g.bg, border: `2px solid ${g.color}`, color: g.color }
-                    : { background: '#faf8fa', border: '1.5px solid var(--border)', color: 'var(--body)' }
-                  }
-                >
-                  <span className="text-2xl">{card.emoji}</span>
-                  <span className="text-sm font-medium leading-tight">{card.label}</span>
-                </button>
+              {currentReptes.map(c => (
+                <Card key={c.value} card={c} selected={repte === c.value} color="#ea580c" bg="#fff7ed" onClick={() => setRepte(c.value)} />
               ))}
             </div>
-          </section>
-        ))}
+          )}
+        </CardGroup>
 
-        {/* Extra context + voice */}
+        {/* 4. Acció principal */}
+        <CardGroup
+          number="4" label="Acció principal" color="#2563eb" bg="#eff6ff" emoji="⚡"
+          description="Què fa l'app. La funció clau que converteix el repte en una solució concreta."
+          selected={accio}
+        >
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {ACCIONS.map(c => (
+              <Card key={c.value} card={c} selected={accio === c.value} color="#2563eb" bg="#eff6ff" onClick={() => setAccio(c.value)} />
+            ))}
+          </div>
+        </CardGroup>
+
+        {/* 5. Estil */}
+        <CardGroup
+          number="5" label="Estil" color="#be185d" bg="#fdf2f8" emoji="🎨"
+          description="Com ha de semblar i sentir-se l'app (look & feel + nivell d'interactivitat)."
+          selected={estil}
+        >
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {ESTILS.map(c => (
+              <Card key={c.value} card={c} selected={estil === c.value} color="#be185d" bg="#fdf2f8" onClick={() => setEstil(c.value)} />
+            ))}
+          </div>
+        </CardGroup>
+
+        {/* Voice / extra context */}
         <section>
           <div className="flex items-center gap-2 mb-3">
             <span className="text-xl">🎤</span>
             <div>
-              <h2 className="font-black text-base" style={{ color: 'var(--heading)' }}>Context addicional</h2>
+              <h3 className="font-black text-base" style={{ color: 'var(--heading)' }}>Context addicional</h3>
               <p className="text-xs" style={{ color: 'var(--muted)' }}>Afegeix detalls per micròfon o escrivint (opcional)</p>
             </div>
           </div>
           <div className="relative">
             <textarea
-              placeholder="Ex: Els alumnes tenen 9 anys i treballem la taula del 7. Vull que sigui molt visual..."
+              placeholder="Ex: Els alumnes tenen 9 anys. Vull que sigui molt visual i que es pugui fer en 10 minuts..."
               value={extraContext}
               onChange={e => setExtraContext(e.target.value)}
               rows={3}
@@ -309,50 +362,11 @@ export default function CreatePage() {
             <button
               type="button"
               onClick={listening ? stopVoice : startVoice}
-              className="absolute right-3 bottom-3 w-10 h-10 rounded-full flex items-center justify-center text-xl transition-all"
-              style={listening
-                ? { background: 'var(--accent)', color: 'white' }
-                : { background: 'white', border: '1.5px solid var(--border)' }
-              }
-              title={listening ? 'Atura el micròfon' : 'Dictar amb veu'}
-            >
-              🎤
-            </button>
+              className="absolute right-3 bottom-3 w-10 h-10 rounded-full flex items-center justify-center text-xl"
+              style={listening ? { background: 'var(--accent)', color: 'white' } : { background: 'white', border: '1.5px solid var(--border)' }}
+            >🎤</button>
           </div>
-          {listening && (
-            <p className="text-xs mt-1 animate-pulse" style={{ color: 'var(--accent)' }}>🔴 Escoltant...</p>
-          )}
-        </section>
-
-        {/* Format */}
-        <section>
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-xl">✨</span>
-            <div>
-              <h2 className="font-black text-base" style={{ color: 'var(--heading)' }}>Format de sortida</h2>
-              <p className="text-xs" style={{ color: 'var(--muted)' }}>Com ha de ser la webapp generada?</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {FORMAT_OPTIONS.map(f => (
-              <button
-                key={f.value}
-                type="button"
-                onClick={() => { setFormat(f.value); setFormatLabel(f.label); }}
-                className="flex items-start gap-3 rounded-xl p-4 text-left transition-all"
-                style={format === f.value
-                  ? { background: '#f0eaf5', border: '2px solid var(--heading)' }
-                  : { background: '#faf8fa', border: '1.5px solid var(--border)' }
-                }
-              >
-                <span className="text-2xl">{f.emoji}</span>
-                <div>
-                  <div className="font-bold text-sm" style={{ color: 'var(--heading)' }}>{f.label}</div>
-                  <div className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>{f.desc}</div>
-                </div>
-              </button>
-            ))}
-          </div>
+          {listening && <p className="text-xs mt-1 animate-pulse" style={{ color: 'var(--accent)' }}>🔴 Escoltant...</p>}
         </section>
 
         {/* Error */}
@@ -362,8 +376,8 @@ export default function CreatePage() {
           </div>
         )}
 
-        {/* Generate button */}
-        <div className="pb-8">
+        {/* Generate */}
+        <div className="pb-10">
           <button
             type="button"
             onClick={generate}
@@ -374,11 +388,65 @@ export default function CreatePage() {
               : { background: '#f0eaf0', color: 'var(--muted)', cursor: 'not-allowed' }
             }
           >
-            {canGenerate ? '✨ Generar webapp educativa' : `Selecciona les ${GROUPS.length - completedGroups} targetes restants i el format`}
+            {canGenerate
+              ? '✨ Generar webapp educativa'
+              : `Selecciona ${GROUPS.length - completedGroups} targeta${GROUPS.length - completedGroups !== 1 ? 'r' : ''} més`
+            }
           </button>
         </div>
 
       </div>
     </main>
+  );
+}
+
+// ── Sub-components ─────────────────────────────────────────────────────────────
+
+function CardGroup({ number, label, color, bg, emoji, description, selected, children }: {
+  number: string; label: string; color: string; bg: string; emoji: string;
+  description: string; selected: string; children: React.ReactNode;
+}) {
+  return (
+    <section>
+      <div className="flex items-start gap-3 mb-4">
+        <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-black text-white" style={{ background: color }}>
+          {number}
+        </div>
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">{emoji}</span>
+            <h2 className="font-black text-base" style={{ color }}>{label}</h2>
+            {selected && (
+              <span className="ml-auto text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: bg, color }}>
+                ✓ {selected}
+              </span>
+            )}
+          </div>
+          <p className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>{description}</p>
+        </div>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function Card({ card, selected, color, bg, onClick }: {
+  card: { value: string; emoji: string };
+  selected: boolean; color: string; bg: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex items-center gap-2 rounded-xl p-3 text-left transition-all"
+      style={selected
+        ? { background: bg, border: `2px solid ${color}`, color }
+        : { background: '#faf8fa', border: '1.5px solid var(--border)', color: 'var(--body)' }
+      }
+    >
+      <span className="text-xl flex-shrink-0">{card.emoji}</span>
+      <span className="text-sm font-medium leading-tight">{card.value}</span>
+    </button>
   );
 }
