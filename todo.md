@@ -1,90 +1,108 @@
 # Vibe Coding — TODO
 
-## 🔴 Blocker (must work on event day)
+---
+
+## 🔴 Blockers (must work on event day)
+
+### Deploy
+- [ ] Fix git push (check branch name with `git branch`) and push to MikelLG/mschools-vibecoding
+- [ ] Deploy to Vercel → set all env vars in dashboard
+- [ ] Test full flow on Vercel URL from a phone
+
+### Core flow (redesign needed)
+- [ ] Redesign `/create` with 5 card groups (Eixos, Persona, Repte, Estil, Restriccions) replacing the current 4 steps
+- [ ] Add **live prompt preview panel** — always visible as users select cards, showing the pre-prompt sentence being assembled
+- [ ] Voice transcription step — mic button records the full pre-prompt sentence, speech-to-text fills the field
+- [ ] Build `/ticket/[id]` — printable page with QR + full prompt (use `window.print()`)
+- [ ] Add **iteration UI** on result page — editable prompt textarea + "Regenerar" button (one iteration allowed)
+- [ ] Gallery cards must show QR code
 
 ### Infrastructure
-- [ ] Create Firebase project and Firestore database (test mode)
-- [ ] Get Gemini API key from Google AI Studio
-- [ ] Fill in `.env.local` with all keys
-- [ ] Set `NEXT_PUBLIC_SESSION_ID` to a unique value per event (e.g. `mschools-2026`)
-- [ ] Deploy to Vercel and verify all env vars are set in the dashboard
-- [ ] Test Firestore real-time sync on two separate devices simultaneously
-
-### Core flow
-- [ ] End-to-end test: complete 4-step flow → generation → result page → `/app/[id]`
-- [ ] Verify generated HTML renders correctly in the sandboxed iframe
-- [ ] Verify QR code on result page opens `/app/[id]` on a real phone
-- [ ] Test voice input (step 3 — TASCA) on Chrome/Android tablet
-- [ ] Confirm `/screen` updates live when a new submission is created
+- [x] Firebase project + Firestore database created
+- [x] Gemini API key set
+- [x] `.env.local` filled in
+- [ ] Set `NEXT_PUBLIC_SESSION_ID` per event
+- [ ] Test Firestore real-time sync on two devices
 
 ---
 
 ## 🟡 Important (should work on event day)
 
-### UX polish
-- [ ] Add a loading skeleton to result page while Firestore fetch completes
-- [ ] Add timeout UI: if Gemini takes >20s, show "still generating…" message
-- [ ] Add retry button on the error state in `/create` (currently just shows error text)
-- [ ] Handle Gemini rate limit errors gracefully (show friendly message)
-- [ ] Make step 3 (TASCA) textarea auto-grow as user types
-- [ ] Ensure the fixed bottom CTA button doesn't overlap content on small phone screens
+### Workshop phases (new pages)
+- [ ] `/intro` — landing for workshop: what is Vibe Coding, strengths/weaknesses of AI, phases overview
+- [ ] `/warmup` — show 2 example webapps embedded in iframes; participants reverse-engineer the prompt
+- [ ] Home page redesign to reflect the phased flow (Intro → Warm-up → Create → Result)
 
-### Station management
-- [ ] Add station ID selector (1–6) at the start of the flow so the screen can label each card
-- [ ] Show station number badge on each card in `/screen`
-- [ ] Pre-configure each tablet URL with `?station=N` param to auto-set station ID
+### Prompt preview
+- [ ] Prompt preview updates live as each card group is selected
+- [ ] Show which parts of the prompt are still missing (greyed out placeholders)
+- [ ] On the generating screen, show the full assembled prompt that was sent to Gemini
+
+### Iteration
+- [ ] After first generation, show editable prompt in a textarea
+- [ ] "Regenerar" button triggers a second generation with the edited prompt
+- [ ] Disable regeneration after first iteration (visual indicator)
+- [ ] Keep both versions (original + iterated) accessible
+
+### Ticket (`/ticket/[id]`)
+- [ ] Large QR code (scannable from 1m distance)
+- [ ] Full prompt text displayed below
+- [ ] Pair name at the top
+- [ ] `window.print()` triggers clean print layout (hide nav, full width)
+- [ ] Link from result page: "Imprimir ticket"
 
 ### Screen (`/screen`)
-- [ ] Test the grid layout with 1, 2, 3, 4, 5, and 6 simultaneous cards
-- [ ] Scale iframe previews correctly so they don't overflow their grid cell
-- [ ] Add a subtle animation when a new card appears (currently just "NOU" badge)
-- [ ] Confirm the screen auto-reconnects if Firebase WebSocket drops
+- [ ] Each card shows QR code (small, scannable)
+- [ ] Test grid with 1–6 cards simultaneously
+- [ ] Confirm auto-reconnects if Firebase drops
 
 ---
 
 ## 🟢 Nice to have (if time allows)
 
-### Result page
-- [ ] Download button — saves the generated HTML file to disk
-- [ ] Copy prompt button — copies the raw prompt text to clipboard
-- [ ] Share button — copies the `/app/[id]` URL to clipboard
+### 5 card groups content
+- [ ] Define full list of cards for each group (Eixos, Persona, Repte, Estil, Restriccions)
+- [ ] Map each card selection to its prompt sentence fragment
+- [ ] Consider custom card descriptions per combination (e.g. Eixos=Matemàtiques + Persona=Alumne 6è → specific pre-prompt)
 
-### Gallery (`/gallery`)
-- [ ] Add format filter chips alongside the existing context theme chips
-- [ ] Add a search bar (filters by tasca text)
-- [ ] Pagination or infinite scroll if many submissions accumulate
+### UX polish
+- [ ] Timeout UI: if Gemini takes >20s, show "Encara generant…" with progress dots
+- [ ] Retry button on error state
+- [ ] Auto-grow textarea on voice transcription step
+- [ ] Haptic feedback on mobile when a card is selected
+
+### Gallery
+- [ ] QR code on each gallery card (small)
+- [ ] Filter by card group (Eixos, Persona, etc.)
+- [ ] Search by prompt text
 
 ### Admin
-- [ ] `/admin` page protected by a simple password (env var `ADMIN_PASSWORD`)
-- [ ] Button to clear all submissions for the current session (reset between runs)
-- [ ] Export all submissions as a ZIP of HTML files
-- [ ] Print-friendly QR sheet: one QR per station linking to `/create?station=N`
+- [ ] `/admin` — password protected (env var `ADMIN_PASSWORD`)
+- [ ] Reset session button
+- [ ] Export all submissions as ZIP
 
 ### Prompt quality
-- [ ] Test Gemini output quality for each of the 6 FORMAT types
-- [ ] Refine the system prompt if any FORMAT produces poor results
-- [ ] Add a `temperature` param to the Gemini call (try 0.9 for more creative output)
-
-### Misc
-- [ ] Add a `favicon.ico` and Open Graph image for sharing
-- [ ] Add `robots.txt` to block indexing (event-only app)
-- [ ] Verify the app works offline-first if the venue WiFi is unreliable (at least the already-loaded iframe)
-- [ ] Add a "com funciona" (how it works) tooltip or modal on the home page for first-time users
+- [ ] Test all 6 format types (quiz, activitat, rúbrica, formulari, joc, suport)
+- [ ] Refine format-specific instructions in `buildPrompt()` based on test results
+- [ ] Add `temperature: 1.0` for more creative outputs
 
 ---
 
 ## ✅ Done
 
-- [x] Scaffold Next.js 16 project (TypeScript + Tailwind + App Router)
-- [x] Install Firebase, `@google/generative-ai`, `react-qr-code`
-- [x] `lib/types.ts` — all option constants and Submission type
-- [x] `lib/firebase.ts` — save, get, list, and subscribe (real-time) helpers
-- [x] `app/api/generate/route.ts` — Gemini API call + HTML stripping
+- [x] Next.js 16 scaffold (TypeScript + Tailwind + App Router)
+- [x] Firebase + Gemini + react-qr-code installed
+- [x] `lib/types.ts` — option constants and Submission type
+- [x] `lib/firebase.ts` — save, get, list, subscribe helpers
+- [x] `app/api/generate/route.ts` — Gemini call with rich format-specific prompt
 - [x] `app/page.tsx` — home page
-- [x] `app/create/page.tsx` — 4-step form with progress bar, voice input, validation
-- [x] `app/result/[id]/page.tsx` — iframe preview + QR code + prompt summary
+- [x] `app/create/page.tsx` — 4-step flow (to be redesigned to 5 card groups)
+- [x] `app/result/[id]/page.tsx` — iframe preview + QR + prompt summary
 - [x] `app/app/[id]/page.tsx` — full-screen sandboxed runner
-- [x] `app/screen/page.tsx` — live collective display with real-time grid
-- [x] `app/gallery/page.tsx` — filterable gallery with mini iframe previews
-- [x] `.env.local.example` with all required keys documented
-- [x] Clean production build (0 TypeScript errors)
+- [x] `app/screen/page.tsx` — live collective 75" display
+- [x] `app/gallery/page.tsx` — filterable gallery
+- [x] `.env.local` filled with real Firebase + Gemini keys
+- [x] End-to-end test on localhost: all 4 steps → generation → result ✅
+- [x] `/screen` shows new submissions in real time ✅
+- [x] Gemini prompt improved with format-specific instructions
+- [x] `--hostname 0.0.0.0` added to dev script for network access
