@@ -108,22 +108,22 @@ export default function CreatePage() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col overflow-y-auto">
+    <main className="min-h-screen flex flex-col overflow-y-auto" style={{ background: 'var(--bg)' }}>
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-[#2a2a2a]">
-        <button onClick={back} className="text-[#888] hover:text-white transition-colors text-sm flex items-center gap-1">
+      <header className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
+        <button onClick={back} className="text-sm flex items-center gap-1 transition-colors" style={{ color: 'var(--muted)' }}>
           ← {step === 'rol' ? 'Inici' : STEP_LABELS[STEPS[STEPS.indexOf(step as Step) - 1] as keyof typeof STEP_LABELS]}
         </button>
-        <span className="font-black text-[#e63946] tracking-tight">VIBE CODING</span>
+        <span className="font-black tracking-tight" style={{ color: 'var(--heading)' }}>Vibe Coding</span>
         <div className="w-16" />
       </header>
 
       {/* Progress bar */}
       {step !== 'generating' && (
-        <div className="h-1 bg-[#1a1a1a]">
+        <div className="h-1" style={{ background: 'var(--border)' }}>
           <div
-            className="h-full bg-[#e63946] transition-all duration-500"
-            style={{ width: `${progress}%` }}
+            className="h-full transition-all duration-500"
+            style={{ width: `${progress}%`, background: 'var(--heading)' }}
           />
         </div>
       )}
@@ -133,17 +133,20 @@ export default function CreatePage() {
         <div className="flex justify-center gap-2 py-6">
           {STEPS.map((s, i) => (
             <div key={s} className="flex items-center gap-2">
-              <div className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold transition-all ${
-                i < currentStepIndex ? 'bg-[#e63946] text-white' :
-                i === currentStepIndex ? 'bg-[#e63946] text-white ring-2 ring-[#e63946]/30 ring-offset-2 ring-offset-[#0a0a0a]' :
-                'bg-[#1a1a1a] text-[#888] border border-[#2a2a2a]'
-              }`}>
+              <div
+                className="flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold transition-all"
+                style={
+                  i <= currentStepIndex
+                    ? { background: 'var(--heading)', color: 'white' }
+                    : { background: '#f0eaf0', color: 'var(--muted)', border: '1px solid var(--border)' }
+                }
+              >
                 {i < currentStepIndex ? '✓' : i + 1}
               </div>
-              <span className={`text-xs font-mono ${i === currentStepIndex ? 'text-white' : 'text-[#888]'}`}>
+              <span className="text-xs font-mono" style={{ color: i === currentStepIndex ? 'var(--heading)' : 'var(--muted)' }}>
                 {STEP_LABELS[s as keyof typeof STEP_LABELS]}
               </span>
-              {i < STEPS.length - 1 && <span className="text-[#2a2a2a] mx-1">—</span>}
+              {i < STEPS.length - 1 && <span className="mx-1" style={{ color: 'var(--border)' }}>—</span>}
             </div>
           ))}
         </div>
@@ -162,7 +165,8 @@ export default function CreatePage() {
                 placeholder="Nom de la parella (opcional)"
                 value={pairName}
                 onChange={e => setPairName(e.target.value)}
-                className="w-full bg-[#141414] border border-[#2a2a2a] rounded-xl px-4 py-3 text-white placeholder-[#555] focus:outline-none focus:border-[#e63946] transition-colors"
+                className="w-full rounded-xl px-4 py-3 focus:outline-none transition-colors"
+                style={{ background: '#f7f4f7', border: '1.5px solid var(--border)', color: 'var(--body)' }}
               />
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -171,11 +175,11 @@ export default function CreatePage() {
                   type="button"
                   key={opt.value}
                   onClick={() => { setRolValue(opt.value); setRolLabel(opt.label); }}
-                  className={`flex flex-col items-center gap-2 rounded-2xl border p-5 transition-all hover:border-[#e63946]/50 hover:bg-[#1e1e1e] ${
-                    rolValue === opt.value
-                      ? 'border-[#e63946] bg-[#e63946]/10 ring-1 ring-[#e63946]/30'
-                      : 'border-[#2a2a2a] bg-[#141414]'
-                  }`}
+                  className="flex flex-col items-center gap-2 rounded-2xl p-5 transition-all"
+                  style={rolValue === opt.value
+                    ? { background: '#f0eaf5', border: '2px solid var(--heading)', color: 'var(--heading)' }
+                    : { background: '#faf8fa', border: '1.5px solid var(--border)', color: 'var(--body)' }
+                  }
                 >
                   <span className="text-3xl">{opt.emoji}</span>
                   <span className="text-sm font-medium text-center leading-tight">{opt.label}</span>
@@ -196,12 +200,11 @@ export default function CreatePage() {
                 <button
                   key={t.value}
                   onClick={() => { setContextTheme(t.value); setContextThemeLabel(t.label); }}
-                  className={`flex flex-col items-center gap-2 rounded-2xl border p-5 transition-all ${
-                    contextTheme === t.value
-                      ? 'border-[#e63946] ring-1 ring-[#e63946]/30'
-                      : 'border-[#2a2a2a] bg-[#141414] hover:border-[#444] hover:bg-[#1e1e1e]'
-                  }`}
-                  style={contextTheme === t.value ? { background: `${t.color}15`, borderColor: t.color } : {}}
+                  className="flex flex-col items-center gap-2 rounded-2xl p-5 transition-all"
+                  style={contextTheme === t.value
+                    ? { background: `${t.color}15`, border: `2px solid ${t.color}`, color: t.color }
+                    : { background: '#faf8fa', border: '1.5px solid var(--border)', color: 'var(--body)' }
+                  }
                 >
                   <span className="text-3xl">{t.emoji}</span>
                   <span className="text-xs font-medium text-center leading-tight">{t.label}</span>
@@ -213,7 +216,8 @@ export default function CreatePage() {
               value={contextDescription}
               onChange={e => setContextDescription(e.target.value)}
               rows={3}
-              className="w-full bg-[#141414] border border-[#2a2a2a] rounded-xl px-4 py-3 text-white placeholder-[#555] focus:outline-none focus:border-[#e63946] transition-colors resize-none"
+              className="w-full rounded-xl px-4 py-3 focus:outline-none transition-colors resize-none"
+              style={{ background: '#f7f4f7', border: '1.5px solid var(--border)', color: 'var(--body)' }}
             />
           </StepContainer>
         )}
@@ -230,25 +234,26 @@ export default function CreatePage() {
                 value={tasca}
                 onChange={e => setTasca(e.target.value)}
                 rows={6}
-                className="w-full bg-[#141414] border border-[#2a2a2a] rounded-xl px-4 py-4 pr-14 text-white placeholder-[#555] focus:outline-none focus:border-[#e63946] transition-colors resize-none"
+                className="w-full rounded-xl px-4 py-4 pr-14 focus:outline-none transition-colors resize-none"
+                style={{ background: '#f7f4f7', border: '1.5px solid var(--border)', color: 'var(--body)' }}
               />
               <button
                 onClick={listening ? stopVoice : startVoice}
                 title={listening ? 'Atura la veu' : 'Dictar amb veu'}
-                className={`absolute right-3 bottom-3 w-10 h-10 rounded-full flex items-center justify-center text-xl transition-all ${
-                  listening
-                    ? 'bg-[#e63946] animate-pulse'
-                    : 'bg-[#1e1e1e] border border-[#2a2a2a] hover:border-[#e63946]'
-                }`}
+                className="absolute right-3 bottom-3 w-10 h-10 rounded-full flex items-center justify-center text-xl transition-all"
+                style={listening
+                  ? { background: 'var(--accent)', animation: 'pulse 1s infinite' }
+                  : { background: 'white', border: '1.5px solid var(--border)' }
+                }
               >
                 🎤
               </button>
             </div>
             <div className="flex justify-between mt-2">
-              <span className="text-xs text-[#555]">
+              <span className="text-xs" style={{ color: 'var(--muted)' }}>
                 {listening ? '🔴 Escoltant...' : 'Prem el micròfon per dictar'}
               </span>
-              <span className={`text-xs ${tasca.length > 10 ? 'text-[#888]' : 'text-[#e63946]'}`}>
+              <span className="text-xs" style={{ color: 'var(--muted)' }}>
                 {tasca.length}/500
               </span>
             </div>
@@ -266,23 +271,23 @@ export default function CreatePage() {
                 <button
                   key={f.value}
                   onClick={() => { setFormat(f.value); setFormatLabel(f.label); }}
-                  className={`flex items-start gap-4 rounded-2xl border p-5 text-left transition-all hover:border-[#e63946]/50 hover:bg-[#1e1e1e] ${
-                    format === f.value
-                      ? 'border-[#e63946] bg-[#e63946]/10 ring-1 ring-[#e63946]/30'
-                      : 'border-[#2a2a2a] bg-[#141414]'
-                  }`}
+                  className="flex items-start gap-4 rounded-2xl p-5 text-left transition-all"
+                  style={format === f.value
+                    ? { background: '#f0eaf5', border: '2px solid var(--heading)' }
+                    : { background: '#faf8fa', border: '1.5px solid var(--border)' }
+                  }
                 >
                   <span className="text-3xl">{f.emoji}</span>
                   <div>
-                    <div className="font-bold text-sm text-white">{f.label}</div>
-                    <div className="text-xs text-[#888] mt-0.5">{f.description}</div>
+                    <div className="font-bold text-sm" style={{ color: 'var(--heading)' }}>{f.label}</div>
+                    <div className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>{f.description}</div>
                   </div>
                 </button>
               ))}
             </div>
 
             {error && (
-              <div className="mt-4 p-3 rounded-xl bg-[#e63946]/10 border border-[#e63946]/30 text-[#e63946] text-sm">
+              <div className="mt-4 p-3 rounded-xl text-sm" style={{ background: '#fff0ee', border: '1px solid #f0c0b8', color: 'var(--accent)' }}>
                 ⚠️ {error}
               </div>
             )}
@@ -293,24 +298,16 @@ export default function CreatePage() {
         {step === 'generating' && (
           <div className="flex-1 flex flex-col items-center justify-center text-center py-20">
             <div className="relative w-24 h-24 mb-8">
-              <div className="absolute inset-0 rounded-full border-4 border-[#1a1a1a]" />
-              <div className="absolute inset-0 rounded-full border-4 border-t-[#e63946] animate-spin" />
-              <div className="absolute inset-4 rounded-full bg-[#141414] flex items-center justify-center text-3xl">
+              <div className="absolute inset-0 rounded-full border-4" style={{ borderColor: 'var(--border)' }} />
+              <div className="absolute inset-0 rounded-full border-4 border-t-transparent animate-spin" style={{ borderColor: 'var(--heading)', borderTopColor: 'transparent' }} />
+              <div className="absolute inset-4 rounded-full flex items-center justify-center text-3xl" style={{ background: '#f7f4f7' }}>
                 ✨
               </div>
             </div>
-            <h2 className="text-2xl font-black text-white mb-3">Generant el teu recurs...</h2>
-            <p className="text-[#888] max-w-sm">
-              Gemini està creant una aplicació educativa personalitzada basada en les teves 4 capes.
+            <h2 className="text-2xl font-black mb-3" style={{ color: 'var(--heading)' }}>Generant el teu recurs...</h2>
+            <p className="max-w-sm" style={{ color: 'var(--muted)' }}>
+              Gemini està creant una aplicació educativa personalitzada basada en les teves capes.
             </p>
-            <div className="mt-8 flex gap-2 items-center">
-              {['ROL', 'CONTEXT', 'TASCA', 'FORMAT'].map((l, i) => (
-                <div key={l} className="flex items-center gap-2">
-                  <span className="text-xs text-[#e63946] font-mono animate-pulse" style={{ animationDelay: `${i * 200}ms` }}>{l}</span>
-                  {i < 3 && <span className="text-[#2a2a2a]">→</span>}
-                </div>
-              ))}
-            </div>
           </div>
         )}
       </div>
@@ -321,11 +318,11 @@ export default function CreatePage() {
           <button
             onClick={advance}
             disabled={!canAdvance()}
-            className={`w-full flex items-center justify-center gap-2 rounded-2xl py-4 text-lg font-bold transition-all ${
-              canAdvance()
-                ? 'bg-[#e63946] text-white hover:bg-[#c1121f] hover:scale-[1.02] active:scale-100'
-                : 'bg-[#1a1a1a] text-[#555] cursor-not-allowed'
-            }`}
+            className="w-full flex items-center justify-center gap-2 rounded-2xl py-4 text-lg font-bold transition-all"
+            style={canAdvance()
+              ? { background: 'var(--heading)', color: 'white' }
+              : { background: '#f0eaf0', color: 'var(--muted)', cursor: 'not-allowed' }
+            }
           >
             {step === 'format' ? (
               <>✨ Generar recurs</>
@@ -343,8 +340,8 @@ function StepContainer({ title, subtitle, children }: { title: string; subtitle:
   return (
     <div className="w-full max-w-2xl">
       <div className="mb-6 text-center">
-        <h2 className="text-3xl font-black text-white mb-2">{title}</h2>
-        <p className="text-[#888]">{subtitle}</p>
+        <h2 className="text-3xl font-black mb-2" style={{ color: 'var(--heading)' }}>{title}</h2>
+        <p style={{ color: 'var(--muted)' }}>{subtitle}</p>
       </div>
       {children}
     </div>
