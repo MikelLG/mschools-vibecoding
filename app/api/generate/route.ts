@@ -12,15 +12,14 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { rolLabel, rol, contextThemeLabel, contextDescription, tasca, formatLabel, format, pairName, stationId, sessionId } = body;
+    const { selectedCards, promptPreview, extraContext, format, formatLabel, pairName, sessionId } = body;
 
-    const prompt = buildPrompt({ rolLabel, contextThemeLabel, contextDescription, tasca, formatLabel, format });
+    const prompt = buildPrompt({ selectedCards, promptPreview, extraContext, formatLabel, format });
 
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     const result = await model.generateContent(prompt);
     let htmlOutput = result.response.text();
 
-    // Strip markdown code fences if present
     htmlOutput = htmlOutput
       .replace(/^```html\s*/i, '')
       .replace(/^```\s*/i, '')
@@ -30,14 +29,14 @@ export async function POST(req: NextRequest) {
     const id = generateId();
     const submission = {
       id,
-      stationId: stationId ?? 1,
+      stationId: 1,
       pairName: pairName ?? '',
-      rol,
-      rolLabel,
-      contextTheme: body.contextTheme,
-      contextThemeLabel,
-      contextDescription,
-      tasca,
+      // Keep legacy fields for compatibility with result/gallery pages
+      rol: '', rolLabel: selectedCards?.find((c: {group:string}) => c.group === 'Persona')?.value ?? '',
+      contextTheme: selectedCards?.find((c: {group:string}) => c.group === 'Eixos')?.value ?? '',
+      contextThemeLabel: selectedCards?.find((c: {group:string}) => c.group === 'Eixos')?.value ?? '',
+      contextDescription: extraContext ?? '',
+      tasca: promptPreview ?? '',
       format,
       formatLabel,
       prompt,
@@ -46,8 +45,6 @@ export async function POST(req: NextRequest) {
       sessionId: sessionId ?? process.env.NEXT_PUBLIC_SESSION_ID ?? 'default',
     };
 
-    // Save to Firestore via server-side Firebase Admin or return to client to save
-    // For simplicity, we return the full submission and let the client save it
     return NextResponse.json({ submission });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
@@ -105,19 +102,21 @@ const FORMAT_INSTRUCTIONS: Record<string, string> = {
 };
 
 function buildPrompt({
-  rolLabel, contextThemeLabel, contextDescription, tasca, formatLabel, format,
+  selectedCards, promptPreview, extraContext, formatLabel, format,
 }: {
-  rolLabel: string; contextThemeLabel: string;
-  contextDescription: string; tasca: string; formatLabel: string; format: string;
+  selectedCards: Array<{ group: string; value: string }>;
+  promptPreview: string; extraContext: string; formatLabel: string; format: string;
 }) {
   const formatInstructions = FORMAT_INSTRUCTIONS[format] ?? `Crea una eina de tipus "${formatLabel}" adequada per al context.`;
+  const cardsText = selectedCards.map(c => `- **${c.group}**: ${c.value}`).join('\n');
 
   return `Ets un expert en disseny d'aplicacions educatives web per a l'escola catalana. La teva especialitat és crear eines digitals interactives, visualment atractives i 100% funcionals per a docents.
 
-## CONTEXT DEL DOCENT
-- **Perfil**: ${rolLabel}
-- **Àrea educativa**: ${contextThemeLabel}${contextDescription ? ` (${contextDescription})` : ''}
-- **Repte a resoldre**: ${tasca}
+## CONTEXT (construït a partir de targetes)
+${cardsText}${extraContext ? `\n- **Context addicional**: ${extraContext}` : ''}
+
+## PROMPT COMPLET
+Crea una eina educativa per a ${promptPreview}.${extraContext ? ` ${extraContext}` : ''}
 
 ## QUÈ HAS DE CREAR
 ${formatInstructions}

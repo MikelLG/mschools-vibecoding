@@ -2,6 +2,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { writeFileSync, mkdirSync } from 'fs';
 
 const API_KEY = process.env.GEMINI_API_KEY;
+if (!API_KEY) throw new Error('Set GEMINI_API_KEY env var before running this script');
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 const EXAMPLES = [
