@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rúbrica d'Avaluació de Treball en Equip</title>
+    <style>
+        /* Estils generals */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border-top: 5px solid #007bff; /* Accent color */
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #0056b3;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            font-size: 1.5em;
+            color: #555;
+            font-weight: normal;
+        }
+
+        /* Informació de l'alumne/a i data */
+        .info-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding: 15px 20px;
+            background-color: #e9f5ff;
+            border-radius: 8px;
+            border: 1px solid #cceeff;
+        }
+
+        .info-item {
+            flex: 1;
+            margin-right: 20px;
+        }
+
+        .info-item:last-child {
+            margin-right: 0;
+        }
+
+        .info-item label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #0056b3;
+        }
+
+        .info-item input[type="text"],
+        .info-item input[type="date"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #a3d9ff;
+            border-radius: 5px;
+            font-size: 1em;
+            box-sizing: border-box;
+            background-color: #f0f8ff;
+        }
+
+        /* Taula de rúbrica */
+        .rubric-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 30px;
+            table-layout: fixed; /* Assegura que les columnes tinguin l'amplada assignada */
+        }
+
+        .rubric-table th, .rubric-table td {
+            border: 1px solid #e0e0e0;
+            padding: 15px;
+            text-align: center;
+            vertical-align: top;
+        }
+
+        .rubric-table thead th {
+            background-color: #007bff;
+            color: #fff;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0; /* Manté les capçaleres visibles en fer scroll */
+            z-index: 10;
+        }
+
+        .rubric-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .rubric-table tbody tr:hover {
+            background-color: #eef7ff;
+        }
+
+        .rubric-table td:first-child { /* Columna del Criteri */
+            font-weight: bold;
+            text-align: left;
+            background-color: #f7f7f7;
+            width: 20%; /* Assigna una amplada específica */
+            color: #0056b3;
+        }
+
+        .rubric-table td:not(:first-child) { /* Cel·les de descripció de nivell */
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            border-left: none; /* Redueix dobles vores */
+            border-top: none;
+            position: relative;
+        }
+
+        .rubric-table td:not(:first-child):hover {
+            background-color: #d9edf7;
+            box-shadow: inset 0 0 0 2px #8bcaff; /* Brillantor interior en passar el ratolí */
+        }
+
+        /* Estil per a la cel·la seleccionada */
+        .rubric-table td.selected {
+            background-color: #28a745; /* Verd per la seleccionada */
+            color: #fff;
+            font-weight: bold;
+            box-shadow: inset 0 0 0 3px #1e7e34; /* Brillantor interior més forta */
+            position: relative;
+            z-index: 1; /* Posa la cel·la seleccionada lleugerament al davant */
+        }
+
+        /* Puntuació Total */
+        .total-score {
+            text-align: right;
+            font-size: 1.8em;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e9f7e9;
+            border-radius: 8px;
+            border: 1px solid #cceccc;
+            color: #28a745;
+            font-weight: bold;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .total-score label {
+            margin-right: 15px;
+            color: #1e7e34;
+        }
+
+        .total-score span {
+            font-size: 1.2em;
+            color: #0056b3;
+        }
+
+        /* Botó d'impressió */
+        .print-button-container {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .print-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+        }
+
+        .print-button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 123, 255, 0.4);
+        }
+
+        .print-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+        }
+
+        /* Media Queries per a adaptabilitat (responsive) */
+        @media (max-width: 768px) {
+            .container {
+                margin: 15px auto;
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            h2 {
+                font-size: 1.2em;
+            }
+
+            .info-section {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .info-item {
+                margin-right: 0;
+            }
+
+            .rubric-table {
+                display: block; /* Fa que la taula es comporti com un bloc */
+                width: 100%;
+            }
+
+            .rubric-table thead {
+                display: none; /* Amaga la capçalera de la taula en pantalles petites */
+            }
+
+            .rubric-table tbody, .rubric-table tr {
+                display: block; /* Fa que tbody i tr es comportin com a blocs */
+            }
+
+            .rubric-table tbody tr {
+                margin-bottom: 20px;
+                border: 1px solid #e0e0e0;
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            }
+
+            .rubric-table td {
+                display: block; /* Fa que totes les cel·les es comportin com a blocs */
+                width: auto !important; /* Anul·la l'amplada fixa per al primer fill */
+                border: none; /* Elimina les vores predeterminades de les cel·les */
+                padding: 15px 10px;
+                text-align: left; /* Alinea el text a l'esquerra per a millor llegibilitat */
+            }
+
+            .rubric-table td:first-child { /* Columna del Criteri */
+                font-weight: bold;
+                background-color: #e6f0ff; /* Blau clar per al criteri */
+                border-bottom: 1px solid #cceeff; /* Separador */
+                text-align: center; /* Centra el títol del criteri */
+                color: #0056b3;
+            }
+
+            .rubric-table td:not(:first-child) { /* Cel·les de descripció de nivell */
+                cursor: pointer;
+                background-color: #fdfdfd; /* Fons més clar per als nivells */
+                border-bottom: 1px solid #f0f0f0; /* Separador entre nivells */
+            }
+
+            .rubric-table td:not(:first-child):last-of-type {
+                border-bottom: none; /* Sense vora inferior per a l'últim nivell */
+            }
+
+            .rubric-table td.selected {
+                background-color: #28a745;
+                color: #fff;
+                font-weight: bold;
+                box-shadow: inset 0 0 0 3px #1e7e34;
+            }
+
+            .total-score {
+                font-size: 1.5em;
+                flex-direction: column;
+                align-items: flex-end;
+                padding: 15px;
+            }
+            .total-score label {
+                margin-bottom: 5px;
+                margin-right: 0;
+            }
+        }
+
+        /* Estils específics per a la impressió */
+        @media print {
+            body {
+                background-color: #fff;
+                -webkit-print-color-adjust: exact; /* Per assegurar que els colors de fons s'imprimeixen */
+                print-color-adjust: exact;
+            }
+            .container {
+                box-shadow: none;
+                border: none;
+                margin: 0;
+                padding: 0;
+            }
+            .print-button-container {
+                display: none; /* Amaga el botó d'impressió en imprimir */
+            }
+            /* Estils generals de la taula per a impressió */
+            .rubric-table {
+                border-collapse: collapse; /* Per a impressió, les vores es col·lapsen per a línies més netes */
+                border-spacing: 0;
+            }
+            .rubric-table th, .rubric-table td {
+                border: 1px solid #ccc !important;
+                padding: 10px !important;
+                background-color: #fff !important;
+                color: #333 !important;
+                box-shadow: none !important;
+            }
+            .rubric-table thead th {
+                 background-color: #e0f2ff !important; /* Blau més clar per a impressió */
+                 color: #000 !important;
+            }
+            .rubric-table td.selected {
+                background-color: #e0ffe0 !important; /* Verd més clar per a impressió */
+                color: #000 !important;
+                box-shadow: none !important;
+            }
+            .info-section, .total-score {
+                background-color: #f0fdf0 !important; /* Verd molt clar per a impressió */
+                border: 1px solid #e0e0e0 !important;
+                color: #333 !important;
+            }
+            .rubric-table tbody tr:nth-child(even) {
+                background-color: #f7f7f7 !important;
+            }
+            .rubric-table td:first-child {
+                background-color: #f0f8ff !important;
+            }
+
+            /* Revertir el disseny mòbil per a la impressió */
+            @media (max-width: 768px) { /* Aquests estils només s'apliquen en imprimir des de pantalles petites */
+                 .rubric-table {
+                    display: table; /* Revertir a la visualització de taula */
+                    width: 100%;
+                 }
+                 .rubric-table thead {
+                    display: table-header-group; /* Mostrar les capçaleres per a impressió */
+                 }
+                 .rubric-table tbody, .rubric-table tr {
+                    display: table-row-group; /* Revertir tbody per agrupar files */
+                 }
+                 .rubric-table tr {
+                    display: table-row; /* Revertir tr a fila de taula */
+                    margin-bottom: 0;
+                    border: none;
+                    box-shadow: none;
+                 }
+                 .rubric-table td {
+                    display: table-cell; /* Revertir td a cel·la de taula */
+                    width: auto !important;
+                    border: 1px solid #ccc !important; /* Restaurar la vora estàndard */
+                    padding: 10px !important;
+                    text-align: center !important; /* Revertir l'alineació del text per als nivells */
+                    background-color: #fff !important;
+                    color: #333 !important;
+                 }
+                 .rubric-table td:first-child {
+                    text-align: left !important; /* Columna del criteri alineada a l'esquerra per a impressió */
+                    background-color: #f0f8ff !important;
+                 }
+                 .rubric-table td:not(:first-child) {
+                     border-bottom: 1px solid #ccc !important;
+                 }
+                 .rubric-table td:not(:first-child):last-of-type {
+                     border-bottom: 1px solid #ccc !important; /* Assegura que l'última tingui vora */
+                 }
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>RÚBRICA D'AVALUACIÓ DIGITAL I INTERACTIVA</h1>
+        <h2>Avaluació del Treball en Equip en Projectes de Recerca (6è de Primària)</h2>
+
+        <div class="info-section">
+            <div class="info-item">
+                <label for="studentName">Nom de l'alumne/a:</label>
+                <input type="text" id="studentName" placeholder="Introdueix el nom de l'alumne/a">
+            </div>
+            <div class="info-item">
+                <label for="evaluationDate">Data:</label>
+                <input type="date" id="evaluationDate">
+            </div>
+        </div>
+
+        <table class="rubric-table">
+            <thead>
+                <tr>
+                    <th>Criteri</th>
+                    <th>Insuficient (1 punt)</th>
+                    <th>En procés (2 punts)</th>
+                    <th>Assolit (3 punts)</th>
+                    <th>Excel·lent (4 punts)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Criteri 1: Participació i implicació -->
+                <tr data-criterion="participacion">
+                    <td>1. Participació i implicació</td>
+                    <td data-score="1">Rarament participa en les discussions de grup i evita les tasques. Mostra poc interès pel projecte.</td>
+                    <td data-score="2">Participa ocasionalment i requereix estímul per involucrar-se. Contribueix només quan se li demana directament.</td>
+                    <td data-score="3" class="selected">Participa activament en les discussions, aporta idees i s'implica en la realització de les tasques del projecte.</td>
+                    <td data-score="4">Sempre participa amb entusiasme, pren la iniciativa, inspira els companys i s'involucra profundament en totes les fases del projecte.</td>
+                </tr>
+
+                <!-- Criteri 2: Escolta activa i respecte -->
+                <tr data-criterion="escucha">
+                    <td>2. Escolta activa i respecte</td>
+                    <td data-score="1">Interromp sovint els companys, no escolta les seves idees o les menysprea. No respecta els torns de paraula.</td>
+                    <td data-score="2">Generalment escolta els companys, però de vegades interromp o no presta total atenció. Mostra respecte de manera inconsistent.</td>
+                    <td data-score="3" class="selected">Escolta atentament les idees dels companys, espera el seu torn per parlar i mostra respecte per les diferents opinions.</td>
+                    <td data-score="4">Sempre escolta amb atenció i empatia, resumeix les idees dels altres per assegurar la comprensió i fomenta un ambient de respecte i inclusió.</td>
+                </tr>
+
+                <!-- Criteri 3: Resolució de conflictes -->
+                <tr data-criterion="conflictos">
+                    <td>3. Resolució de conflictes</td>
+                    <td data-score="1">Contribueix a generar conflictes o s'aparta d'ells sense intentar resoldre'ls. No accepta el compromís.</td>
+                    <td data-score="2">Reconeix els conflictes, però li costa proposar solucions o cedir en els desacords. A vegades necessita mediació.</td>
+                    <td data-score="3" class="selected">Identifica els conflictes i proposa solucions justes, acceptant el compromís per al bé de l'equip.</td>
+                    <td data-score="4">És proactiu en prevenir conflictes, actua com a mediador natural, i ajuda el grup a trobar solucions creatives i consensuades que satisfan a tots.</td>
+                </tr>
+
+                <!-- Criteri 4: Aportació d'idees -->
+                <tr data-criterion="ideas">
+                    <td>4. Aportació d'idees</td>
+                    <td data-score="1">No aporta idees al grup, o les seves aportacions són irrellevants. Es basa sempre en les idees dels altres.</td>
+                    <td data-score="2">Aporta algunes idees, però de vegades són poc desenvolupades o poc originals. Necessita ser animat a contribuir més.</td>
+                    <td data-score="3" class="selected">Aporta idees rellevants i creatives que ajuden a fer avançar el projecte, i les justifica de forma coherent.</td>
+                    <td data-score="4">Genera una gran quantitat d'idees innovadores i ben fonamentades, les explica amb claredat i ajuda a transformar les idees dels altres en propostes concretes.</td>
+                </tr>
+
+                <!-- Criteri 5: Responsabilitat amb les tasques assignades -->
+                <tr data-criterion="responsabilidad">
+                    <td>5. Responsabilitat amb les tasques assignades</td>
+                    <td data-score="1">No realitza les tasques assignades, les entrega amb retard o amb molt poca qualitat. No compleix els terminis.</td>
+                    <td data-score="2">Realitza les tasques amb certa supervisió, però de vegades les entrega incomptes, amb errors o amb algun retard.</td>
+                    <td data-score="3" class="selected">Compleix amb les tasques assignades en temps i forma, amb la qualitat esperada i sense necessitat de recordatoris constants.</td>
+                    <td data-score="4">Supera les expectatives en la realització de les seves tasques, les entrega abans del previst, amb una qualitat excepcional i s'ofereix a ajudar altres companys.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="total-score">
+            <label>Puntuació Total:</label>
+            <span id="totalScoreDisplay">0 punts</span>
+        </div>
+
+        <div class="print-button-container">
+            <button class="print-button" onclick="window.print()">Imprimir Avaluació</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const rubricTable = document.querySelector('.rubric-table tbody');
+            const totalScoreDisplay = document.getElementById('totalScoreDisplay');
+            const evaluationDateInput = document.getElementById('evaluationDate');
+
+            // Estableix la data actual al camp de data
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0'); // Els mesos comencen des de 0
+            const dd = String(today.getDate()).padStart(2, '0');
+            evaluationDateInput.value = `${yyyy}-${mm}-${dd}`;
+
+            // Funció per calcular la puntuació total
+            function calculateTotalScore() {
+                let totalScore = 0;
+                const rows = rubricTable.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const selectedCell = row.querySelector('td.selected');
+                    if (selectedCell) {
+                        totalScore += parseInt(selectedCell.dataset.score);
+                    }
+                });
+                totalScoreDisplay.textContent = `${totalScore} punts`;
+            }
+
+            // Afegeix un "event listener" de clic a cada cel·la seleccionable
+            rubricTable.querySelectorAll('td[data-score]').forEach(cell => {
+                cell.addEventListener('click', function() {
+                    // Elimina la classe 'selected' de totes les altres cel·les de la mateixa fila
+                    const currentRow = this.closest('tr');
+                    currentRow.querySelectorAll('td[data-score]').forEach(sibling => {
+                        sibling.classList.remove('selected');
+                    });
+                    // Afegeix la classe 'selected' a la cel·la clicada
+                    this.classList.add('selected');
+                    calculateTotalScore(); // Recalcula la puntuació després de la selecció
+                });
+            });
+
+            // Càlcul inicial en carregar la pàgina
+            calculateTotalScore();
+        });
+    </script>
+</body>
+</html>

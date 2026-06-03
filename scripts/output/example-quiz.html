@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emocions a l'Aula 🏫</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap');
+
+        :root {
+            --primary-color: #6a0dad; /* Morat fosc */
+            --secondary-color: #a020f0; /* Morat clar */
+            --accent-color: #ffeb3b; /* Groc */
+            --background-color: #e0f2f7; /* Blau cel clar */
+            --text-color: #333;
+            --success-color: #4CAF50; /* Verd */
+            --error-color: #F44336; /* Vermell */
+            --border-radius: 15px;
+            --padding-base: 20px;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow: hidden; /* Prevent scrollbar from emoji animations */
+        }
+
+        #quiz-container {
+            background-color: #ffffff;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: var(--padding-base) * 1.5;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border: 5px solid var(--primary-color);
+        }
+
+        #quiz-container::before {
+            content: '✨';
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            font-size: 80px;
+            opacity: 0.1;
+            transform: rotate(-30deg);
+        }
+
+        #quiz-container::after {
+            content: '🌈';
+            position: absolute;
+            bottom: -20px;
+            right: -20px;
+            font-size: 80px;
+            opacity: 0.1;
+            transform: rotate(20deg);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: var(--secondary-color);
+            font-size: 2em;
+            margin-top: 30px;
+        }
+
+        #question-text {
+            font-size: 1.8em;
+            margin-bottom: 30px;
+            color: var(--primary-color);
+            background-color: #f7f0ff;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            border: 1px dashed var(--secondary-color);
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #options-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .option-button {
+            background-color: #ffffff;
+            border: 3px solid var(--secondary-color);
+            color: var(--secondary-color);
+            padding: 15px 20px;
+            font-size: 1.5em;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .option-button:hover:not([disabled]) {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .option-button:active:not([disabled]) {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .option-button.correct {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+            color: white;
+        }
+
+        .option-button.incorrect {
+            background-color: var(--error-color);
+            border-color: var(--error-color);
+            color: white;
+        }
+
+        .option-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        #feedback-area {
+            min-height: 100px; /* To prevent layout shift */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        #feedback-text {
+            font-size: 1.6em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        #feedback-text.correct-feedback {
+            color: var(--success-color);
+        }
+
+        #feedback-text.incorrect-feedback {
+            color: var(--error-color);
+        }
+
+        #next-button, #restart-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.6em;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        #next-button:hover, #restart-button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-3px);
+        }
+
+        #next-button:active, #restart-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .emoji {
+            font-size: 2em; /* Bigger emojis */
+            vertical-align: middle;
+            line-height: 1;
+        }
+
+        #score-area {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f0f8ff;
+            border-radius: var(--border-radius);
+            border: 2px solid var(--accent-color);
+        }
+
+        #final-score {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        #final-message {
+            font-size: 1.6em;
+            margin-bottom: 30px;
+            color: var(--text-color);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2em;
+            }
+            #question-text {
+                font-size: 1.4em;
+                min-height: 100px;
+            }
+            .option-button {
+                font-size: 1.2em;
+                padding: 12px 15px;
+            }
+            #next-button, #restart-button {
+                font-size: 1.4em;
+                padding: 12px 25px;
+            }
+            .emoji {
+                font-size: 1.8em;
+            }
+            #feedback-text, #final-score, #final-message {
+                font-size: 1.4em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="quiz-container">
+        <h1>Emocions a l'Aula 🏫</h1>
+
+        <div id="question-area">
+            <p id="question-text">Carregant la pregunta...</p>
+            <div id="options-container">
+                <!-- Buttons will be injected here by JavaScript -->
+            </div>
+            <div id="feedback-area">
+                <p id="feedback-text"></p>
+                <button id="next-button" class="hidden">Següent pregunta ✨</button>
+            </div>
+        </div>
+
+        <div id="score-area" class="hidden">
+            <h2>Resultat Final 🎉</h2>
+            <p id="final-score"></p>
+            <p id="final-message"></p>
+            <button id="restart-button">Tornar a jugar! 🚀</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                situation: "En Pau intenta muntar una torre amb blocs, però cada vegada que gairebé l'acaba, es cau a terra. Ja ho ha provat 5 vegades! Quina emoció sentirà?",
+                correctEmotion: "Frustració",
+                options: ["Frustració", "Alegria", "Sorpresa", "Calma"],
+                emoji: "😠"
+            },
+            {
+                situation: "La Carla ha passat un examen de matemàtiques que li costava molt. Ara que ja té la nota sap que ho ha fet molt bé! Com se sent?",
+                correctEmotion: "Alegria",
+                options: ["Alegria", "Tristesa", "Nerviosisme", "Por"],
+                emoji: "😄"
+            },
+            {
+                situation: "Avui la Laia ha de presentar el seu projecte de ciències davant de tota la classe. Se li mou la panxa i sent una mica de papallones. Quina emoció sent?",
+                correctEmotion: "Nerviosisme",
+                options: ["Nerviosisme", "Orgull", "Tristesa", "Diversió"],
+                emoji: "😬"
+            },
+            {
+                situation: "En Marc obre la seva carmanyola a l'hora del pati i descobreix que la seva mare li ha posat el seu pastís preferit! No s'ho esperava gens. Com se sent?",
+                correctEmotion: "Sorpresa",
+                options: ["Sorpresa", "Tristesa", "Avorriment", "Frustració"],
+                emoji: "🤩"
+            },
+            {
+                situation: "El gos de l'Àlex ha hagut d'anar al veterinari i avui no pot anar a buscar-lo. Troba molt a faltar la seva mascota. Quina emoció sent probablement?",
+                correctEmotion: "Tristesa",
+                options: ["Tristesa", "Orgull", "Alegria", "Ràbia"],
+                emoji: "😔"
+            },
+            {
+                situation: "La Júlia ha estat practicant molt per aprendre a lligar-se les sabates sola, i avui per fi ho ha aconseguit! Se sent molt bé amb ella mateixa. Com se sent?",
+                correctEmotion: "Orgull",
+                options: ["Orgull", "Nerviosisme", "Frustració", "Avorriment"],
+                emoji: "😌"
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let shuffledQuestions = [];
+
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackText = document.getElementById('feedback-text');
+        const nextButton = document.getElementById('next-button');
+        const questionArea = document.getElementById('question-area');
+        const scoreArea = document.getElementById('score-area');
+        const finalScore = document.getElementById('final-score');
+        const finalMessage = document.getElementById('final-message');
+        const restartButton = document.getElementById('restart-button');
+
+        // Utility to shuffle an array (Fisher-Yates algorithm)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            shuffledQuestions = shuffleArray([...questions]); // Create a shuffled copy
+            
+            scoreArea.classList.add('hidden');
+            questionArea.classList.remove('hidden');
+            nextButton.classList.add('hidden');
+            feedbackText.textContent = '';
+            feedbackText.className = '';
+
+            displayQuestion();
+        }
+
+        function displayQuestion() {
+            const question = shuffledQuestions[currentQuestionIndex];
+            questionText.textContent = question.situation;
+            optionsContainer.innerHTML = '';
+            feedbackText.textContent = '';
+            feedbackText.className = '';
+            nextButton.classList.add('hidden');
+
+            // Shuffle options to make the quiz more varied
+            const shuffledOptions = shuffleArray([...question.options]);
+
+            shuffledOptions.forEach(option => {
+                const button = document.createElement('button');
+                button.classList.add('option-button');
+                button.textContent = option;
+                button.onclick = () => checkAnswer(option, question.correctEmotion, button);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function checkAnswer(selectedEmotion, correctEmotion, clickedButton) {
+            // Disable all buttons after an answer is selected
+            Array.from(optionsContainer.children).forEach(button => {
+                button.disabled = true;
+            });
+
+            if (selectedEmotion === correctEmotion) {
+                score++;
+                clickedButton.classList.add('correct');
+                feedbackText.textContent = `✅ Correcte! Molt bé! L'emoció és ${correctEmotion}.`;
+                feedbackText.classList.add('correct-feedback');
+            } else {
+                clickedButton.classList.add('incorrect');
+                // Find and highlight the correct answer
+                Array.from(optionsContainer.children).forEach(button => {
+                    if (button.textContent === correctEmotion) {
+                        button.classList.add('correct');
+                    }
+                });
+                feedbackText.textContent = `❌ Oh, no! La resposta correcta era ${correctEmotion}.`;
+                feedbackText.classList.add('incorrect-feedback');
+            }
+            nextButton.classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < shuffledQuestions.length) {
+                displayQuestion();
+            } else {
+                showFinalScore();
+            }
+        }
+
+        function showFinalScore() {
+            questionArea.classList.add('hidden');
+            scoreArea.classList.remove('hidden');
+
+            const percentage = (score / questions.length) * 100;
+            finalScore.textContent = `Has encertat ${score} de ${questions.length} preguntes! (${Math.round(percentage)}%)`;
+
+            let message = '';
+            if (percentage === 100) {
+                message = "Fantàstic! Ets un/a expert/a en emocions! 🌟";
+            } else if (percentage >= 70) {
+                message = "Molt bé! Has fet una feina excel·lent! Continua així! 👍";
+            } else if (percentage >= 40) {
+                message = "Ho has fet força bé! Pots seguir practicant per aprendre més! 💪";
+            } else {
+                message = "No et preocupis! Aprendre sobre emocions és un viatge. Cada intent t'ajuda a millorar! 🤗";
+            }
+            finalMessage.textContent = message;
+        }
+
+        // Event Listeners
+        nextButton.addEventListener('click', nextQuestion);
+        restartButton.addEventListener('click', startQuiz);
+
+        // Start the quiz when the page loads
+        startQuiz();
+    </script>
+</body>
+</html>

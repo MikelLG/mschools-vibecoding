@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌍 Pont de Paraules: Memory Multilingüe</title>
+    <style>
+        /* Importa una font càlida i amigable */
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap');
+
+        /* Variables CSS per a colors càlids i multiculturalitat */
+        :root {
+            --primary-bg: #fdfaf7; /* Fons general clar i càlid */
+            --secondary-bg: #ffffff; /* Fons del contenidor principal */
+            --accent-orange: #ff914d; /* Taronja vibrant */
+            --accent-yellow: #fddb3a; /* Groc alegre */
+            --accent-terracotta: #cc5500; /* Terracota, to terra */
+            --accent-teal: #008080; /* Verd-blavós, com un contrast fresc */
+            --text-color: #333333; /* Text fosc general */
+            --card-back-gradient: linear-gradient(135deg, #ffc72c, #ff9a00); /* Gradient per la part de darrere de la carta */
+            --card-front-color: #f7f7f7; /* Color de la part de davant de la carta */
+            --card-border: #cccccc; /* Bord de la carta */
+            --shadow-light: rgba(0, 0, 0, 0.1); /* Ombra lleugera */
+            --shadow-medium: rgba(0, 0, 0, 0.2); /* Ombra mitjana */
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: var(--primary-bg); /* Aplica el fons càlid */
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            box-sizing: border-box;
+            line-height: 1.6;
+        }
+
+        #app {
+            background: var(--secondary-bg);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--shadow-medium);
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        header h1 {
+            color: var(--accent-terracotta);
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            line-height: 1.2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+        }
+        header h1 span {
+            margin: 0 8px; /* Espai al voltant de l'emoji */
+        }
+        header p {
+            font-size: 1.2em;
+            color: #555;
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-around;
+            background: linear-gradient(45deg, var(--accent-orange), var(--accent-yellow));
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px var(--shadow-light);
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        .game-info p {
+            margin: 0;
+        }
+
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); /* 5 columnes per defecte */
+            gap: 15px;
+            justify-content: center;
+            perspective: 1000px; /* Per l'efecte 3D de gir de carta */
+        }
+
+        /* Adaptació per a pantalles més petites */
+        @media (max-width: 768px) {
+            .memory-grid {
+                grid-template-columns: repeat(4, 1fr); /* 4 columnes en tablets */
+            }
+            header h1 {
+                font-size: 2em;
+            }
+        }
+        @media (max-width: 480px) {
+            .memory-grid {
+                grid-template-columns: repeat(3, 1fr); /* 3 columnes en mòbils */
+            }
+            header h1 {
+                font-size: 1.6em;
+            }
+            header p {
+                font-size: 1em;
+            }
+            .game-info {
+                font-size: 0.9em;
+                padding: 10px 15px;
+            }
+        }
+        @media (max-width: 320px) {
+            .memory-grid {
+                grid-template-columns: repeat(2, 1fr); /* 2 columnes en mòbils molt petits */
+            }
+            .card-front {
+                font-size: 0.9em;
+            }
+        }
+
+        .card {
+            width: 100%;
+            padding-bottom: 100%; /* Fa que la carta sigui quadrada */
+            position: relative;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent; /* Evita fons blau en tocar en mòbils */
+        }
+
+        .card-inner {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1); /* Transició suau i natural */
+            transform-style: preserve-3d;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px var(--shadow-light);
+        }
+
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden; /* Oculta la cara posterior del navegador */
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column; /* Per alinear contingut verticalment */
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-weight: bold;
+            padding: 5px; /* Ajusta el padding per al text */
+            box-sizing: border-box;
+            word-break: break-word; /* Gestiona paraules llargues */
+            line-height: 1.2;
+            overflow: hidden; /* Evita que el text sobresurti si és massa llarg */
+        }
+        .card-front {
+            background: var(--card-front-color);
+            color: var(--text-color);
+            transform: rotateY(180deg);
+            border: 1px solid var(--card-border);
+            font-size: 1.1em; /* Ajusta la mida de la font per a les cartes */
+        }
+        .card-front .emoji {
+            display: block; /* Assegura que l'emoji tingui el seu propi espai */
+            font-size: 1.5em; /* Mida de l'emoji */
+            margin-bottom: 5px;
+        }
+
+        .card-back {
+            background: var(--card-back-gradient); /* Gradient per la part de darrere */
+            color: white;
+            font-size: 2em;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+            /* Patró subtil de mosaic/connexió */
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%23ffd700" opacity="0.1"/><path d="M 20 40 L 50 20 L 80 40 L 80 60 L 50 80 L 20 60 Z" fill="%23fff" opacity="0.1"/></svg>');
+            background-size: 40%;
+            background-repeat: no-repeat;
+            background-position: center center;
+            border: 1px solid var(--accent-orange);
+        }
+
+        .card.matched .card-inner {
+            opacity: 0.7;
+            pointer-events: none; /* Deshabilita la interacció amb cartes aparellades */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transform: rotateY(180deg) scale(0.95); /* Una mica d'efecte en aparellar */
+        }
+
+        /* Modal de Felicitació */
+        .congrats-modal {
+            display: none; /* Amagat per defecte */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            box-sizing: border-box;
+            padding: 20px;
+        }
+
+        .congrats-modal.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .congrats-content {
+            background: linear-gradient(135deg, var(--accent-yellow), var(--accent-orange));
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 15px 40px var(--shadow-medium);
+            max-width: 500px;
+            width: 100%;
+            animation: pop-in 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+            position: relative;
+            overflow: hidden; /* Per l'efecte de confeti */
+            box-sizing: border-box;
+        }
+        /* Efecte de confeti dins del modal */
+        .congrats-content::before, .congrats-content::after {
+            content: '';
+            position: absolute;
+            background: radial-gradient(circle, #ffeb3b, transparent 60%),
+                        radial-gradient(circle, #ff9800, transparent 60%),
+                        radial-gradient(circle, #e91e63, transparent 60%);
+            background-size: 10px 10px, 15px 15px, 12px 12px;
+            background-repeat: repeat;
+            opacity: 0.7;
+            filter: blur(1px);
+        }
+        .congrats-content::before {
+            top: 0; left: 0; width: 100%; height: 50%;
+            transform: rotate(15deg);
+            transform-origin: top left;
+        }
+        .congrats-content::after {
+            bottom: 0; right: 0; width: 100%; height: 50%;
+            transform: rotate(-15deg);
+            transform-origin: bottom right;
+        }
+
+
+        .congrats-content h2 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            color: #fff;
+            text-shadow: 2px 2px 5px var(--shadow-medium);
+            font-weight: 800;
+        }
+        .congrats-content p {
+            font-size: 1.3em;
+            margin-bottom: 25px;
+        }
+        .congrats-content button {
+            background-color: var(--accent-teal);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            font-weight: bold;
+        }
+        .congrats-content button:hover {
+            background-color: #006666;
+            transform: translateY(-2px);
+        }
+
+        /* Animació per al modal de felicitació */
+        @keyframes pop-in {
+            0% { transform: scale(0.5); opacity: 0; }
+            80% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1><span aria-hidden="true">🌍</span> Pont de Paraules: Memory Multilingüe</h1>
+            <p>Uneix les salutacions amb el seu idioma!</p>
+        </header>
+
+        <div class="game-info">
+            <p>Parelles trobades: <span id="pairs-found">0</span> / 10</p>
+            <p>Intents: <span id="attempts">0</span></p>
+        </div>
+
+        <div id="game-board" class="memory-grid">
+            <!-- Les cartes seran inserides dinàmicament aquí per JavaScript -->
+        </div>
+
+        <div id="congratulations" class="congrats-modal">
+            <div class="congrats-content">
+                <h2>🎉 Felicitats! 🎉</h2>
+                <p>Has completat el Pont de Paraules!</p>
+                <p>Has trobat totes les parelles en <span id="final-attempts">0</span> intents.</p>
+                <button onclick="resetGame()">Tornar a jugar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const gameBoard = document.getElementById('game-board');
+        const pairsFoundSpan = document.getElementById('pairs-found');
+        const attemptsSpan = document.getElementById('attempts');
+        const congratulationsModal = document.getElementById('congratulations');
+        const finalAttemptsSpan = document.getElementById('final-attempts');
+
+        // Definició de les 10 parelles d'idioma/salutació
+        const gamePairs = [
+            { lang: 'Català', flag: '🇪🇸', word: 'Hola' },
+            { lang: 'Català', flag: '🇪🇸', word: 'Bon dia' },
+            { lang: 'Castellà', flag: '🇪🇸', word: 'Hola' },
+            { lang: 'Castellà', flag: '🇪🇸', word: 'Buenos días' },
+            { lang: 'Anglès', flag: '🇬🇧', word: 'Hello' },
+            { lang: 'Anglès', flag: '🇬🇧', word: 'Good morning' },
+            { lang: 'Francès', flag: '🇫🇷', word: 'Bonjour' },
+            { lang: 'Francès', flag: '🇫🇷', word: 'Salut' },
+            { lang: 'Àrab', flag: '🇸🇦', word: 'مرحبا' }, /* Marhaban */
+            { lang: 'Àrab', flag: '🇸🇦', word: 'صباح الخير' } /* Sabah al-khayr */
+        ];
+
+        let cards = [];
+        let flippedCards = [];
+        let lockBoard = false;
+        let pairsFound = 0;
+        let attempts = 0;
+        let cardIdCounter = 0; // Per assignar IDs únics a cada instància de carta
+
+        /**
+         * Crea el conjunt de dades de les cartes a partir de gamePairs.
+         * Cada parella genera dues cartes amb el mateix matchId.
+         */
+        function createCardsData() {
+            cards = [];
+            cardIdCounter = 0; // Reinicia el comptador per a cada nou joc
+            gamePairs.forEach((pair, index) => {
+                const matchId = `pair-${index}`;
+                
+                // Carta d'idioma/país
+                cards.push({
+                    id: cardIdCounter++,
+                    type: 'lang',
+                    content: `<span class="emoji">${pair.flag}</span>${pair.lang}`,
+                    matchId: matchId,
+                    isFlipped: false,
+                    isMatched: false
+                });
+                // Carta de paraula de salutació
+                cards.push({
+                    id: cardIdCounter++,
+                    type: 'word',
+                    content: pair.word,
+                    matchId: matchId,
+                    isFlipped: false,
+                    isMatched: false
+                });
+            });
+            shuffle(cards); // Barreja les cartes un cop creades
+        }
+
+        /**
+         * Barreja un array utilitzant l'algoritme Fisher-Yates.
+         * @param {Array} array - L'array a barrejar.
+         */
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        /**
+         * Crea un element DOM per a una carta.
+         * @param {Object} card - L'objecte de dades de la carta.
+         * @returns {HTMLElement} L'element div de la carta.
+         */
+        function createCardElement(card) {
+            const cardElement = document.createElement('div');
+            cardElement.classList.add('card');
+            cardElement.dataset.id = card.id; // ID únic per a aquesta instància de carta
+            cardElement.dataset.matchId = card.matchId; // ID per a la lògica d'aparellament
+
+            cardElement.innerHTML = `
+                <div class="card-inner">
+                    <div class="card-back"></div>
+                    <div class="card-front">${card.content}</div>
+                </div>
+            `;
+            cardElement.addEventListener('click', () => flipCard(cardElement, card));
+            return cardElement;
+        }
+
+        /**
+         * Gira una carta i gestiona la lògica del joc.
+         * @param {HTMLElement} cardElement - L'element DOM de la carta clicada.
+         * @param {Object} cardData - L'objecte de dades de la carta.
+         */
+        function flipCard(cardElement, cardData) {
+            // No permet girar si el tauler està bloquejat, ja està girada o ja està aparellada
+            if (lockBoard || cardData.isFlipped || cardData.isMatched) {
+                return;
+            }
+
+            cardElement.classList.add('flipped');
+            cardData.isFlipped = true;
+            flippedCards.push({ element: cardElement, data: cardData });
+
+            if (flippedCards.length === 2) {
+                attempts++;
+                attemptsSpan.textContent = attempts;
+                lockBoard = true; // Bloqueja el tauler mentre es comprova l'aparellament
+                checkForMatch();
+            }
+        }
+
+        /**
+         * Comprova si les dues cartes girades formen una parella.
+         */
+        function checkForMatch() {
+            const [card1, card2] = flippedCards;
+            // Comprova si els matchId coincideixen i si no és la mateixa carta clicada dues vegades
+            const isMatch = (card1.data.matchId === card2.data.matchId && card1.data.id !== card2.data.id);
+
+            if (isMatch) {
+                disableCards(); // Manté les cartes girades i les marca com aparellades
+            } else {
+                unflipCards(); // Gira les cartes de nou
+            }
+        }
+
+        /**
+         * Marca les cartes aparellades com inactives i actualitza el comptador.
+         */
+        function disableCards() {
+            const [card1Element, card2Element] = [flippedCards[0].element, flippedCards[1].element];
+            const [card1Data, card2Data] = [flippedCards[0].data, flippedCards[1].data];
+
+            card1Data.isMatched = true;
+            card2Data.isMatched = true;
+
+            setTimeout(() => {
+                card1Element.classList.add('matched');
+                card2Element.classList.add('matched');
+                resetFlippedCards(); // Neteja l'estat de les cartes girades
+                pairsFound++;
+                pairsFoundSpan.textContent = pairsFound;
+
+                if (pairsFound === gamePairs.length) {
+                    endGame(); // Totes les parelles trobades, fi del joc
+                }
+            }, 500); // Dona un moment per veure la parella abans de marcar-les com "matched"
+        }
+
+        /**
+         * Gira les cartes de nou si no són una parella.
+         */
+        function unflipCards() {
+            setTimeout(() => {
+                flippedCards.forEach(fc => {
+                    fc.element.classList.remove('flipped');
+                    fc.data.isFlipped = false;
+                });
+                resetFlippedCards(); // Neteja l'estat de les cartes girades
+            }, 1000); // Mostra les cartes durant un segon abans de girar-les de nou
+        }
+
+        /**
+         * Reinicia l'estat de les cartes girades i desbloqueja el tauler.
+         */
+        function resetFlippedCards() {
+            flippedCards = [];
+            lockBoard = false;
+        }
+
+        /**
+         * Gestiona la lògica de finalització del joc.
+         */
+        function endGame() {
+            finalAttemptsSpan.textContent = attempts;
+            congratulationsModal.classList.add('show'); // Mostra el modal de felicitació
+        }
+
+        /**
+         * Reinicia el joc a l'estat inicial.
+         */
+        function resetGame() {
+            congratulationsModal.classList.remove('show');
+            pairsFound = 0;
+            attempts = 0;
+            pairsFoundSpan.textContent = pairsFound;
+            attemptsSpan.textContent = attempts;
+            flippedCards = [];
+            lockBoard = false;
+            initGame(); // Re-inicialitza el joc per restablir i barrejar les cartes
+        }
+
+        /**
+         * Inicialitza el joc: crea cartes, les barreja i les afegeix al DOM.
+         */
+        function initGame() {
+            gameBoard.innerHTML = ''; // Neteja les cartes existents
+            createCardsData();
+            cards.forEach(card => {
+                gameBoard.appendChild(createCardElement(card));
+            });
+        }
+
+        // Inicialitza el joc quan el contingut del DOM s'ha carregat completament
+        document.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
