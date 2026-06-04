@@ -16,6 +16,7 @@ export default function ResultPage() {
   const [refining, setRefining] = useState(false);
   const [refineListening, setRefineListening] = useState(false);
   const [refineError, setRefineError] = useState('');
+  const [showFullPrompt, setShowFullPrompt] = useState(false);
   const refineRecRef = useRef<SpeechRecognition | null>(null);
 
   const startRefineVoice = useCallback(() => {
@@ -182,6 +183,26 @@ export default function ResultPage() {
               <p className="text-xs pt-2 border-t" style={{ color: 'var(--muted)', borderColor: 'var(--border)' }}>
                 👥 {submission.pairName}
               </p>
+            )}
+            {submission.prompt && (
+              <div className="border-t pt-3" style={{ borderColor: 'var(--border)' }}>
+                <button
+                  onClick={() => setShowFullPrompt(v => !v)}
+                  className="flex items-center gap-1.5 text-xs font-bold transition-colors"
+                  style={{ color: 'var(--muted)' }}
+                >
+                  <span>{showFullPrompt ? '▲' : '▼'}</span>
+                  {showFullPrompt ? 'Amagar prompt complet' : 'Veure prompt complet enviat a Gemini'}
+                </button>
+                {showFullPrompt && (
+                  <pre
+                    className="mt-3 text-xs rounded-xl p-3 overflow-x-auto whitespace-pre-wrap break-words leading-relaxed"
+                    style={{ background: 'white', border: '1px solid var(--border)', color: 'var(--body)', fontFamily: 'monospace' }}
+                  >
+                    {submission.prompt}
+                  </pre>
+                )}
+              </div>
             )}
           </div>
 
