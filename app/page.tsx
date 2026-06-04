@@ -43,7 +43,7 @@ const NOT_FOR = [
   {
     emoji: '🤖',
     title: 'Deixar-ho tot a la IA',
-    desc: 'La IA ajuda, però el repte i el context els poseu vosaltres. Sense context, no hi ha bon recurs.',
+    desc: 'La IA ajuda, però el repte i el context els poseu vosaltres. Sense context, no hi ha bon recurs. I recorda: la primera versió és un punt de partida, cal iterar.',
     color: '#991b1b', bg: '#fecaca',
   },
 ];
