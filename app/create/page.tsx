@@ -234,28 +234,22 @@ export default function CreatePage() {
       </header>
 
       {/* Live prompt preview */}
-      <div className="sticky top-[57px] z-10 px-6 py-3 border-b" style={{ background: '#f7f4f7', borderColor: 'var(--border)' }}>
+      <div className="sticky top-[57px] z-10 px-6 py-4 border-b" style={{ background: '#f7f4f7', borderColor: 'var(--border)' }}>
         <div className="max-w-3xl mx-auto">
-          <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--heading)' }}>📝 Prompt en construcció</p>
-          <div className="flex flex-wrap gap-1.5 items-center">
-            {GROUPS.map((g, i) => {
-              const val = selections[g.id as keyof typeof selections];
-              return (
-                <span key={g.id} className="inline-flex items-center gap-1">
-                  <span
-                    className="px-2.5 py-1 rounded-full text-xs font-semibold"
-                    style={val
-                      ? { background: g.bg, color: g.color, border: `1px solid ${g.color}40` }
-                      : { background: '#ede8ed', color: '#999' }
-                    }
-                  >
-                    {val ? `${g.emoji} ${val}` : `[${g.label}]`}
-                  </span>
-                  {i < GROUPS.length - 1 && <span style={{ color: 'var(--border)' }}>·</span>}
-                </span>
-              );
-            })}
-          </div>
+          <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--muted)' }}>Prompt en construcció</p>
+          <p className="text-sm leading-[2.2]" style={{ color: 'var(--body)' }}>
+            &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de{' '}
+            <PromptBadge value={eix} placeholder="EIX" color="#0d9488" bg="#f0fdfb" emoji="🎯" />,{' '}
+            pensada perquè la faci servir{' '}
+            <PromptBadge value={usuari} placeholder="USUARI FINAL" color="#7c3aed" bg="#f5f3ff" emoji="👤" />,{' '}
+            a través de{' '}
+            <PromptBadge value={accio} placeholder="ACCIÓ PRINCIPAL" color="#2563eb" bg="#eff6ff" emoji="⚡" />{' '}
+            que serveixi per a{' '}
+            <PromptBadge value={repte} placeholder="REPTE" color="#ea580c" bg="#fff7ed" emoji="💡" />,{' '}
+            amb un estil{' '}
+            <PromptBadge value={estil} placeholder="ESTIL" color="#be185d" bg="#fdf2f8" emoji="🎨" />,{' '}
+            que sigui coherent i fàcil d&apos;usar.&rdquo;
+          </p>
         </div>
       </div>
 
@@ -296,9 +290,22 @@ export default function CreatePage() {
           </div>
         </CardGroup>
 
-        {/* 3. Repte — dynamic based on usuari */}
+        {/* 3. Acció principal */}
         <CardGroup
-          number="3" label="Repte" color="#ea580c" bg="#fff7ed" emoji="💡"
+          number="3" label="Acció principal" color="#2563eb" bg="#eff6ff" emoji="⚡"
+          description="Què fa l'app. La funció clau que converteix el repte en una solució concreta."
+          selected={accio}
+        >
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {ACCIONS.map(c => (
+              <Card key={c.value} card={c} selected={accio === c.value} color="#2563eb" bg="#eff6ff" onClick={() => setAccio(c.value)} />
+            ))}
+          </div>
+        </CardGroup>
+
+        {/* 4. Repte — dynamic based on usuari */}
+        <CardGroup
+          number="4" label="Repte" color="#ea580c" bg="#fff7ed" emoji="💡"
           description={usuari ? `Necessitat concreta del/la ${usuari.toLowerCase()} dins d'aquest eix.` : 'Primer selecciona l\'usuari final per veure els reptes disponibles.'}
           selected={repte}
         >
@@ -313,19 +320,6 @@ export default function CreatePage() {
               ))}
             </div>
           )}
-        </CardGroup>
-
-        {/* 4. Acció principal */}
-        <CardGroup
-          number="4" label="Acció principal" color="#2563eb" bg="#eff6ff" emoji="⚡"
-          description="Què fa l'app. La funció clau que converteix el repte en una solució concreta."
-          selected={accio}
-        >
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {ACCIONS.map(c => (
-              <Card key={c.value} card={c} selected={accio === c.value} color="#2563eb" bg="#eff6ff" onClick={() => setAccio(c.value)} />
-            ))}
-          </div>
         </CardGroup>
 
         {/* 5. Estil */}
@@ -401,6 +395,23 @@ export default function CreatePage() {
 }
 
 // ── Sub-components ─────────────────────────────────────────────────────────────
+
+function PromptBadge({ value, placeholder, color, bg, emoji }: {
+  value: string; placeholder: string; color: string; bg: string; emoji: string;
+}) {
+  return (
+    <span
+      className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-bold align-middle"
+      style={value
+        ? { background: bg, color, border: `1.5px solid ${color}50` }
+        : { background: '#e8e2e8', color: '#aaa', border: '1.5px solid #d8d0d8' }
+      }
+    >
+      <span>{emoji}</span>
+      {value || placeholder}
+    </span>
+  );
+}
 
 function CardGroup({ number, label, color, bg, emoji, description, selected, children }: {
   number: string; label: string; color: string; bg: string; emoji: string;
