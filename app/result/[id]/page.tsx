@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import QRCode from 'react-qr-code';
-import { getSubmission } from '@/lib/firebase';
+import { getSubmission, updateSubmission } from '@/lib/firebase';
 import type { Submission } from '@/lib/types';
 import { CONTEXT_THEMES } from '@/lib/types';
 
@@ -13,6 +13,52 @@ export default function ResultPage() {
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [loading, setLoading] = useState(true);
   const [origin, setOrigin] = useState('');
+  const [refineText, setRefineText] = useState('');
+  const [refining, setRefining] = useState(false);
+  const [refineListening, setRefineListening] = useState(false);
+  const [refineError, setRefineError] = useState('');
+  const refineRecRef = useRef<SpeechRecognition | null>(null);
+
+  const startRefineVoice = useCallback(() => {
+    if (refineListening) { refineRecRef.current?.stop(); return; }
+    const SR = (window as unknown as { SpeechRecognition?: typeof SpeechRecognition; webkitSpeechRecognition?: typeof SpeechRecognition }).SpeechRecognition
+      || (window as unknown as { webkitSpeechRecognition?: typeof SpeechRecognition }).webkitSpeechRecognition;
+    if (!SR) return;
+    const rec = new SR();
+    rec.lang = 'ca-ES';
+    rec.continuous = false;
+    rec.interimResults = false;
+    rec.onresult = (e: SpeechRecognitionEvent) => {
+      const t = e.results[0][0].transcript;
+      setRefineText(prev => prev ? prev + ' ' + t : t);
+    };
+    rec.onend = () => setRefineListening(false);
+    rec.start();
+    refineRecRef.current = rec;
+    setRefineListening(true);
+  }, [refineListening]);
+
+  const handleRefine = async () => {
+    if (!submission || !refineText.trim()) return;
+    setRefining(true);
+    setRefineError('');
+    try {
+      const res = await fetch('/api/refine', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ existingHtml: submission.htmlOutput, refinementText: refineText }),
+      });
+      if (!res.ok) throw new Error('Error en la millora');
+      const { htmlOutput } = await res.json() as { htmlOutput: string };
+      await updateSubmission(submission.id, { htmlOutput });
+      setSubmission(prev => prev ? { ...prev, htmlOutput } : prev);
+      setRefineText('');
+    } catch (err) {
+      setRefineError((err as Error).message || 'Error inesperat');
+    } finally {
+      setRefining(false);
+    }
+  };
 
   useEffect(() => {
     setOrigin(window.location.origin);
@@ -137,6 +183,41 @@ export default function ResultPage() {
               <Row label="TASCA" value={submission.tasca} truncate />
               <Row label="FORMAT" value={submission.formatLabel} />
             </div>
+          </div>
+
+          {/* Refine section */}
+          <div className="rounded-2xl border border-[#2a2a2a] bg-[#141414] p-5 flex flex-col gap-3">
+            <div className="text-xs font-bold text-[#888] uppercase tracking-widest">✏️ Millorar el recurs</div>
+            <p className="text-xs text-[#555]">Descriu els canvis i la IA modificarà l&apos;app mantenint el contingut existent.</p>
+            <div className="relative">
+              <textarea
+                placeholder="Ex: Afegeix un temporitzador de 30s, canvia els colors a blau, afegeix 3 preguntes més..."
+                value={refineText}
+                onChange={e => setRefineText(e.target.value)}
+                rows={3}
+                className="w-full rounded-xl px-3 py-2.5 pr-10 text-sm focus:outline-none resize-none"
+                style={{ background: '#1a1a1a', border: '1px solid #333', color: '#f5f5f5' }}
+              />
+              <button
+                type="button"
+                onClick={startRefineVoice}
+                className="absolute right-2 bottom-2 w-8 h-8 rounded-full flex items-center justify-center text-sm"
+                style={refineListening ? { background: '#e63946', color: 'white' } : { background: '#2a2a2a', color: '#888' }}
+              >🎤</button>
+            </div>
+            {refineListening && <p className="text-xs animate-pulse text-[#e63946]">🔴 Escoltant...</p>}
+            {refineError && <p className="text-xs text-[#e63946]">⚠️ {refineError}</p>}
+            <button
+              onClick={handleRefine}
+              disabled={!refineText.trim() || refining}
+              className="rounded-xl py-3 text-sm font-bold transition-all"
+              style={refineText.trim() && !refining
+                ? { background: '#e63946', color: 'white' }
+                : { background: '#1a1a1a', color: '#555', cursor: 'not-allowed', border: '1px solid #2a2a2a' }
+              }
+            >
+              {refining ? '⏳ Millorant...' : '✨ Aplicar millores'}
+            </button>
           </div>
 
           {/* New resource button */}

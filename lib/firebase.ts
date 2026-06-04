@@ -14,6 +14,11 @@ const firebaseConfig = {
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 export const db = getFirestore(app);
 
+export async function updateSubmission(id: string, updates: Partial<Submission>) {
+  const ref = doc(db, 'submissions', id);
+  await setDoc(ref, updates, { merge: true });
+}
+
 export async function saveSubmission(submission: Omit<Submission, 'id'> & { id: string }) {
   const ref = doc(db, 'submissions', submission.id);
   await setDoc(ref, { ...submission, createdAt: Timestamp.fromMillis(submission.createdAt) });
