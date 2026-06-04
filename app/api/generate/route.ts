@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextRequest, NextResponse } from 'next/server';
+import { EIX_CONTEXT, USUARI_CONTEXT, REPTE_CONTEXT, ACCIO_CONTEXT, ESTIL_CONTEXT } from '@/lib/card-context';
 
 export const maxDuration = 120;
 
@@ -108,16 +109,38 @@ function buildPrompt({
 }) {
   const formatInstructions = FORMAT_INSTRUCTIONS[format] ?? `Crea una eina de tipus "${formatLabel}" adequada per al context.`;
 
-  const contextSection = voicePrompt
-    ? `## DESCRIPCIÓ DEL DOCENT (per veu)\n"${voicePrompt}"${extraContext ? `\n\nContext addicional: ${extraContext}` : ''}`
-    : `## CONTEXT (construït a partir de targetes)\n${selectedCards.map(c => `- **${c.group}**: ${c.value}`).join('\n')}${extraContext ? `\n- **Context addicional**: ${extraContext}` : ''}`;
+  let contextSection: string;
+  if (voicePrompt) {
+    contextSection = `## DESCRIPCIÓ DEL DOCENT (per veu)\n"${voicePrompt}"${extraContext ? `\n\nContext addicional: ${extraContext}` : ''}`;
+  } else {
+    const eix = selectedCards.find(c => c.group === 'Eix')?.value ?? '';
+    const usuari = selectedCards.find(c => c.group === 'Usuari final')?.value ?? '';
+    const accio = selectedCards.find(c => c.group === 'Acció principal')?.value ?? '';
+    const repte = selectedCards.find(c => c.group === 'Repte')?.value ?? '';
+    const estil = selectedCards.find(c => c.group === 'Estil')?.value ?? '';
+
+    contextSection = `## CONTEXT DE L'EIX — ${eix}
+${EIX_CONTEXT[eix] ?? eix}
+
+## PERFIL DE L'USUARI FINAL — ${usuari}
+${USUARI_CONTEXT[usuari] ?? usuari}
+
+## CONTEXT DEL REPTE — ${repte}
+${REPTE_CONTEXT[repte] ?? repte}
+
+## ESPECIFICACIÓ DE L'ACCIÓ PRINCIPAL — ${accio}
+${ACCIO_CONTEXT[accio] ?? accio}
+
+## GUIA D'ESTIL — ${estil}
+${ESTIL_CONTEXT[estil] ?? estil}${extraContext ? `\n\n## CONTEXT ADDICIONAL DEL DOCENT\n${extraContext}` : ''}`;
+  }
 
   return `Ets un expert en disseny d'aplicacions educatives web per a l'escola catalana. La teva especialitat és crear eines digitals interactives, visualment atractives i 100% funcionals per a docents.
 
-${contextSection}
+## PROMPT
+Crea una aplicació web emmarcada dins l'eix de ${promptPreview}.${extraContext ? ` ${extraContext}` : ''}
 
-## PROMPT COMPLET
-Crea una eina educativa per a ${promptPreview}.${extraContext ? ` ${extraContext}` : ''}
+${contextSection}
 
 ## QUÈ HAS DE CREAR
 ${formatInstructions}
