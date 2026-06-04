@@ -31,10 +31,9 @@ export async function POST(req: NextRequest) {
       id,
       stationId: 1,
       pairName: pairName ?? '',
-      // Keep legacy fields for compatibility with result/gallery pages
-      rol: '', rolLabel: selectedCards?.find((c: {group:string}) => c.group === 'Persona')?.value ?? '',
-      contextTheme: selectedCards?.find((c: {group:string}) => c.group === 'Eixos')?.value ?? '',
-      contextThemeLabel: selectedCards?.find((c: {group:string}) => c.group === 'Eixos')?.value ?? '',
+      rol: '', rolLabel: selectedCards?.find((c: {group:string}) => c.group === 'Usuari final')?.value ?? '',
+      contextTheme: selectedCards?.find((c: {group:string}) => c.group === 'Eix')?.value ?? '',
+      contextThemeLabel: selectedCards?.find((c: {group:string}) => c.group === 'Eix')?.value ?? '',
       contextDescription: extraContext ?? '',
       tasca: promptPreview ?? '',
       format,

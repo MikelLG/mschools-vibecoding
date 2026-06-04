@@ -4,6 +4,17 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import EXAMPLES from '@/lib/examples.json';
 
+function WBadge({ v, color, bg, emoji }: { v: string; color: string; bg: string; emoji: string }) {
+  return (
+    <span
+      className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-bold align-middle"
+      style={{ color, background: bg, border: `1.5px solid ${color}50` }}
+    >
+      <span>{emoji}</span>{v}
+    </span>
+  );
+}
+
 export default function WarmupPage() {
   const router = useRouter();
   const [revealed, setRevealed] = useState<Record<string, boolean>>({});
@@ -12,24 +23,27 @@ export default function WarmupPage() {
   const ex = EXAMPLES[active];
   const isRevealed = revealed[ex.id];
 
-  const PROMPTS: Record<string, { rol: string; context: string; tasca: string; format: string }> = {
+  const PROMPTS: Record<string, { eix: string; usuari: string; accio: string; repte: string; estil: string }> = {
     'example-quiz': {
-      rol: 'Mestre/a de primària',
-      context: 'Benestar emocional',
-      tasca: 'Quiz per identificar emocions en situacions quotidianes de l\'aula per a alumnes de 4t de primària',
-      format: 'Quiz interactiu',
+      eix: 'Benestar social',
+      usuari: 'Alumnat',
+      accio: 'Crear un mini-joc',
+      repte: 'Practicar un contingut',
+      estil: 'Colors suaus',
     },
     'example-joc': {
-      rol: 'Mestre/a de primària',
-      context: 'Inclusió i diversitat',
-      tasca: 'Joc de memory per practicar salutacions en 5 idiomes en una escola multicultural de cicle superior',
-      format: 'Joc educatiu',
+      eix: 'Cultura i diversitat',
+      usuari: 'Alumnat',
+      accio: 'Crear un mini-joc',
+      repte: 'Explorar un concepte',
+      estil: 'Infantil',
     },
     'example-rubrica': {
-      rol: 'Tutor/a de classe',
-      context: 'Avaluació i feedback',
-      tasca: 'Rúbrica per avaluar el treball en equip en projectes de recerca per a alumnes de 6è de primària',
-      format: 'Rúbrica d\'avaluació',
+      eix: 'Benestar social',
+      usuari: 'Docent',
+      accio: 'Recollir dades',
+      repte: 'Avaluació',
+      estil: 'Estil fitxa / sobri',
     },
   };
 
@@ -143,14 +157,24 @@ export default function WarmupPage() {
                 <div className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--heading)' }}>
                   El prompt que vam usar
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {Object.entries(PROMPTS[ex.id]).map(([key, val]) => (
-                    <div key={key} className="rounded-xl p-3" style={{ background: 'white', border: '1px solid var(--border)' }}>
-                      <div className="text-xs font-mono font-bold mb-1 uppercase" style={{ color: 'var(--accent)' }}>{key}</div>
-                      <div className="text-sm font-medium" style={{ color: 'var(--body)' }}>{val}</div>
-                    </div>
-                  ))}
-                </div>
+                {(() => {
+                  const p = PROMPTS[ex.id];
+                  return (
+                    <p className="text-sm leading-[2.4]" style={{ color: 'var(--body)' }}>
+                      &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de{' '}
+                      <WBadge v={p.eix} color="#0d9488" bg="#f0fdfb" emoji="🎯" />,{' '}
+                      pensada perquè la faci servir{' '}
+                      <WBadge v={p.usuari} color="#7c3aed" bg="#f5f3ff" emoji="👤" />,{' '}
+                      a través de{' '}
+                      <WBadge v={p.accio} color="#2563eb" bg="#eff6ff" emoji="⚡" />{' '}
+                      que serveixi per a{' '}
+                      <WBadge v={p.repte} color="#ea580c" bg="#fff7ed" emoji="💡" />,{' '}
+                      amb un estil{' '}
+                      <WBadge v={p.estil} color="#be185d" bg="#fdf2f8" emoji="🎨" />,{' '}
+                      que sigui coherent i fàcil d&apos;usar.&rdquo;
+                    </p>
+                  );
+                })()}
               </div>
             )}
           </div>

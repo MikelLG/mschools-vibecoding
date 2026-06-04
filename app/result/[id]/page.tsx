@@ -176,13 +176,13 @@ export default function ResultPage() {
 
           {/* Prompt summary */}
           <div className="rounded-2xl border border-[#2a2a2a] bg-[#141414] p-5 flex flex-col gap-3">
-            <div className="text-xs font-bold text-[#888] uppercase tracking-widest">Resum del prompt</div>
-            <div className="space-y-2">
-              <Row label="ROL" value={submission.rolLabel} />
-              <Row label="CONTEXT" value={submission.contextThemeLabel} />
-              <Row label="TASCA" value={submission.tasca} truncate />
-              <Row label="FORMAT" value={submission.formatLabel} />
-            </div>
+            <div className="text-xs font-bold text-[#888] uppercase tracking-widest">El prompt</div>
+            <PromptSentence tasca={submission.tasca} />
+            {submission.pairName && (
+              <p className="text-xs pt-2 border-t border-[#2a2a2a]" style={{ color: '#555' }}>
+                👥 {submission.pairName}
+              </p>
+            )}
           </div>
 
           {/* Refine section */}
@@ -241,11 +241,36 @@ export default function ResultPage() {
   );
 }
 
-function Row({ label, value, truncate }: { label: string; value: string; truncate?: boolean }) {
+function PromptSentence({ tasca }: { tasca: string }) {
+  const parts = tasca.split(' · ');
+  if (parts.length < 5) {
+    return <p className="text-sm italic leading-relaxed" style={{ color: '#aaa' }}>&ldquo;{tasca}&rdquo;</p>;
+  }
+  const [eix, usuari, accio, repte, estil] = parts;
   return (
-    <div className="flex gap-2">
-      <span className="text-xs font-mono text-[#e63946] w-16 shrink-0 pt-0.5">{label}</span>
-      <span className={`text-xs text-[#f5f5f5] ${truncate ? 'line-clamp-2' : ''}`}>{value}</span>
-    </div>
+    <p className="text-sm leading-[2.4]" style={{ color: '#aaa' }}>
+      &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de{' '}
+      <Badge v={eix} color="#0d9488" bg="#0d948820" />,{' '}
+      pensada perquè la faci servir{' '}
+      <Badge v={usuari} color="#7c3aed" bg="#7c3aed20" />,{' '}
+      a través de{' '}
+      <Badge v={accio} color="#2563eb" bg="#2563eb20" />{' '}
+      que serveixi per a{' '}
+      <Badge v={repte} color="#ea580c" bg="#ea580c20" />,{' '}
+      amb un estil{' '}
+      <Badge v={estil} color="#be185d" bg="#be185d20" />,{' '}
+      que sigui coherent i fàcil d&apos;usar.&rdquo;
+    </p>
+  );
+}
+
+function Badge({ v, color, bg }: { v: string; color: string; bg: string }) {
+  return (
+    <span
+      className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold align-middle"
+      style={{ color, background: bg, border: `1px solid ${color}40` }}
+    >
+      {v}
+    </span>
   );
 }
