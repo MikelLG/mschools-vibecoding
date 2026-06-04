@@ -19,6 +19,12 @@ const FOR = [
     desc: 'Un quiz, un joc, una rúbrica, una fitxa. Res complex. Directe al gra.',
     color: '#166534', bg: '#bbf7d0',
   },
+  {
+    emoji: '🔁',
+    title: 'Iterar fins que funcioni',
+    desc: 'La primera versió és un punt de partida. Usa el panell de millores per refinar, afegir contingut i ajustar fins que sigui perfecte.',
+    color: '#15803d', bg: '#dcfce7',
+  },
 ];
 
 const NOT_FOR = [
