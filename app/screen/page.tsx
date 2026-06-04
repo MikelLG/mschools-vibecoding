@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { subscribeSubmissions } from '@/lib/firebase';
 import type { Submission } from '@/lib/types';
 
@@ -19,6 +19,55 @@ export default function ScreenPage() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [showNew, setShowNew] = useState(false);
   const [latestId, setLatestId] = useState<string | null>(null);
+
+  // Countdown
+  const [inputMinutes, setInputMinutes] = useState(15);
+  const [secondsLeft, setSecondsLeft] = useState(15 * 60);
+  const [running, setRunning] = useState(false);
+  const [finished, setFinished] = useState(false);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const startStop = () => {
+    if (running) {
+      clearInterval(intervalRef.current!);
+      setRunning(false);
+    } else {
+      if (secondsLeft === 0) {
+        setSecondsLeft(inputMinutes * 60);
+        setFinished(false);
+      }
+      setRunning(true);
+    }
+  };
+
+  const reset = () => {
+    clearInterval(intervalRef.current!);
+    setRunning(false);
+    setFinished(false);
+    setSecondsLeft(inputMinutes * 60);
+  };
+
+  useEffect(() => {
+    if (running) {
+      intervalRef.current = setInterval(() => {
+        setSecondsLeft(s => {
+          if (s <= 1) {
+            clearInterval(intervalRef.current!);
+            setRunning(false);
+            setFinished(true);
+            return 0;
+          }
+          return s - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(intervalRef.current!);
+  }, [running]);
+
+  const mins = Math.floor(secondsLeft / 60);
+  const secs = secondsLeft % 60;
+  const pct = secondsLeft / (inputMinutes * 60);
+  const urgent = secondsLeft <= 60 && secondsLeft > 0;
 
   useEffect(() => {
     const unsub = subscribeSubmissions(SESSION_ID, (subs) => {
@@ -53,9 +102,71 @@ export default function ScreenPage() {
               mSchools 2026 · {submissions.length} recurs{submissions.length !== 1 ? 'os' : ''} en temps real
             </p>
           </div>
-          <div className="flex items-center gap-2 rounded-full px-4 py-2" style={{ border: '1.5px solid var(--border)', background: '#f7f4f7' }}>
-            <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--accent)' }} />
-            <span className="text-sm font-mono" style={{ color: 'var(--muted)' }}>LIVE</span>
+          {/* Countdown */}
+          <div className="flex items-center gap-3">
+            {/* Time display */}
+            <div
+              className="relative flex items-center justify-center rounded-2xl px-5 py-2 font-mono text-3xl font-black tabular-nums transition-all"
+              style={{
+                background: finished ? '#fef2f2' : urgent ? '#fff7ed' : '#f7f4f7',
+                border: `2px solid ${finished ? 'var(--accent)' : urgent ? '#ea580c' : 'var(--border)'}`,
+                color: finished ? 'var(--accent)' : urgent ? '#ea580c' : 'var(--heading)',
+                minWidth: '120px',
+                textAlign: 'center',
+              }}
+            >
+              {finished ? '⏰ 0:00' : `${mins}:${String(secs).padStart(2, '0')}`}
+              {/* Progress bar */}
+              <div className="absolute bottom-0 left-0 h-1 rounded-b-2xl transition-all duration-1000"
+                style={{
+                  width: `${pct * 100}%`,
+                  background: finished ? 'var(--accent)' : urgent ? '#ea580c' : 'var(--heading)',
+                  opacity: 0.4,
+                }}
+              />
+            </div>
+
+            {/* Controls */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  min={1} max={99}
+                  value={inputMinutes}
+                  onChange={e => {
+                    const v = Math.max(1, Math.min(99, Number(e.target.value)));
+                    setInputMinutes(v);
+                    if (!running) setSecondsLeft(v * 60);
+                    setFinished(false);
+                  }}
+                  disabled={running}
+                  className="w-14 rounded-lg px-2 py-1 text-sm text-center font-bold focus:outline-none"
+                  style={{ border: '1.5px solid var(--border)', background: running ? '#f0eaf0' : 'white', color: 'var(--heading)' }}
+                />
+                <span className="text-xs" style={{ color: 'var(--muted)' }}>min</span>
+                <button
+                  onClick={startStop}
+                  className="rounded-lg px-3 py-1.5 text-sm font-bold transition-all"
+                  style={running
+                    ? { background: '#fff7ed', color: '#ea580c', border: '1.5px solid #ea580c50' }
+                    : { background: 'var(--heading)', color: 'white' }
+                  }
+                >
+                  {running ? '⏸ Pausa' : secondsLeft === 0 ? '↺ Reinicia' : '▶ Iniciar'}
+                </button>
+                <button
+                  onClick={reset}
+                  className="rounded-lg px-2 py-1.5 text-sm transition-all"
+                  style={{ color: 'var(--muted)', border: '1.5px solid var(--border)', background: '#f7f4f7' }}
+                >
+                  ↺
+                </button>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--accent)' }} />
+                <span className="text-xs font-mono" style={{ color: 'var(--muted)' }}>LIVE · {submissions.length} recursos</span>
+              </div>
+            </div>
           </div>
         </div>
 
