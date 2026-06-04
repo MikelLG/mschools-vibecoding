@@ -38,6 +38,7 @@ export default function ScreenPage() {
     submissions.length <= 2 ? 'grid-cols-2' :
     submissions.length <= 4 ? 'grid-cols-2' :
     submissions.length <= 6 ? 'grid-cols-3' :
+    submissions.length <= 9 ? 'grid-cols-3' :
     'grid-cols-4';
 
   return (
@@ -102,7 +103,7 @@ export default function ScreenPage() {
       {submissions.length > 0 && (
         <div className="flex-1 p-6">
           <div className={`grid gap-5 ${cols}`}>
-            {submissions.slice(0, 8).map((s, i) => (
+            {submissions.map(s => (
               <ScreenCard key={s.id} submission={s} isNew={s.id === latestId && showNew} />
             ))}
           </div>
