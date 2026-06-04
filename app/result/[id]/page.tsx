@@ -48,7 +48,10 @@ export default function ResultPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ existingHtml: submission.htmlOutput, refinementText: refineText }),
       });
-      if (!res.ok) throw new Error('Error en la millora');
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(errData.error || 'Error en la millora');
+      }
       const { htmlOutput } = await res.json() as { htmlOutput: string };
       await updateSubmission(submission.id, { htmlOutput });
       setSubmission(prev => prev ? { ...prev, htmlOutput } : prev);
