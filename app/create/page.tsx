@@ -164,7 +164,10 @@ export default function CreatePage() {
           sessionId: process.env.NEXT_PUBLIC_SESSION_ID ?? 'mschools-2026',
         }),
       });
-      if (!res.ok) throw new Error('Error de generació');
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(errData.error || 'Error de generació');
+      }
       const { submission } = await res.json() as { submission: Submission };
       const { saveSubmission } = await import('@/lib/firebase');
       await saveSubmission(submission);
