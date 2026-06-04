@@ -3,20 +3,28 @@
 import { useEffect, useState } from 'react';
 import { subscribeSubmissions } from '@/lib/firebase';
 import type { Submission } from '@/lib/types';
-import { CONTEXT_THEMES } from '@/lib/types';
 
 const SESSION_ID = process.env.NEXT_PUBLIC_SESSION_ID ?? 'mschools-2026';
 
+const EIXOS = [
+  { value: 'Benestar social', emoji: '🤝', color: '#0d9488', bg: '#f0fdfb' },
+  { value: 'Educació mediàtica', emoji: '📱', color: '#7c3aed', bg: '#f5f3ff' },
+  { value: 'Consciència social', emoji: '🌍', color: '#ea580c', bg: '#fff7ed' },
+  { value: 'Art i creativitat', emoji: '🎨', color: '#2563eb', bg: '#eff6ff' },
+  { value: 'Equitat i inclusió', emoji: '🌈', color: '#be185d', bg: '#fdf2f8' },
+  { value: 'Cultura i diversitat', emoji: '🏛️', color: '#16a34a', bg: '#f0fdf4' },
+];
+
 export default function ScreenPage() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
-  const [latest, setLatest] = useState<Submission | null>(null);
   const [showNew, setShowNew] = useState(false);
+  const [latestId, setLatestId] = useState<string | null>(null);
 
   useEffect(() => {
     const unsub = subscribeSubmissions(SESSION_ID, (subs) => {
       setSubmissions(prev => {
         if (subs.length > prev.length && subs.length > 0) {
-          setLatest(subs[0]);
+          setLatestId(subs[0].id);
           setShowNew(true);
           setTimeout(() => setShowNew(false), 4000);
         }
@@ -26,119 +34,131 @@ export default function ScreenPage() {
     return () => unsub();
   }, []);
 
+  const cols =
+    submissions.length <= 2 ? 'grid-cols-2' :
+    submissions.length <= 4 ? 'grid-cols-2' :
+    submissions.length <= 6 ? 'grid-cols-3' :
+    'grid-cols-4';
+
   return (
-    <main className="min-h-screen bg-[#050505] overflow-hidden flex flex-col">
+    <main className="min-h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
+
       {/* Header */}
-      <header className="flex items-center justify-between px-10 py-5 border-b border-[#1a1a1a]">
-        <div>
-          <div className="text-xs text-[#555] uppercase tracking-widest font-mono">mSchools Awards 2026</div>
-          <h1 className="text-3xl font-black tracking-tighter">
-            VIBE<span className="text-[#e63946]">CODING</span>
-            <span className="text-[#333] ml-2 text-xl font-normal">— Recursos generats</span>
-          </h1>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 rounded-full border border-[#1a1a1a] bg-[#0a0a0a] px-4 py-2">
-            <span className="w-2 h-2 rounded-full bg-[#e63946] animate-pulse" />
-            <span className="text-sm text-[#888] font-mono">{submissions.length} recursos</span>
+      <header className="sticky top-0 z-10 bg-white border-b px-8 py-4" style={{ borderColor: 'var(--border)' }}>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-black" style={{ color: 'var(--heading)' }}>Vibe Coding · Pantalla</h1>
+            <p className="text-xs" style={{ color: 'var(--muted)' }}>
+              mSchools 2026 · {submissions.length} recurs{submissions.length !== 1 ? 'os' : ''} en temps real
+            </p>
+          </div>
+          <div className="flex items-center gap-2 rounded-full px-4 py-2" style={{ border: '1.5px solid var(--border)', background: '#f7f4f7' }}>
+            <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--accent)' }} />
+            <span className="text-sm font-mono" style={{ color: 'var(--muted)' }}>LIVE</span>
           </div>
         </div>
+
+        {/* Eix counts */}
+        {submissions.length > 0 && (
+          <div className="mt-3 flex gap-3 flex-wrap">
+            {EIXOS.map(e => {
+              const count = submissions.filter(s => s.contextTheme === e.value || s.contextThemeLabel === e.value).length;
+              if (count === 0) return null;
+              return (
+                <span key={e.value} className="flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium"
+                  style={{ background: e.bg, color: e.color, border: `1px solid ${e.color}30` }}>
+                  {e.emoji} {e.value} · {count}
+                </span>
+              );
+            })}
+          </div>
+        )}
       </header>
 
       {/* New submission toast */}
-      {showNew && latest && (
-        <div className="fixed top-6 right-6 z-50 animate-in slide-in-from-right-4 rounded-2xl border border-[#e63946]/30 bg-[#e63946]/10 p-4 max-w-xs backdrop-blur-sm">
-          <div className="text-xs text-[#e63946] font-bold mb-1">✨ Nou recurs!</div>
-          <div className="text-sm text-white font-medium">{latest.formatLabel}</div>
-          <div className="text-xs text-[#888]">{latest.contextThemeLabel}</div>
+      {showNew && (
+        <div className="fixed top-6 right-6 z-50 rounded-2xl p-4 max-w-xs shadow-lg"
+          style={{ background: '#f7f4f7', border: '1.5px solid var(--border)' }}>
+          <div className="text-xs font-bold mb-1" style={{ color: 'var(--accent)' }}>✨ Nou recurs!</div>
+          <div className="text-sm font-medium" style={{ color: 'var(--heading)' }}>
+            {submissions[0]?.formatLabel}
+          </div>
+          {submissions[0]?.pairName && (
+            <div className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>{submissions[0].pairName}</div>
+          )}
         </div>
       )}
 
       {/* Empty state */}
       {submissions.length === 0 && (
-        <div className="flex-1 flex flex-col items-center justify-center text-center gap-4">
-          <div className="text-6xl opacity-20">✨</div>
-          <p className="text-[#333] text-xl font-bold">Esperant els primers recursos...</p>
-          <p className="text-[#222] text-sm">Els recursos apareixeran aquí en temps real</p>
+        <div className="flex-1 flex flex-col items-center justify-center text-center gap-4 py-32">
+          <div className="text-6xl">✨</div>
+          <p className="text-xl font-bold" style={{ color: 'var(--heading)' }}>Esperant els primers recursos...</p>
+          <p className="text-sm" style={{ color: 'var(--muted)' }}>Els recursos apareixeran aquí en temps real</p>
         </div>
       )}
 
       {/* Grid */}
       {submissions.length > 0 && (
-        <div className="flex-1 p-8 overflow-hidden">
-          <div className={`grid gap-5 h-full ${
-            submissions.length <= 2 ? 'grid-cols-2' :
-            submissions.length <= 4 ? 'grid-cols-2 grid-rows-2' :
-            submissions.length <= 6 ? 'grid-cols-3 grid-rows-2' :
-            'grid-cols-4 grid-rows-2'
-          }`}>
+        <div className="flex-1 p-6">
+          <div className={`grid gap-5 ${cols}`}>
             {submissions.slice(0, 8).map((s, i) => (
-              <SubmissionCard key={s.id} submission={s} isNew={i === 0 && showNew} />
+              <ScreenCard key={s.id} submission={s} isNew={s.id === latestId && showNew} />
             ))}
           </div>
         </div>
       )}
-
-      {/* Footer bar */}
-      <footer className="flex items-center justify-between px-10 py-3 border-t border-[#1a1a1a]">
-        <div className="flex gap-4">
-          {CONTEXT_THEMES.map(t => {
-            const count = submissions.filter(s => s.contextTheme === t.value).length;
-            if (count === 0) return null;
-            return (
-              <div key={t.value} className="flex items-center gap-1.5">
-                <span className="text-sm">{t.emoji}</span>
-                <span className="text-xs text-[#555]">{count}</span>
-              </div>
-            );
-          })}
-        </div>
-        <div className="text-xs text-[#222] font-mono">LIVE · mSchools 2026</div>
-      </footer>
     </main>
   );
 }
 
-function SubmissionCard({ submission: s, isNew }: { submission: Submission; isNew: boolean }) {
-  const theme = CONTEXT_THEMES.find(t => t.value === s.contextTheme);
+function ScreenCard({ submission: s, isNew }: { submission: Submission; isNew: boolean }) {
+  const eix = EIXOS.find(e => e.value === s.contextTheme || e.value === s.contextThemeLabel);
 
   return (
     <a
       href={`/app/${s.id}`}
       target="_blank"
       rel="noopener noreferrer"
-      className={`group relative flex flex-col rounded-2xl border overflow-hidden transition-all hover:scale-[1.02] ${
-        isNew ? 'border-[#e63946]/50 shadow-[0_0_30px_rgba(230,57,70,0.15)]' : 'border-[#1a1a1a] hover:border-[#2a2a2a]'
-      }`}
-      style={{ background: theme ? `linear-gradient(135deg, ${theme.color}08, #0a0a0a)` : '#0a0a0a' }}
+      className="flex flex-col rounded-2xl overflow-hidden transition-all hover:scale-[1.02]"
+      style={{
+        border: isNew ? `2px solid var(--accent)` : '1.5px solid var(--border)',
+        background: 'var(--bg)',
+        boxShadow: isNew ? '0 0 24px rgba(230,57,70,0.12)' : undefined,
+      }}
     >
-      {isNew && (
-        <div className="absolute top-3 right-3 z-10 rounded-full bg-[#e63946] px-2 py-0.5 text-xs font-bold text-white">
-          NOU
-        </div>
-      )}
-
-      {/* Mini iframe preview */}
-      <div className="flex-1 relative overflow-hidden bg-white/5">
+      {/* iframe preview */}
+      <div className="relative overflow-hidden" style={{ height: '200px', background: '#f7f4f7' }}>
         <iframe
           srcDoc={s.htmlOutput}
-          className="absolute inset-0 w-full h-full"
-          style={{ transform: 'scale(0.5)', transformOrigin: 'top left', width: '200%', height: '200%', pointerEvents: 'none' }}
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          style={{ transform: 'scale(0.4)', transformOrigin: 'top left', width: '250%', height: '250%' }}
           sandbox="allow-scripts"
           title={s.formatLabel}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#0a0a0a] opacity-60" />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 60%, #f7f4f7)' }} />
+        {eix && (
+          <div className="absolute top-2 left-2 rounded-full px-2.5 py-1 text-xs font-bold"
+            style={{ background: eix.bg, color: eix.color, border: `1px solid ${eix.color}30` }}>
+            {eix.emoji} {eix.value}
+          </div>
+        )}
+        {isNew && (
+          <div className="absolute top-2 right-2 rounded-full px-2.5 py-1 text-xs font-bold text-white"
+            style={{ background: 'var(--accent)' }}>
+            NOU ✨
+          </div>
+        )}
       </div>
 
-      {/* Bottom info */}
-      <div className="p-4 border-t border-[#1a1a1a]">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-lg">{theme?.emoji ?? '✨'}</span>
-          <span className="text-sm font-bold text-white truncate">{s.formatLabel}</span>
+      {/* Info */}
+      <div className="p-4 flex flex-col gap-1.5">
+        <div className="font-bold text-sm truncate" style={{ color: 'var(--heading)' }}>
+          {s.formatLabel || 'Recurs educatiu'}
         </div>
-        <div className="text-xs text-[#555] truncate">{s.contextThemeLabel}</div>
+        <p className="text-xs line-clamp-2" style={{ color: 'var(--muted)' }}>{s.tasca}</p>
         {s.pairName && (
-          <div className="mt-1.5 text-xs font-mono text-[#e63946]">{s.pairName}</div>
+          <div className="mt-1 text-xs font-bold" style={{ color: 'var(--accent)' }}>{s.pairName}</div>
         )}
       </div>
     </a>
