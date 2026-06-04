@@ -107,30 +107,21 @@ export default function CreatePage() {
   const [estil, setEstil] = useState('');
   const [pairName, setPairName] = useState('');
   const [extraContext, setExtraContext] = useState('');
-  const [listeningFor, setListeningFor] = useState<string | null>(null);
+  const [voicePrompt, setVoicePrompt] = useState('');
+  const [listening, setListening] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState('');
   const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   const selections = { eix, usuari, repte, accio, estil };
   const completedGroups = GROUPS.filter(g => selections[g.id as keyof typeof selections]).length;
-  const canGenerate = completedGroups === GROUPS.length;
+  const canGenerate = completedGroups === GROUPS.length || voicePrompt.trim().length > 5;
 
-  // When usuari changes, clear repte if it no longer applies
-  const handleUsuari = (val: string) => {
-    setUsuari(val);
-    setRepte('');
-  };
-
+  const handleUsuari = (val: string) => { setUsuari(val); setRepte(''); };
   const currentReptes = usuari ? REPTES_PER_USUARI[usuari] ?? [] : [];
 
-  const stopVoice = useCallback(() => {
-    recognitionRef.current?.stop();
-    setListeningFor(null);
-  }, []);
-
-  const startVoiceFor = useCallback((groupId: string, onResult: (transcript: string) => void) => {
-    if (listeningFor) { stopVoice(); return; }
+  const startVoice = useCallback((onResult: (t: string) => void) => {
+    if (listening) { recognitionRef.current?.stop(); return; }
     const SR = (window as unknown as { SpeechRecognition?: typeof SpeechRecognition; webkitSpeechRecognition?: typeof SpeechRecognition }).SpeechRecognition
       || (window as unknown as { webkitSpeechRecognition?: typeof SpeechRecognition }).webkitSpeechRecognition;
     if (!SR) return;
@@ -139,44 +130,36 @@ export default function CreatePage() {
     rec.continuous = false;
     rec.interimResults = false;
     rec.onresult = (e: SpeechRecognitionEvent) => onResult(e.results[0][0].transcript);
-    rec.onend = () => setListeningFor(null);
+    rec.onend = () => setListening(false);
     rec.start();
     recognitionRef.current = rec;
-    setListeningFor(groupId);
-  }, [listeningFor, stopVoice]);
-
-  function matchOption(transcript: string, options: { value: string }[]): string | null {
-    const t = transcript.toLowerCase().trim();
-    return (
-      options.find(o => o.value.toLowerCase() === t) ??
-      options.find(o => t.includes(o.value.toLowerCase()) || o.value.toLowerCase().includes(t)) ??
-      options.find(o => o.value.toLowerCase().split(' ').some(word => word.length > 3 && t.includes(word))) ??
-      null
-    )?.value ?? null;
-  }
+    setListening(true);
+  }, [listening]);
 
   const generate = async () => {
     setGenerating(true);
     setError('');
     try {
+      const usingVoice = voicePrompt.trim().length > 5 && completedGroups < GROUPS.length;
       const selectedCards = [
         { group: 'Eix', value: eix },
         { group: 'Usuari final', value: usuari },
-        { group: 'Repte', value: repte },
         { group: 'Acció principal', value: accio },
+        { group: 'Repte', value: repte },
         { group: 'Estil', value: estil },
       ];
-      const promptPreview = `${eix} · ${usuari} · ${repte} · ${accio} · ${estil}`;
+      const promptPreview = usingVoice ? voicePrompt : `${eix} · ${usuari} · ${accio} · ${repte} · ${estil}`;
 
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          selectedCards,
+          selectedCards: usingVoice ? [] : selectedCards,
           promptPreview,
+          voicePrompt: usingVoice ? voicePrompt : '',
           extraContext,
-          format: accio.toLowerCase().replace(/\s/g, '_'),
-          formatLabel: accio,
+          format: accio.toLowerCase().replace(/\s/g, '_') || 'activitat',
+          formatLabel: accio || 'Recurs educatiu',
           pairName,
           sessionId: process.env.NEXT_PUBLIC_SESSION_ID ?? 'mschools-2026',
         }),
@@ -244,20 +227,42 @@ export default function CreatePage() {
       {/* Live prompt preview */}
       <div className="sticky top-[57px] z-10 px-6 py-4 border-b" style={{ background: '#f7f4f7', borderColor: 'var(--border)' }}>
         <div className="max-w-3xl mx-auto">
-          <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--muted)' }}>Prompt en construcció</p>
-          <p className="text-sm leading-[2.2]" style={{ color: 'var(--body)' }}>
-            &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de{' '}
-            <PromptBadge value={eix} placeholder="EIX" color="#0d9488" bg="#f0fdfb" emoji="🎯" />,{' '}
-            pensada perquè la faci servir{' '}
-            <PromptBadge value={usuari} placeholder="USUARI FINAL" color="#7c3aed" bg="#f5f3ff" emoji="👤" />,{' '}
-            a través de{' '}
-            <PromptBadge value={accio} placeholder="ACCIÓ PRINCIPAL" color="#2563eb" bg="#eff6ff" emoji="⚡" />{' '}
-            que serveixi per a{' '}
-            <PromptBadge value={repte} placeholder="REPTE" color="#ea580c" bg="#fff7ed" emoji="💡" />,{' '}
-            amb un estil{' '}
-            <PromptBadge value={estil} placeholder="ESTIL" color="#be185d" bg="#fdf2f8" emoji="🎨" />,{' '}
-            que sigui coherent i fàcil d&apos;usar.&rdquo;
-          </p>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Prompt en construcció</p>
+            <button
+              type="button"
+              onClick={() => startVoice(t => setVoicePrompt(prev => prev ? prev + ' ' + t : t))}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all"
+              style={listening
+                ? { background: 'var(--accent)', color: 'white' }
+                : { background: 'white', border: '1.5px solid var(--border)', color: 'var(--heading)' }
+              }
+            >
+              🎤 {listening ? 'Escoltant...' : 'Dictar prompt'}
+            </button>
+          </div>
+          {voicePrompt ? (
+            <div className="flex items-start gap-2">
+              <p className="flex-1 text-sm italic rounded-xl px-3 py-2" style={{ background: 'white', border: '1px solid var(--border)', color: 'var(--body)' }}>
+                &ldquo;{voicePrompt}&rdquo;
+              </p>
+              <button type="button" onClick={() => setVoicePrompt('')} className="text-xs mt-2" style={{ color: 'var(--muted)' }}>✕</button>
+            </div>
+          ) : (
+            <p className="text-sm leading-[2.2]" style={{ color: 'var(--body)' }}>
+              &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de{' '}
+              <PromptBadge value={eix} placeholder="EIX" color="#0d9488" bg="#f0fdfb" emoji="🎯" />,{' '}
+              pensada perquè la faci servir{' '}
+              <PromptBadge value={usuari} placeholder="USUARI FINAL" color="#7c3aed" bg="#f5f3ff" emoji="👤" />,{' '}
+              a través de{' '}
+              <PromptBadge value={accio} placeholder="ACCIÓ PRINCIPAL" color="#2563eb" bg="#eff6ff" emoji="⚡" />{' '}
+              que serveixi per a{' '}
+              <PromptBadge value={repte} placeholder="REPTE" color="#ea580c" bg="#fff7ed" emoji="💡" />,{' '}
+              amb un estil{' '}
+              <PromptBadge value={estil} placeholder="ESTIL" color="#be185d" bg="#fdf2f8" emoji="🎨" />,{' '}
+              que sigui coherent i fàcil d&apos;usar.&rdquo;
+            </p>
+          )}
         </div>
       </div>
 
@@ -277,8 +282,6 @@ export default function CreatePage() {
           number="1" label="Eix" color="#0d9488" bg="#f0fdfb" emoji="🎯"
           description="Des de quin marc volem emmarcar l'app. L'eix dona sentit, valors i enfocament."
           selected={eix}
-          micActive={listeningFor === 'eix'}
-          onMicToggle={() => startVoiceFor('eix', t => { const m = matchOption(t, EIXOS); if (m) setEix(m); })}
         >
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {EIXOS.map(c => (
@@ -292,8 +295,6 @@ export default function CreatePage() {
           number="2" label="Usuari final" color="#7c3aed" bg="#f5f3ff" emoji="👤"
           description="Qui interactuarà amb l'app. Canvia completament el to, la interfície i la complexitat."
           selected={usuari}
-          micActive={listeningFor === 'usuari'}
-          onMicToggle={() => startVoiceFor('usuari', t => { const m = matchOption(t, USUARIS); if (m) handleUsuari(m); })}
         >
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {USUARIS.map(c => (
@@ -307,8 +308,6 @@ export default function CreatePage() {
           number="3" label="Acció principal" color="#2563eb" bg="#eff6ff" emoji="⚡"
           description="Què fa l'app. La funció clau que converteix el repte en una solució concreta."
           selected={accio}
-          micActive={listeningFor === 'accio'}
-          onMicToggle={() => startVoiceFor('accio', t => { const m = matchOption(t, ACCIONS); if (m) setAccio(m); })}
         >
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {ACCIONS.map(c => (
@@ -322,8 +321,6 @@ export default function CreatePage() {
           number="4" label="Repte" color="#ea580c" bg="#fff7ed" emoji="💡"
           description={usuari ? `Necessitat concreta del/la ${usuari.toLowerCase()} dins d'aquest eix.` : 'Primer selecciona l\'usuari final per veure els reptes disponibles.'}
           selected={repte}
-          micActive={listeningFor === 'repte'}
-          onMicToggle={usuari ? () => startVoiceFor('repte', t => { const m = matchOption(t, currentReptes); if (m) setRepte(m); }) : undefined}
         >
           {!usuari ? (
             <div className="rounded-xl p-6 text-center text-sm" style={{ background: '#fff7ed', border: '1.5px dashed #ea580c50', color: '#ea580c' }}>
@@ -343,8 +340,6 @@ export default function CreatePage() {
           number="5" label="Estil" color="#be185d" bg="#fdf2f8" emoji="🎨"
           description="Com ha de semblar i sentir-se l'app (look & feel + nivell d'interactivitat)."
           selected={estil}
-          micActive={listeningFor === 'estil'}
-          onMicToggle={() => startVoiceFor('estil', t => { const m = matchOption(t, ESTILS); if (m) setEstil(m); })}
         >
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {ESTILS.map(c => (
@@ -373,12 +368,12 @@ export default function CreatePage() {
             />
             <button
               type="button"
-              onClick={() => listeningFor === 'context' ? stopVoice() : startVoiceFor('context', t => setExtraContext(prev => prev ? prev + ' ' + t : t))}
+              onClick={() => startVoice(t => setExtraContext(prev => prev ? prev + ' ' + t : t))}
               className="absolute right-3 bottom-3 w-10 h-10 rounded-full flex items-center justify-center text-xl"
-              style={listeningFor === 'context' ? { background: 'var(--accent)', color: 'white' } : { background: 'white', border: '1.5px solid var(--border)' }}
+              style={listening ? { background: 'var(--accent)', color: 'white' } : { background: 'white', border: '1.5px solid var(--border)' }}
             >🎤</button>
           </div>
-          {listeningFor && <p className="text-xs mt-1 animate-pulse" style={{ color: 'var(--accent)' }}>🔴 Escoltant...</p>}
+          {listening && <p className="text-xs mt-1 animate-pulse" style={{ color: 'var(--accent)' }}>🔴 Escoltant...</p>}
         </section>
 
         {/* Error */}
@@ -431,10 +426,9 @@ function PromptBadge({ value, placeholder, color, bg, emoji }: {
   );
 }
 
-function CardGroup({ number, label, color, bg, emoji, description, selected, micActive, onMicToggle, children }: {
+function CardGroup({ number, label, color, bg, emoji, description, selected, children }: {
   number: string; label: string; color: string; bg: string; emoji: string;
   description: string; selected: string; children: React.ReactNode;
-  micActive?: boolean; onMicToggle?: () => void;
 }) {
   return (
     <section>
@@ -446,25 +440,11 @@ function CardGroup({ number, label, color, bg, emoji, description, selected, mic
           <div className="flex items-center gap-2">
             <span className="text-lg">{emoji}</span>
             <h2 className="font-black text-base" style={{ color }}>{label}</h2>
-            <div className="ml-auto flex items-center gap-2">
-              {selected && (
-                <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: bg, color }}>
-                  ✓ {selected}
-                </span>
-              )}
-              {onMicToggle && (
-                <button
-                  type="button"
-                  onClick={onMicToggle}
-                  className="w-7 h-7 rounded-full flex items-center justify-center text-sm transition-all"
-                  style={micActive
-                    ? { background: 'var(--accent)', color: 'white' }
-                    : { background: '#f0eaf0', border: '1px solid var(--border)', color: 'var(--muted)' }
-                  }
-                  title="Dictar amb veu"
-                >🎤</button>
-              )}
-            </div>
+            {selected && (
+              <span className="ml-auto text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: bg, color }}>
+                ✓ {selected}
+              </span>
+            )}
           </div>
           <p className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>{description}</p>
         </div>

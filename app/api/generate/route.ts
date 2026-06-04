@@ -12,9 +12,9 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { selectedCards, promptPreview, extraContext, format, formatLabel, pairName, sessionId } = body;
+    const { selectedCards, promptPreview, voicePrompt, extraContext, format, formatLabel, pairName, sessionId } = body;
 
-    const prompt = buildPrompt({ selectedCards, promptPreview, extraContext, formatLabel, format });
+    const prompt = buildPrompt({ selectedCards, promptPreview, voicePrompt, extraContext, formatLabel, format });
 
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     const result = await model.generateContent(prompt);
@@ -102,18 +102,20 @@ const FORMAT_INSTRUCTIONS: Record<string, string> = {
 };
 
 function buildPrompt({
-  selectedCards, promptPreview, extraContext, formatLabel, format,
+  selectedCards, promptPreview, voicePrompt, extraContext, formatLabel, format,
 }: {
   selectedCards: Array<{ group: string; value: string }>;
-  promptPreview: string; extraContext: string; formatLabel: string; format: string;
+  promptPreview: string; voicePrompt?: string; extraContext: string; formatLabel: string; format: string;
 }) {
   const formatInstructions = FORMAT_INSTRUCTIONS[format] ?? `Crea una eina de tipus "${formatLabel}" adequada per al context.`;
-  const cardsText = selectedCards.map(c => `- **${c.group}**: ${c.value}`).join('\n');
+
+  const contextSection = voicePrompt
+    ? `## DESCRIPCIÓ DEL DOCENT (per veu)\n"${voicePrompt}"${extraContext ? `\n\nContext addicional: ${extraContext}` : ''}`
+    : `## CONTEXT (construït a partir de targetes)\n${selectedCards.map(c => `- **${c.group}**: ${c.value}`).join('\n')}${extraContext ? `\n- **Context addicional**: ${extraContext}` : ''}`;
 
   return `Ets un expert en disseny d'aplicacions educatives web per a l'escola catalana. La teva especialitat és crear eines digitals interactives, visualment atractives i 100% funcionals per a docents.
 
-## CONTEXT (construït a partir de targetes)
-${cardsText}${extraContext ? `\n- **Context addicional**: ${extraContext}` : ''}
+${contextSection}
 
 ## PROMPT COMPLET
 Crea una eina educativa per a ${promptPreview}.${extraContext ? ` ${extraContext}` : ''}
