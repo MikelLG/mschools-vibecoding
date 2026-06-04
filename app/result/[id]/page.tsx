@@ -5,7 +5,6 @@ import { useParams, useRouter } from 'next/navigation';
 import QRCode from 'react-qr-code';
 import { getSubmission, updateSubmission } from '@/lib/firebase';
 import type { Submission } from '@/lib/types';
-import { CONTEXT_THEMES } from '@/lib/types';
 
 export default function ResultPage() {
   const { id } = useParams<{ id: string }>();
@@ -76,78 +75,75 @@ export default function ResultPage() {
   }, [id]);
 
   const appUrl = origin ? `${origin}/app/${id}` : '';
-  const theme = CONTEXT_THEMES.find(t => t.value === submission?.contextTheme);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-10 h-10 rounded-full border-2 border-[#e63946] border-t-transparent animate-spin" />
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg)' }}>
+        <div className="w-10 h-10 rounded-full border-2 animate-spin" style={{ borderColor: 'var(--border)', borderTopColor: 'var(--heading)' }} />
       </div>
     );
   }
 
   if (!submission) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-        <p className="text-[#888]">Recurs no trobat.</p>
-        <button onClick={() => router.push('/')} className="text-[#e63946] hover:underline">← Inici</button>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4" style={{ background: 'var(--bg)' }}>
+        <p style={{ color: 'var(--muted)' }}>Recurs no trobat.</p>
+        <button onClick={() => router.push('/')} style={{ color: 'var(--accent)' }} className="hover:underline">← Inici</button>
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen flex flex-col">
+    <main className="min-h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-[#2a2a2a]">
-        <button onClick={() => router.push('/')} className="text-[#888] hover:text-white transition-colors text-sm">
+      <header className="flex items-center justify-between px-6 py-4 border-b sticky top-0 z-20 bg-white" style={{ borderColor: 'var(--border)' }}>
+        <button onClick={() => router.push('/')} className="text-sm transition-colors" style={{ color: 'var(--muted)' }}>
           ← Inici
         </button>
-        <span className="font-black text-[#e63946] tracking-tight">VIBE CODING</span>
+        <span className="font-black" style={{ color: 'var(--heading)' }}>Vibe Coding</span>
         <button
           onClick={() => router.push('/create')}
-          className="text-sm text-[#888] hover:text-white border border-[#2a2a2a] hover:border-[#444] rounded-lg px-3 py-1.5 transition-all"
+          className="text-sm rounded-lg px-3 py-1.5 transition-all"
+          style={{ color: 'var(--muted)', border: '1px solid var(--border)' }}
         >
           + Nou recurs
         </button>
       </header>
 
-      <div className="flex-1 flex flex-col lg:flex-row gap-0 max-w-7xl mx-auto w-full p-6 gap-6">
+      <div className="flex-1 flex flex-col lg:flex-row max-w-7xl mx-auto w-full p-6 gap-6">
         {/* Left: Preview iframe */}
         <div className="flex-1 flex flex-col gap-4">
           {/* Tags */}
           <div className="flex flex-wrap gap-2">
-            <span className="rounded-full border border-[#2a2a2a] bg-[#141414] px-3 py-1 text-xs text-[#888]">
-              👩‍🏫 {submission.rolLabel}
-            </span>
-            {theme && (
-              <span
-                className="rounded-full border px-3 py-1 text-xs"
-                style={{ borderColor: `${theme.color}40`, color: theme.color, background: `${theme.color}10` }}
-              >
-                {theme.emoji} {theme.label}
+            {submission.rolLabel && (
+              <span className="rounded-full px-3 py-1 text-xs" style={{ border: '1px solid var(--border)', background: '#f7f4f7', color: 'var(--muted)' }}>
+                👩‍🏫 {submission.rolLabel}
               </span>
             )}
-            <span className="rounded-full border border-[#2a2a2a] bg-[#141414] px-3 py-1 text-xs text-[#888]">
-              ✨ {submission.formatLabel}
-            </span>
+            {submission.formatLabel && (
+              <span className="rounded-full px-3 py-1 text-xs" style={{ border: '1px solid var(--border)', background: '#f7f4f7', color: 'var(--muted)' }}>
+                ✨ {submission.formatLabel}
+              </span>
+            )}
             {submission.pairName && (
-              <span className="rounded-full border border-[#e63946]/30 bg-[#e63946]/10 px-3 py-1 text-xs text-[#e63946]">
+              <span className="rounded-full px-3 py-1 text-xs font-bold" style={{ border: '1px solid var(--accent)', background: '#fff0ee', color: 'var(--accent)' }}>
                 {submission.pairName}
               </span>
             )}
           </div>
 
           {/* iframe preview */}
-          <div className="relative rounded-2xl overflow-hidden border border-[#2a2a2a] bg-[#141414]" style={{ height: '520px' }}>
-            <div className="absolute top-0 left-0 right-0 h-8 bg-[#1a1a1a] border-b border-[#2a2a2a] flex items-center px-3 gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-[#2a2a2a]" />
-              <div className="w-3 h-3 rounded-full bg-[#2a2a2a]" />
-              <div className="w-3 h-3 rounded-full bg-[#2a2a2a]" />
-              <div className="ml-2 flex-1 h-4 rounded bg-[#2a2a2a] max-w-xs" />
+          <div className="relative rounded-2xl overflow-hidden" style={{ height: '520px', border: '1.5px solid var(--border)' }}>
+            <div className="flex items-center px-3 gap-1.5 border-b" style={{ height: '32px', background: '#f7f4f7', borderColor: 'var(--border)' }}>
+              <div className="w-3 h-3 rounded-full" style={{ background: '#e5e5e5' }} />
+              <div className="w-3 h-3 rounded-full" style={{ background: '#e5e5e5' }} />
+              <div className="w-3 h-3 rounded-full" style={{ background: '#e5e5e5' }} />
+              <span className="ml-2 text-xs" style={{ color: 'var(--muted)' }}>webapp educativa generada per IA</span>
             </div>
             <iframe
               srcDoc={submission.htmlOutput}
-              className="absolute top-8 left-0 right-0 bottom-0 w-full h-[calc(100%-2rem)]"
+              className="absolute left-0 right-0 bottom-0 w-full"
+              style={{ top: '32px', height: 'calc(100% - 32px)' }}
               sandbox="allow-scripts allow-forms"
               title="Recurs educatiu generat"
             />
@@ -158,7 +154,8 @@ export default function ResultPage() {
             href={`/app/${id}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 rounded-xl border border-[#2a2a2a] bg-[#141414] py-3 text-sm text-[#888] hover:text-white hover:border-[#444] transition-all"
+            className="flex items-center justify-center gap-2 rounded-xl py-3 text-sm transition-all"
+            style={{ border: '1.5px solid var(--border)', background: '#f7f4f7', color: 'var(--muted)' }}
           >
             ↗ Obrir en pantalla completa
           </a>
@@ -167,31 +164,31 @@ export default function ResultPage() {
         {/* Right: QR + info */}
         <div className="w-full lg:w-72 flex flex-col gap-4">
           {/* QR card */}
-          <div className="rounded-2xl border border-[#2a2a2a] bg-[#141414] p-6 flex flex-col items-center gap-4">
-            <div className="text-sm font-bold text-white">Accedeix al recurs</div>
+          <div className="rounded-2xl p-6 flex flex-col items-center gap-4" style={{ border: '1.5px solid var(--border)', background: '#f7f4f7' }}>
+            <div className="text-sm font-bold" style={{ color: 'var(--heading)' }}>Accedeix al recurs</div>
             {appUrl && (
-              <div className="bg-white p-3 rounded-xl">
+              <div className="bg-white p-3 rounded-xl" style={{ border: '1px solid var(--border)' }}>
                 <QRCode value={appUrl} size={160} />
               </div>
             )}
-            <div className="text-xs text-[#555] text-center break-all">{appUrl}</div>
+            <div className="text-xs text-center break-all" style={{ color: 'var(--muted)' }}>{appUrl}</div>
           </div>
 
           {/* Prompt summary */}
-          <div className="rounded-2xl border border-[#2a2a2a] bg-[#141414] p-5 flex flex-col gap-3">
-            <div className="text-xs font-bold text-[#888] uppercase tracking-widest">El prompt</div>
+          <div className="rounded-2xl p-5 flex flex-col gap-3" style={{ border: '1.5px solid var(--border)', background: '#f7f4f7' }}>
+            <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>El prompt</div>
             <PromptSentence tasca={submission.tasca} />
             {submission.pairName && (
-              <p className="text-xs pt-2 border-t border-[#2a2a2a]" style={{ color: '#555' }}>
+              <p className="text-xs pt-2 border-t" style={{ color: 'var(--muted)', borderColor: 'var(--border)' }}>
                 👥 {submission.pairName}
               </p>
             )}
           </div>
 
           {/* Refine section */}
-          <div className="rounded-2xl border border-[#2a2a2a] bg-[#141414] p-5 flex flex-col gap-3">
-            <div className="text-xs font-bold text-[#888] uppercase tracking-widest">✏️ Millorar el recurs</div>
-            <p className="text-xs text-[#555]">Descriu els canvis i la IA modificarà l&apos;app mantenint el contingut existent.</p>
+          <div className="rounded-2xl p-5 flex flex-col gap-3" style={{ border: '1.5px solid var(--border)', background: '#f7f4f7' }}>
+            <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>✏️ Millorar el recurs</div>
+            <p className="text-xs" style={{ color: 'var(--muted)' }}>Descriu els canvis i la IA modificarà l&apos;app mantenint el contingut existent.</p>
             <div className="relative">
               <textarea
                 placeholder="Ex: Afegeix un temporitzador de 30s, canvia els colors a blau, afegeix 3 preguntes més..."
@@ -199,24 +196,27 @@ export default function ResultPage() {
                 onChange={e => setRefineText(e.target.value)}
                 rows={3}
                 className="w-full rounded-xl px-3 py-2.5 pr-10 text-sm focus:outline-none resize-none"
-                style={{ background: '#1a1a1a', border: '1px solid #333', color: '#f5f5f5' }}
+                style={{ background: 'white', border: '1.5px solid var(--border)', color: 'var(--body)' }}
               />
               <button
                 type="button"
                 onClick={startRefineVoice}
                 className="absolute right-2 bottom-2 w-8 h-8 rounded-full flex items-center justify-center text-sm"
-                style={refineListening ? { background: '#e63946', color: 'white' } : { background: '#2a2a2a', color: '#888' }}
+                style={refineListening
+                  ? { background: 'var(--accent)', color: 'white' }
+                  : { background: '#f7f4f7', border: '1px solid var(--border)', color: 'var(--muted)' }
+                }
               >🎤</button>
             </div>
-            {refineListening && <p className="text-xs animate-pulse text-[#e63946]">🔴 Escoltant...</p>}
-            {refineError && <p className="text-xs text-[#e63946]">⚠️ {refineError}</p>}
+            {refineListening && <p className="text-xs animate-pulse" style={{ color: 'var(--accent)' }}>🔴 Escoltant...</p>}
+            {refineError && <p className="text-xs" style={{ color: 'var(--accent)' }}>⚠️ {refineError}</p>}
             <button
               onClick={handleRefine}
               disabled={!refineText.trim() || refining}
               className="rounded-xl py-3 text-sm font-bold transition-all"
               style={refineText.trim() && !refining
-                ? { background: '#e63946', color: 'white' }
-                : { background: '#1a1a1a', color: '#555', cursor: 'not-allowed', border: '1px solid #2a2a2a' }
+                ? { background: 'var(--heading)', color: 'white' }
+                : { background: '#e8e2e8', color: 'var(--muted)', cursor: 'not-allowed' }
               }
             >
               {refining ? '⏳ Millorant...' : '✨ Aplicar millores'}
@@ -226,7 +226,8 @@ export default function ResultPage() {
           {/* New resource button */}
           <button
             onClick={() => router.push('/create')}
-            className="rounded-2xl bg-[#e63946] py-4 text-white font-bold hover:bg-[#c1121f] transition-all hover:scale-[1.02]"
+            className="rounded-2xl py-4 font-bold transition-all hover:opacity-90 hover:scale-[1.02]"
+            style={{ background: 'var(--heading)', color: 'white' }}
           >
             ✨ Crear un altre recurs
           </button>
@@ -234,7 +235,8 @@ export default function ResultPage() {
           {/* Gallery link */}
           <a
             href="/gallery"
-            className="rounded-2xl border border-[#2a2a2a] py-3 text-center text-sm text-[#888] hover:text-white hover:border-[#444] transition-all"
+            className="rounded-2xl py-3 text-center text-sm transition-all"
+            style={{ border: '1.5px solid var(--border)', background: '#f7f4f7', color: 'var(--muted)' }}
           >
             🖼️ Veure la galeria completa
           </a>
@@ -247,21 +249,21 @@ export default function ResultPage() {
 function PromptSentence({ tasca }: { tasca: string }) {
   const parts = tasca.split(' · ');
   if (parts.length < 5) {
-    return <p className="text-sm italic leading-relaxed" style={{ color: '#aaa' }}>&ldquo;{tasca}&rdquo;</p>;
+    return <p className="text-sm italic leading-relaxed" style={{ color: 'var(--muted)' }}>&ldquo;{tasca}&rdquo;</p>;
   }
   const [eix, usuari, accio, repte, estil] = parts;
   return (
-    <p className="text-sm leading-[2.4]" style={{ color: '#aaa' }}>
+    <p className="text-sm leading-[2.4]" style={{ color: 'var(--body)' }}>
       &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de{' '}
-      <Badge v={eix} color="#0d9488" bg="#0d948820" />,{' '}
+      <Badge v={eix} color="#0d9488" bg="#f0fdfb" />,{' '}
       pensada perquè la faci servir{' '}
-      <Badge v={usuari} color="#7c3aed" bg="#7c3aed20" />,{' '}
+      <Badge v={usuari} color="#7c3aed" bg="#f5f3ff" />,{' '}
       a través de{' '}
-      <Badge v={accio} color="#2563eb" bg="#2563eb20" />{' '}
+      <Badge v={accio} color="#2563eb" bg="#eff6ff" />{' '}
       que serveixi per a{' '}
-      <Badge v={repte} color="#ea580c" bg="#ea580c20" />,{' '}
+      <Badge v={repte} color="#ea580c" bg="#fff7ed" />,{' '}
       amb un estil{' '}
-      <Badge v={estil} color="#be185d" bg="#be185d20" />,{' '}
+      <Badge v={estil} color="#be185d" bg="#fdf2f8" />,{' '}
       que sigui coherent i fàcil d&apos;usar.&rdquo;
     </p>
   );
@@ -271,7 +273,7 @@ function Badge({ v, color, bg }: { v: string; color: string; bg: string }) {
   return (
     <span
       className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold align-middle"
-      style={{ color, background: bg, border: `1px solid ${color}40` }}
+      style={{ color, background: bg, border: `1.5px solid ${color}50` }}
     >
       {v}
     </span>
