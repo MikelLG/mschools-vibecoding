@@ -137,7 +137,7 @@ export default function Home() {
 
         {/* Footer note */}
         <p className="text-center text-xs mb-8" style={{ color: 'var(--muted)' }}>
-          ~15 minuts · Gemini (aprovat pel Dept. d&apos;Educació)
+          ~15 minuts · Gemini
         </p>
 
         {/* Next step CTA */}
