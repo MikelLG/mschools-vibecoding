@@ -178,34 +178,56 @@ export default function CreatePage() {
   // ── Generating screen ────────────────────────────────────────────────────────
   if (generating) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-center px-6" style={{ background: 'var(--bg)' }}>
-        <div className="relative w-20 h-20 mb-8">
-          <div className="absolute inset-0 rounded-full border-4" style={{ borderColor: 'var(--border)' }} />
-          <div className="absolute inset-0 rounded-full border-4 animate-spin" style={{ borderColor: 'var(--heading)', borderTopColor: 'transparent' }} />
-          <div className="absolute inset-4 rounded-full flex items-center justify-center text-2xl" style={{ background: '#f7f4f7' }}>✨</div>
-        </div>
-        <h2 className="text-2xl font-black mb-3" style={{ color: 'var(--heading)' }}>Generant el teu recurs...</h2>
-        <p className="max-w-sm mb-8" style={{ color: 'var(--muted)' }}>
-          Gemini està creant la webapp educativa a partir del teu prompt.
-        </p>
-        <div className="max-w-lg w-full rounded-2xl p-5 text-left" style={{ background: '#f7f4f7', border: '1px solid var(--border)' }}>
-          <div className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--heading)' }}>El teu prompt</div>
-          <div className="flex flex-wrap gap-2">
-            {[
-              { label: eix, color: '#0d9488', bg: '#f0fdfb' },
-              { label: usuari, color: '#7c3aed', bg: '#f5f3ff' },
-              { label: repte, color: '#ea580c', bg: '#fff7ed' },
-              { label: accio, color: '#2563eb', bg: '#eff6ff' },
-              { label: estil, color: '#be185d', bg: '#fdf2f8' },
-            ].map(chip => (
-              <span key={chip.label} className="px-3 py-1 rounded-full text-sm font-semibold" style={{ background: chip.bg, color: chip.color }}>
-                {chip.label}
-              </span>
-            ))}
+      <div className="min-h-screen flex flex-col items-center justify-center px-6" style={{ background: 'var(--bg)' }}>
+        <div className="w-full max-w-lg flex flex-col items-center">
+          {/* Spinner */}
+          <div className="relative w-16 h-16 mb-6">
+            <div className="absolute inset-0 rounded-full border-4" style={{ borderColor: 'var(--border)' }} />
+            <div className="absolute inset-0 rounded-full border-4 animate-spin" style={{ borderColor: 'var(--heading)', borderTopColor: 'transparent' }} />
+            <div className="absolute inset-3 rounded-full flex items-center justify-center text-xl" style={{ background: '#f7f4f7' }}>✨</div>
           </div>
-          {extraContext && (
-            <p className="mt-3 text-sm" style={{ color: 'var(--muted)' }}>+ {extraContext}</p>
-          )}
+          <h2 className="text-2xl font-black mb-2 text-center" style={{ color: 'var(--heading)' }}>Generant el teu recurs...</h2>
+          <p className="text-sm mb-8 text-center" style={{ color: 'var(--muted)' }}>Gemini està creant la webapp educativa.</p>
+
+          {/* Full sentence prompt */}
+          <div className="w-full rounded-2xl p-5 mb-4" style={{ background: '#f7f4f7', border: '1px solid var(--border)' }}>
+            <div className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--muted)' }}>El teu prompt</div>
+            {voicePrompt ? (
+              <p className="text-sm italic" style={{ color: 'var(--body)' }}>&ldquo;{voicePrompt}&rdquo;</p>
+            ) : (
+              <p className="text-sm leading-[2.2]" style={{ color: 'var(--body)' }}>
+                &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de{' '}
+                <PromptBadge value={eix} placeholder="EIX" color="#0d9488" bg="#f0fdfb" emoji="🎯" />,{' '}
+                pensada perquè la faci servir{' '}
+                <PromptBadge value={usuari} placeholder="USUARI FINAL" color="#7c3aed" bg="#f5f3ff" emoji="👤" />,{' '}
+                a través de{' '}
+                <PromptBadge value={accio} placeholder="ACCIÓ PRINCIPAL" color="#2563eb" bg="#eff6ff" emoji="⚡" />{' '}
+                que serveixi per a{' '}
+                <PromptBadge value={repte} placeholder="REPTE" color="#ea580c" bg="#fff7ed" emoji="💡" />,{' '}
+                amb un estil{' '}
+                <PromptBadge value={estil} placeholder="ESTIL" color="#be185d" bg="#fdf2f8" emoji="🎨" />,{' '}
+                que sigui coherent i fàcil d&apos;usar.&rdquo;
+              </p>
+            )}
+            {extraContext && (
+              <p className="mt-3 text-sm border-t pt-3" style={{ color: 'var(--muted)', borderColor: 'var(--border)' }}>
+                + {extraContext}
+              </p>
+            )}
+          </div>
+
+          {/* Extra context editable while waiting */}
+          <div className="w-full rounded-2xl p-4" style={{ background: 'white', border: '1px solid var(--border)' }}>
+            <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--muted)' }}>Afegir al prompt (opcional)</p>
+            <textarea
+              placeholder="Mentre esperes, pots afegir més context per a la pròxima iteració..."
+              value={extraContext}
+              onChange={e => setExtraContext(e.target.value)}
+              rows={2}
+              className="w-full rounded-xl px-3 py-2 text-sm focus:outline-none resize-none"
+              style={{ background: '#f7f4f7', border: '1px solid var(--border)', color: 'var(--body)' }}
+            />
+          </div>
         </div>
       </div>
     );
