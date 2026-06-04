@@ -11,13 +11,13 @@ const FOR = [
     emoji: '🛠️',
     title: 'Recursos per usar avui',
     desc: 'Una eina que el docent o l\'alumne pugui obrir i fer servir directament a classe.',
-    color: '#2563eb', bg: '#eff6ff',
+    color: '#15803d', bg: '#dcfce7',
   },
   {
     emoji: '✨',
     title: 'Simple i funcional',
     desc: 'Un quiz, un joc, una rúbrica, una fitxa. Res complex. Directe al gra.',
-    color: '#7c3aed', bg: '#f5f3ff',
+    color: '#166534', bg: '#bbf7d0',
   },
 ];
 
@@ -26,19 +26,19 @@ const NOT_FOR = [
     emoji: '🔐',
     title: 'Apps amb login o base de dades',
     desc: 'La IA genera HTML estàtic. Sense comptes, contrasenyes ni emmagatzematge permanent.',
-    color: '#ea580c', bg: '#fff7ed',
+    color: '#dc2626', bg: '#fef2f2',
   },
   {
     emoji: '🚫',
     title: 'Eines genèriques o personals',
     desc: 'No és per a projectes particulars. El recurs ha de tenir una utilitat educativa clara.',
-    color: '#be185d', bg: '#fdf2f8',
+    color: '#b91c1c', bg: '#fee2e2',
   },
   {
     emoji: '🤖',
     title: 'Deixar-ho tot a la IA',
     desc: 'La IA ajuda, però el repte i el context els poseu vosaltres. Sense context, no hi ha bon recurs.',
-    color: '#b45309', bg: '#fffbeb',
+    color: '#991b1b', bg: '#fecaca',
   },
 ];
 
@@ -108,7 +108,7 @@ export default function Home() {
         {/* What it's NOT for */}
         <section className="mb-12">
           <div className="flex items-center gap-2 mb-4">
-            <span className="text-sm font-bold tracking-widest uppercase" style={{ color: '#be185d' }}>
+            <span className="text-sm font-bold tracking-widest uppercase" style={{ color: '#dc2626' }}>
               🔴 Fora de l&apos;abast
             </span>
           </div>
