@@ -43,7 +43,7 @@ export async function getSubmissions(sessionId: string): Promise<Submission[]> {
     .filter(s => s.sessionId === sessionId);
 }
 
-export function subscribeSubmissions(sessionId: string, cb: (submissions: Submission[]) => void) {
+export function subscribeSubmissions(sessionId: string, cb: (submissions: Submission[]) => void, allSessions = false) {
   const q = query(collection(db, 'submissions'), orderBy('createdAt', 'desc'));
   return onSnapshot(q, snap => {
     const results = snap.docs
@@ -51,7 +51,7 @@ export function subscribeSubmissions(sessionId: string, cb: (submissions: Submis
         const data = d.data();
         return { ...data, id: d.id, createdAt: (data.createdAt as Timestamp).toMillis() } as Submission;
       })
-      .filter(s => s.sessionId === sessionId);
+      .filter(s => allSessions || s.sessionId === sessionId);
     cb(results);
   });
 }

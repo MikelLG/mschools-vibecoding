@@ -79,7 +79,7 @@ export default function ScreenPage() {
         }
         return subs;
       });
-    });
+    }, true); // allSessions=true so nothing is missed
     return () => unsub();
   }, []);
 
@@ -183,6 +183,15 @@ export default function ScreenPage() {
                 </span>
               );
             })}
+            {(() => {
+              const other = submissions.filter(s => !EIXOS.some(e => e.value === s.contextTheme || e.value === s.contextThemeLabel)).length;
+              return other > 0 ? (
+                <span className="flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium"
+                  style={{ background: '#f7f4f7', color: 'var(--muted)', border: '1px solid var(--border)' }}>
+                  🎤 Veu · {other}
+                </span>
+              ) : null;
+            })()}
           </div>
         )}
       </header>
