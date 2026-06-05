@@ -16,7 +16,6 @@ export default function ResultPage() {
   const [refining, setRefining] = useState(false);
   const [refineListening, setRefineListening] = useState(false);
   const [refineError, setRefineError] = useState('');
-  const [showFullPrompt, setShowFullPrompt] = useState(false);
   const refineRecRef = useRef<SpeechRecognition | null>(null);
 
   const startRefineVoice = useCallback(() => {
@@ -160,6 +159,19 @@ export default function ResultPage() {
           >
             ↗ Obrir en pantalla completa
           </a>
+
+          {/* Full prompt */}
+          {submission.prompt && (
+            <div className="rounded-2xl p-5 flex flex-col gap-3" style={{ border: '1.5px solid var(--border)', background: '#f7f4f7' }}>
+              <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Prompt enviat a Gemini</div>
+              <pre
+                className="text-xs rounded-xl p-4 whitespace-pre-wrap break-words leading-relaxed overflow-auto max-h-72"
+                style={{ background: 'white', border: '1px solid var(--border)', color: 'var(--body)', fontFamily: 'monospace' }}
+              >
+                {submission.prompt}
+              </pre>
+            </div>
+          )}
         </div>
 
         {/* Right: QR + info */}
@@ -175,34 +187,14 @@ export default function ResultPage() {
             <div className="text-xs text-center break-all" style={{ color: 'var(--muted)' }}>{appUrl}</div>
           </div>
 
-          {/* Prompt summary */}
+          {/* Pre-Prompt summary */}
           <div className="rounded-2xl p-5 flex flex-col gap-3" style={{ border: '1.5px solid var(--border)', background: '#f7f4f7' }}>
-            <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>El prompt</div>
+            <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Pre-Prompt</div>
             <PromptSentence tasca={submission.tasca} />
             {submission.pairName && (
               <p className="text-xs pt-2 border-t" style={{ color: 'var(--muted)', borderColor: 'var(--border)' }}>
                 👥 {submission.pairName}
               </p>
-            )}
-            {submission.prompt && (
-              <div className="border-t pt-3" style={{ borderColor: 'var(--border)' }}>
-                <button
-                  onClick={() => setShowFullPrompt(v => !v)}
-                  className="flex items-center gap-1.5 text-xs font-bold transition-colors"
-                  style={{ color: 'var(--muted)' }}
-                >
-                  <span>{showFullPrompt ? '▲' : '▼'}</span>
-                  {showFullPrompt ? 'Amagar prompt complet' : 'Veure prompt complet enviat a Gemini'}
-                </button>
-                {showFullPrompt && (
-                  <pre
-                    className="mt-3 text-xs rounded-xl p-3 overflow-x-auto whitespace-pre-wrap break-words leading-relaxed"
-                    style={{ background: 'white', border: '1px solid var(--border)', color: 'var(--body)', fontFamily: 'monospace' }}
-                  >
-                    {submission.prompt}
-                  </pre>
-                )}
-              </div>
             )}
           </div>
 
