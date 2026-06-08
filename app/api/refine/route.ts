@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextRequest, NextResponse } from 'next/server';
 
-export const maxDuration = 120;
+export const maxDuration = 240;
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 

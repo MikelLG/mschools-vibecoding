@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextRequest, NextResponse } from 'next/server';
 import { EIX_CONTEXT, USUARI_CONTEXT, REPTE_CONTEXT, ACCIO_CONTEXT, ESTIL_CONTEXT } from '@/lib/card-context';
 
-export const maxDuration = 120;
+export const maxDuration = 240;
 
 function generateId() {
   return crypto.randomUUID().replace(/-/g, '').slice(0, 16);

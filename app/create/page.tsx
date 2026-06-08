@@ -165,8 +165,9 @@ export default function CreatePage() {
         }),
       });
       if (!res.ok) {
+        if (res.status === 504 || res.status === 524) throw new Error('La generació ha trigat massa. Torna-ho a intentar.');
         const errData = await res.json().catch(() => ({})) as { error?: string };
-        throw new Error(errData.error || 'Error de generació');
+        throw new Error(errData.error || `Error ${res.status} — torna-ho a intentar`);
       }
       const { submission } = await res.json() as { submission: Submission };
       const { saveSubmission } = await import('@/lib/firebase');
