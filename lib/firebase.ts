@@ -1,6 +1,6 @@
 import { initializeApp, getApps } from 'firebase/app';
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, orderBy, onSnapshot, Timestamp } from 'firebase/firestore';
-import type { Submission } from './types';
+import type { Submission, WorkshopTimer } from './types';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -42,6 +42,38 @@ export async function getSubmissions(sessionId: string): Promise<Submission[]> {
     })
     .filter(s => s.sessionId === sessionId);
 }
+
+// ── Workshop timer ─────────────────────────────────────────────────────────────
+
+const TIMER_DOC = 'timer';
+const WORKSHOP_COLLECTION = 'workshop';
+
+export const DEFAULT_TIMER: WorkshopTimer = {
+  phase: 0,
+  phaseLabel: '',
+  instruction: '',
+  color: '#ea580c',
+  bg: '#fff7ed',
+  durationSeconds: 300,
+  startedAt: 0,
+  secondsAtStart: 300,
+  running: false,
+};
+
+export async function updateWorkshopTimer(updates: Partial<WorkshopTimer>) {
+  const ref = doc(db, WORKSHOP_COLLECTION, TIMER_DOC);
+  await setDoc(ref, updates, { merge: true });
+}
+
+export function subscribeWorkshopTimer(cb: (timer: WorkshopTimer) => void) {
+  const ref = doc(db, WORKSHOP_COLLECTION, TIMER_DOC);
+  return onSnapshot(ref, snap => {
+    if (!snap.exists()) { cb(DEFAULT_TIMER); return; }
+    cb({ ...DEFAULT_TIMER, ...snap.data() } as WorkshopTimer);
+  });
+}
+
+// ── Submissions ────────────────────────────────────────────────────────────────
 
 export function subscribeSubmissions(sessionId: string, cb: (submissions: Submission[]) => void, allSessions = false) {
   const q = query(collection(db, 'submissions'), orderBy('createdAt', 'desc'));

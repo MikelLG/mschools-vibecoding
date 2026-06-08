@@ -1,3 +1,15 @@
+export interface WorkshopTimer {
+  phase: number;           // 0 = not started, 1/2/3 = active phase
+  phaseLabel: string;
+  instruction: string;
+  color: string;
+  bg: string;
+  durationSeconds: number;
+  startedAt: number;       // ms timestamp of when current run segment started
+  secondsAtStart: number;  // seconds remaining when start/resume was pressed
+  running: boolean;
+}
+
 export interface Submission {
   id: string;
   stationId: number;
