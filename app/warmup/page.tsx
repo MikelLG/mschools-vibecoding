@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import EXAMPLES from '@/lib/examples.json';
+import { PhaseTimer } from '@/components/PhaseTimer';
 
 function WBadge({ v, color, bg, emoji }: { v: string; color: string; bg: string; emoji: string }) {
   return (
@@ -15,37 +16,19 @@ function WBadge({ v, color, bg, emoji }: { v: string; color: string; bg: string;
   );
 }
 
+const PROMPT: { eix: string; usuari: string; accio: string; repte: string; estil: string } = {
+  eix: 'Benestar social',
+  usuari: 'Alumnat',
+  accio: 'Crear un mini-joc',
+  repte: 'Practicar un contingut',
+  estil: 'Colors suaus',
+};
+
+const example = EXAMPLES[0];
+
 export default function WarmupPage() {
   const router = useRouter();
-  const [revealed, setRevealed] = useState<Record<string, boolean>>({});
-  const [active, setActive] = useState(0);
-
-  const ex = EXAMPLES[active];
-  const isRevealed = revealed[ex.id];
-
-  const PROMPTS: Record<string, { eix: string; usuari: string; accio: string; repte: string; estil: string }> = {
-    'example-quiz': {
-      eix: 'Benestar social',
-      usuari: 'Alumnat',
-      accio: 'Crear un mini-joc',
-      repte: 'Practicar un contingut',
-      estil: 'Colors suaus',
-    },
-    'example-joc': {
-      eix: 'Cultura i diversitat',
-      usuari: 'Alumnat',
-      accio: 'Crear un mini-joc',
-      repte: 'Explorar un concepte',
-      estil: 'Infantil',
-    },
-    'example-rubrica': {
-      eix: 'Benestar social',
-      usuari: 'Docent',
-      accio: 'Recollir dades',
-      repte: 'Avaluació',
-      estil: 'Estil fitxa / sobri',
-    },
-  };
+  const [revealed, setRevealed] = useState(false);
 
   return (
     <main className="min-h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
@@ -58,94 +41,67 @@ export default function WarmupPage() {
         <div className="w-16" />
       </header>
 
-      <div className="max-w-4xl mx-auto w-full px-6 py-8 flex-1 flex flex-col">
+      {/* Phase timer */}
+      <PhaseTimer
+        phase={1}
+        label="Warm-up"
+        defaultMinutes={5}
+        instruction="Explora l'app i endevina el prompt que la va generar"
+        color="#ea580c"
+        bg="#fff7ed"
+      />
+
+      <div className="max-w-3xl mx-auto w-full px-6 py-8 flex-1 flex flex-col">
         {/* Intro */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-4 text-sm font-bold border" style={{ borderColor: '#ea580c40', background: '#fff7ed', color: '#ea580c' }}>
-            🔍 Warm-up · 5 minuts
-          </div>
-          <h1 className="text-3xl font-black mb-3" style={{ color: 'var(--heading)' }}>
+        <div className="mb-6">
+          <h1 className="text-2xl font-black mb-2" style={{ color: 'var(--heading)' }}>
             Endevina el prompt
           </h1>
-          <p className="max-w-lg mx-auto" style={{ color: 'var(--muted)' }}>
-            Explora aquesta webapp educativa. Intenta endevinar quines instruccions li vam donar a la IA per crear-la. Quan ho tinguis, revela el prompt!
+          <p style={{ color: 'var(--muted)' }}>
+            Explora aquesta webapp educativa generada per IA. Intenta endevinar quines instruccions li vam donar. Quan ho tinguis, revela el prompt!
           </p>
         </div>
 
-        {/* Example navigation */}
-        <div className="flex items-center justify-between mb-6 gap-4">
-          <button
-            onClick={() => { setActive(i => Math.max(0, i - 1)); }}
-            disabled={active === 0}
-            className="rounded-xl px-4 py-2 text-sm font-medium transition-all flex items-center gap-2"
-            style={active === 0
-              ? { background: '#f0eaf0', color: 'var(--border)', cursor: 'not-allowed' }
-              : { background: '#f7f4f7', color: 'var(--heading)', border: '1px solid var(--border)' }
-            }
-          >
-            ← Anterior
-          </button>
-
-          <div className="flex gap-2 flex-wrap justify-center">
-            {EXAMPLES.map((e, i) => (
-              <button
-                key={e.id}
-                onClick={() => setActive(i)}
-                className="rounded-full px-4 py-2 text-sm font-medium transition-all"
-                style={active === i
-                  ? { background: 'var(--heading)', color: 'white' }
-                  : { background: '#f7f4f7', color: 'var(--muted)', border: '1px solid var(--border)' }
-                }
-              >
-                {i + 1}. {e.title}
-              </button>
-            ))}
-          </div>
-
-          <button
-            onClick={() => { setActive(i => Math.min(EXAMPLES.length - 1, i + 1)); }}
-            disabled={active === EXAMPLES.length - 1}
-            className="rounded-xl px-4 py-2 text-sm font-medium transition-all flex items-center gap-2"
-            style={active === EXAMPLES.length - 1
-              ? { background: '#f0eaf0', color: 'var(--border)', cursor: 'not-allowed' }
-              : { background: '#f7f4f7', color: 'var(--heading)', border: '1px solid var(--border)' }
-            }
-          >
-            Següent →
-          </button>
+        {/* Instructions */}
+        <div className="rounded-2xl p-4 mb-5 flex flex-col gap-2" style={{ background: '#f0fdfb', border: '1.5px solid #0d948825' }}>
+          <div className="text-xs font-bold uppercase tracking-widest" style={{ color: '#0d9488' }}>Com funciona</div>
+          <ol className="text-sm flex flex-col gap-1" style={{ color: 'var(--body)' }}>
+            <li>1. Prova l&apos;app interactiva de sota — juga-hi, toca-ho tot</li>
+            <li>2. Pensa quin podria ser el <strong>Eix</strong>, <strong>Usuari</strong>, <strong>Acció</strong>, <strong>Repte</strong> i <strong>Estil</strong></li>
+            <li>3. Clica &ldquo;Revela el prompt&rdquo; per veure la resposta</li>
+          </ol>
         </div>
 
         {/* Webapp iframe */}
-        <div className="flex-1 flex flex-col gap-4">
+        <div className="flex flex-col gap-4 flex-1">
           <div className="relative rounded-2xl overflow-hidden flex-1 min-h-[480px]" style={{ border: '1.5px solid var(--border)' }}>
-            {/* Browser chrome */}
             <div className="flex items-center gap-1.5 px-4 py-2 border-b" style={{ background: '#f7f4f7', borderColor: 'var(--border)' }}>
               <div className="w-3 h-3 rounded-full" style={{ background: '#e5e5e5' }} />
               <div className="w-3 h-3 rounded-full" style={{ background: '#e5e5e5' }} />
               <div className="w-3 h-3 rounded-full" style={{ background: '#e5e5e5' }} />
-              <span className="ml-3 text-xs" style={{ color: 'var(--muted)' }}>webapp educativa generada per IA</span>
+              <span className="ml-3 text-xs" style={{ color: 'var(--muted)' }}>{example.title}</span>
             </div>
             <iframe
-              key={ex.id}
-              srcDoc={ex.html}
+              key={example.id}
+              srcDoc={example.html}
               className="w-full h-full min-h-[440px]"
               sandbox="allow-scripts allow-forms"
-              title={ex.title}
+              title={example.title}
             />
           </div>
 
           {/* Reveal area */}
           <div className="rounded-2xl p-6" style={{ background: '#f7f4f7', border: '1.5px solid var(--border)' }}>
-            {!isRevealed ? (
+            {!revealed ? (
               <div className="text-center">
-                <p className="text-sm mb-4 font-medium" style={{ color: 'var(--heading)' }}>
+                <p className="text-sm mb-2 font-medium" style={{ color: 'var(--heading)' }}>
                   💭 Quines instruccions creus que li vam donar a la IA?
                 </p>
-                <p className="text-xs mb-6" style={{ color: 'var(--muted)' }}>
+                <p className="text-xs mb-5" style={{ color: 'var(--muted)' }}>
                   Pensa en: qui ho demana, per a qui és, quin és el repte, quin format té...
                 </p>
                 <button
-                  onClick={() => setRevealed(r => ({ ...r, [ex.id]: true }))}
+                  onClick={() => setRevealed(true)}
                   className="rounded-xl px-6 py-3 font-bold text-white transition-all hover:opacity-90"
                   style={{ background: 'var(--heading)' }}
                 >
@@ -157,24 +113,19 @@ export default function WarmupPage() {
                 <div className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--heading)' }}>
                   El prompt que vam usar
                 </div>
-                {(() => {
-                  const p = PROMPTS[ex.id];
-                  return (
-                    <p className="text-sm leading-[2.4]" style={{ color: 'var(--body)' }}>
-                      &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de{' '}
-                      <WBadge v={p.eix} color="#0d9488" bg="#f0fdfb" emoji="🎯" />,{' '}
-                      pensada perquè la faci servir{' '}
-                      <WBadge v={p.usuari} color="#7c3aed" bg="#f5f3ff" emoji="👤" />,{' '}
-                      a través de{' '}
-                      <WBadge v={p.accio} color="#2563eb" bg="#eff6ff" emoji="⚡" />{' '}
-                      que serveixi per a{' '}
-                      <WBadge v={p.repte} color="#ea580c" bg="#fff7ed" emoji="💡" />,{' '}
-                      amb un estil{' '}
-                      <WBadge v={p.estil} color="#be185d" bg="#fdf2f8" emoji="🎨" />,{' '}
-                      que sigui coherent i fàcil d&apos;usar.&rdquo;
-                    </p>
-                  );
-                })()}
+                <p className="text-sm leading-[2.4]" style={{ color: 'var(--body)' }}>
+                  &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de{' '}
+                  <WBadge v={PROMPT.eix} color="#0d9488" bg="#f0fdfb" emoji="🎯" />,{' '}
+                  pensada perquè la faci servir{' '}
+                  <WBadge v={PROMPT.usuari} color="#7c3aed" bg="#f5f3ff" emoji="👤" />,{' '}
+                  a través de{' '}
+                  <WBadge v={PROMPT.accio} color="#2563eb" bg="#eff6ff" emoji="⚡" />{' '}
+                  que serveixi per a{' '}
+                  <WBadge v={PROMPT.repte} color="#ea580c" bg="#fff7ed" emoji="💡" />,{' '}
+                  amb un estil{' '}
+                  <WBadge v={PROMPT.estil} color="#be185d" bg="#fdf2f8" emoji="🎨" />,{' '}
+                  que sigui coherent i fàcil d&apos;usar.&rdquo;
+                </p>
               </div>
             )}
           </div>

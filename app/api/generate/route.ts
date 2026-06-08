@@ -31,9 +31,9 @@ async function generateWithRetry(prompt: string): Promise<string> {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { selectedCards, promptPreview, voicePrompt, extraContext, format, formatLabel, pairName, sessionId } = body;
+    const { selectedCards, promptPreview, voicePrompt, extraContext, format, formatLabel, pairName, sessionId, rawPrompt } = body;
 
-    const prompt = buildPrompt({ selectedCards, promptPreview, voicePrompt, extraContext, formatLabel, format });
+    const prompt = rawPrompt ?? buildPrompt({ selectedCards: selectedCards ?? [], promptPreview, voicePrompt, extraContext, formatLabel, format });
 
     let htmlOutput = await generateWithRetry(prompt);
 
@@ -52,9 +52,9 @@ export async function POST(req: NextRequest) {
       contextTheme: selectedCards?.find((c: {group:string}) => c.group === 'Eix')?.value ?? '',
       contextThemeLabel: selectedCards?.find((c: {group:string}) => c.group === 'Eix')?.value ?? '',
       contextDescription: extraContext ?? '',
-      tasca: promptPreview ?? '',
-      format,
-      formatLabel,
+      tasca: rawPrompt ? 'Prompt personalitzat' : (promptPreview ?? ''),
+      format: format ?? 'activitat',
+      formatLabel: formatLabel ?? 'Recurs educatiu',
       prompt,
       htmlOutput,
       createdAt: Date.now(),

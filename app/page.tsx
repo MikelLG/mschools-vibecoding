@@ -75,16 +75,9 @@ export default function Home() {
           <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4 leading-tight" style={{ color: 'var(--heading)' }}>
             Construeix un recurs educatiu real, ara mateix
           </h1>
-          <p className="text-lg leading-relaxed mb-8" style={{ color: 'var(--muted)' }}>
+          <p className="text-lg leading-relaxed" style={{ color: 'var(--muted)' }}>
             Seguireu 4 passos per descriure el vostre repte docent. La IA generarà una eina funcional que podreu usar directament a l&apos;aula.
           </p>
-          <Link
-            href="/create"
-            className="inline-flex items-center justify-center gap-2 rounded-xl px-8 py-4 text-lg font-bold text-white transition-all hover:opacity-90"
-            style={{ background: 'var(--heading)' }}
-          >
-            ✨ Crear recurs
-          </Link>
         </div>
 
         {/* What it's for */}
@@ -112,7 +105,7 @@ export default function Home() {
         </section>
 
         {/* What it's NOT for */}
-        <section className="mb-12">
+        <section className="mb-10">
           <div className="flex items-center gap-2 mb-4">
             <span className="text-sm font-bold tracking-widest uppercase" style={{ color: '#dc2626' }}>
               🔴 Fora de l&apos;abast
@@ -135,6 +128,19 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Privacy disclaimer */}
+        <section className="mb-10 rounded-2xl p-5" style={{ background: '#f0f9ff', border: '1.5px solid #bae6fd' }}>
+          <div className="flex items-start gap-3">
+            <span className="text-xl mt-0.5">🔒</span>
+            <div>
+              <div className="font-bold text-sm mb-1" style={{ color: '#0369a1' }}>Privadesa i dades</div>
+              <div className="text-sm leading-relaxed" style={{ color: '#0c4a6e' }}>
+                Aquesta eina no recull ni emmagatzema cap dada personal. Les instruccions que envieu es processen amb Gemini (Google) per generar el codi de l&apos;eina. L&apos;HTML generat es guarda temporalment per permetre l&apos;accés via QR durant la sessió. Cap dada s&apos;associa a la vostra identitat.
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Footer note */}
         <p className="text-center text-xs mb-8" style={{ color: 'var(--muted)' }}>
           ~15 minuts · Gemini
@@ -147,7 +153,7 @@ export default function Home() {
             className="inline-flex items-center gap-3 rounded-2xl px-8 py-4 text-lg font-bold text-white transition-all hover:opacity-90"
             style={{ background: 'var(--heading)' }}
           >
-            Següent: Warm-up
+            Comença: Warm-up
             <span className="text-xl">→</span>
           </Link>
         </div>

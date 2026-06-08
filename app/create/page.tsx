@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Submission } from '@/lib/types';
+import { PhaseTimer } from '@/components/PhaseTimer';
 
 // ── Card definitions ───────────────────────────────────────────────────────────
 
@@ -105,7 +106,6 @@ export default function CreatePage() {
   const [repte, setRepte] = useState('');
   const [accio, setAccio] = useState('');
   const [estil, setEstil] = useState('');
-  const [pairName, setPairName] = useState('');
   const [extraContext, setExtraContext] = useState('');
   const [voicePrompt, setVoicePrompt] = useState('');
   const [listening, setListening] = useState(false);
@@ -160,7 +160,6 @@ export default function CreatePage() {
           extraContext,
           format: accio.toLowerCase().replace(/\s/g, '_') || 'activitat',
           formatLabel: accio || 'Recurs educatiu',
-          pairName,
           sessionId: process.env.NEXT_PUBLIC_SESSION_ID ?? 'mschools-2026',
         }),
       });
@@ -250,6 +249,16 @@ export default function CreatePage() {
         </span>
       </header>
 
+      {/* Phase timer */}
+      <PhaseTimer
+        phase={2}
+        label="Construeix el prompt"
+        defaultMinutes={8}
+        instruction="Selecciona les 5 targetes i descriu el teu repte educatiu"
+        color="#7c3aed"
+        bg="#f5f3ff"
+      />
+
       {/* Live prompt preview */}
       <div className="sticky top-[57px] z-10 px-6 py-4 border-b" style={{ background: '#f7f4f7', borderColor: 'var(--border)' }}>
         <div className="max-w-3xl mx-auto">
@@ -293,15 +302,6 @@ export default function CreatePage() {
       </div>
 
       <div className="max-w-3xl mx-auto w-full px-6 py-6 flex flex-col gap-10">
-
-        {/* Pair name */}
-        <input
-          placeholder="Nom de la parella (opcional)"
-          value={pairName}
-          onChange={e => setPairName(e.target.value)}
-          className="w-full rounded-xl px-4 py-3 text-sm focus:outline-none"
-          style={{ background: '#f7f4f7', border: '1.5px solid var(--border)', color: 'var(--body)' }}
-        />
 
         {/* 1. Eixos */}
         <CardGroup

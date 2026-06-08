@@ -40,4 +40,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-.vercel
+# local ai/dev context files (not needed in repo)
+cards-context.md
+todo.md
+wip.md

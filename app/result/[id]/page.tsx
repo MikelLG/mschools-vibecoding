@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import QRCode from 'react-qr-code';
 import { getSubmission, updateSubmission } from '@/lib/firebase';
 import type { Submission } from '@/lib/types';
+import { PhaseTimer } from '@/components/PhaseTimer';
 
 export default function ResultPage() {
   const { id } = useParams<{ id: string }>();
@@ -12,11 +13,22 @@ export default function ResultPage() {
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [loading, setLoading] = useState(true);
   const [origin, setOrigin] = useState('');
+
+  // Refine
   const [refineText, setRefineText] = useState('');
   const [refining, setRefining] = useState(false);
   const [refineListening, setRefineListening] = useState(false);
   const [refineError, setRefineError] = useState('');
   const refineRecRef = useRef<SpeechRecognition | null>(null);
+
+  // Group name (saved at end)
+  const [groupName, setGroupName] = useState('');
+  const [groupNameSaved, setGroupNameSaved] = useState(false);
+
+  // Editable prompt
+  const [editablePrompt, setEditablePrompt] = useState('');
+  const [promptEdited, setPromptEdited] = useState(false);
+  const [regenerating, setRegenerating] = useState(false);
 
   const startRefineVoice = useCallback(() => {
     if (refineListening) { refineRecRef.current?.stop(); return; }
@@ -62,6 +74,42 @@ export default function ResultPage() {
     }
   };
 
+  const handleRegenerate = async () => {
+    if (!submission || !editablePrompt.trim()) return;
+    setRegenerating(true);
+    setRefineError('');
+    try {
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          rawPrompt: editablePrompt,
+          pairName: groupName || submission.pairName || '',
+          sessionId: process.env.NEXT_PUBLIC_SESSION_ID ?? 'mschools-2026',
+        }),
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(errData.error || 'Error regenerant');
+      }
+      const { submission: newSub } = await res.json() as { submission: Submission };
+      const { saveSubmission } = await import('@/lib/firebase');
+      await saveSubmission(newSub);
+      router.push(`/result/${newSub.id}`);
+    } catch (err) {
+      setRefineError((err as Error).message || 'Error inesperat');
+      setRegenerating(false);
+    }
+  };
+
+  const saveGroupName = async () => {
+    if (!submission) return;
+    await updateSubmission(submission.id, { pairName: groupName });
+    setSubmission(prev => prev ? { ...prev, pairName: groupName } : prev);
+    setGroupNameSaved(true);
+    setTimeout(() => setGroupNameSaved(false), 2500);
+  };
+
   useEffect(() => {
     setOrigin(window.location.origin);
   }, []);
@@ -71,6 +119,10 @@ export default function ResultPage() {
     getSubmission(id as string).then(s => {
       setSubmission(s);
       setLoading(false);
+      if (s) {
+        setGroupName(s.pairName ?? '');
+        setEditablePrompt(s.prompt ?? '');
+      }
     });
   }, [id]);
 
@@ -109,6 +161,16 @@ export default function ResultPage() {
           + Nou recurs
         </button>
       </header>
+
+      {/* Phase timer */}
+      <PhaseTimer
+        phase={3}
+        label="Itera i millora"
+        defaultMinutes={5}
+        instruction="Prova l'app, usa el panell de millores i posa-li el nom al final"
+        color="#0d9488"
+        bg="#f0fdfb"
+      />
 
       <div className="flex-1 flex flex-col lg:flex-row max-w-7xl mx-auto w-full p-6 gap-6">
         {/* Left: Preview iframe */}
@@ -160,16 +222,37 @@ export default function ResultPage() {
             ↗ Obrir en pantalla completa
           </a>
 
-          {/* Full prompt */}
-          {submission.prompt && (
+          {/* Editable full prompt */}
+          {editablePrompt && (
             <div className="rounded-2xl p-5 flex flex-col gap-3" style={{ border: '1.5px solid var(--border)', background: '#f7f4f7' }}>
-              <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Prompt enviat a Gemini</div>
-              <pre
-                className="text-xs rounded-xl p-4 whitespace-pre-wrap break-words leading-relaxed overflow-auto max-h-72"
-                style={{ background: 'white', border: '1px solid var(--border)', color: 'var(--body)', fontFamily: 'monospace' }}
-              >
-                {submission.prompt}
-              </pre>
+              <div className="flex items-center justify-between">
+                <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>
+                  Prompt enviat a Gemini
+                </div>
+                {promptEdited && (
+                  <span className="text-xs font-medium" style={{ color: '#0d9488' }}>Editat ✓</span>
+                )}
+              </div>
+              <textarea
+                value={editablePrompt}
+                onChange={e => { setEditablePrompt(e.target.value); setPromptEdited(true); }}
+                rows={10}
+                className="text-xs rounded-xl p-4 whitespace-pre-wrap leading-relaxed resize-y focus:outline-none"
+                style={{ background: 'white', border: `1px solid ${promptEdited ? '#0d9488' : 'var(--border)'}`, color: 'var(--body)', fontFamily: 'monospace' }}
+              />
+              {promptEdited && (
+                <button
+                  onClick={handleRegenerate}
+                  disabled={regenerating}
+                  className="rounded-xl py-2.5 text-sm font-bold transition-all"
+                  style={regenerating
+                    ? { background: '#e8e2e8', color: 'var(--muted)', cursor: 'not-allowed' }
+                    : { background: '#0d9488', color: 'white' }
+                  }
+                >
+                  {regenerating ? '⏳ Generant...' : '🔄 Regenerar amb aquest prompt'}
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -191,11 +274,6 @@ export default function ResultPage() {
           <div className="rounded-2xl p-5 flex flex-col gap-3" style={{ border: '1.5px solid var(--border)', background: '#f7f4f7' }}>
             <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Pre-Prompt</div>
             <PromptSentence tasca={submission.tasca} />
-            {submission.pairName && (
-              <p className="text-xs pt-2 border-t" style={{ color: 'var(--muted)', borderColor: 'var(--border)' }}>
-                👥 {submission.pairName}
-              </p>
-            )}
           </div>
 
           {/* Refine section */}
@@ -234,6 +312,33 @@ export default function ResultPage() {
             >
               {refining ? '⏳ Millorant...' : '✨ Aplicar millores'}
             </button>
+          </div>
+
+          {/* Group name — save at the end */}
+          <div className="rounded-2xl p-5 flex flex-col gap-3" style={{ border: '1.5px solid var(--border)', background: '#f7f4f7' }}>
+            <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>👥 Identificar el recurs</div>
+            <p className="text-xs" style={{ color: 'var(--muted)' }}>Opcional. Afegiu el nom del vostre grup per identificar el recurs a la galeria.</p>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Ex: Grup 3, Equip B, Anna & Marc..."
+                value={groupName}
+                onChange={e => setGroupName(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') saveGroupName(); }}
+                className="flex-1 rounded-xl px-3 py-2 text-sm focus:outline-none"
+                style={{ background: 'white', border: '1.5px solid var(--border)', color: 'var(--body)' }}
+              />
+              <button
+                onClick={saveGroupName}
+                className="rounded-xl px-3 py-2 text-sm font-bold transition-all flex-shrink-0"
+                style={groupNameSaved
+                  ? { background: '#f0fdfb', color: '#0d9488', border: '1.5px solid #0d9488' }
+                  : { background: 'var(--heading)', color: 'white' }
+                }
+              >
+                {groupNameSaved ? '✓' : 'Desar'}
+              </button>
+            </div>
           </div>
 
           {/* New resource button */}
