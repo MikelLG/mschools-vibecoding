@@ -142,8 +142,8 @@ export default function CreatePage() {
     setError('');
     setRetryInfo(null);
 
-    const MAX_RETRIES = 3;
-    const RETRY_SECONDS = 12;
+    const MAX_RETRIES = 10; // ~2 minutes of auto-retry before giving up
+    const RETRY_SECONDS = 10;
 
     const usingVoice = voicePrompt.trim().length > 5 && completedGroups < GROUPS.length;
     const selectedCards = [
@@ -225,12 +225,12 @@ export default function CreatePage() {
                 Els models estan ocupats...
               </h2>
               <p className="text-sm mb-2 text-center" style={{ color: 'var(--muted)' }}>
-                Tornant a intentar automàticament · Intent {retryInfo.attempt} de 3
+                Tornant a intentar automàticament · Intent {retryInfo.attempt}
               </p>
               <div className="flex items-center gap-2 mb-8">
                 <div className="h-2 rounded-full flex-1" style={{ background: 'var(--border)' }}>
                   <div className="h-full rounded-full transition-all duration-1000"
-                    style={{ width: `${((12 - retryInfo.countdown) / 12) * 100}%`, background: '#ea580c' }} />
+                    style={{ width: `${((10 - retryInfo.countdown) / 10) * 100}%`, background: '#ea580c' }} />
                 </div>
                 <span className="text-sm font-mono font-bold tabular-nums w-8 text-right" style={{ color: '#ea580c' }}>
                   {retryInfo.countdown}s
