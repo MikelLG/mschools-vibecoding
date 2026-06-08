@@ -249,15 +249,8 @@ export default function CreatePage() {
         </span>
       </header>
 
-      {/* Phase timer */}
-      <PhaseTimer
-        phase={2}
-        label="Construeix el prompt"
-        defaultMinutes={8}
-        instruction="Selecciona les 5 targetes i descriu el teu repte educatiu"
-        color="#7c3aed"
-        bg="#f5f3ff"
-      />
+      {/* Phase timer — synced with facilitator */}
+      <PhaseTimer pagePhase={2} />
 
       {/* Live prompt preview */}
       <div className="sticky top-[57px] z-10 px-6 py-4 border-b" style={{ background: '#f7f4f7', borderColor: 'var(--border)' }}>

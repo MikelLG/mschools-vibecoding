@@ -162,15 +162,8 @@ export default function ResultPage() {
         </button>
       </header>
 
-      {/* Phase timer */}
-      <PhaseTimer
-        phase={3}
-        label="Itera i millora"
-        defaultMinutes={5}
-        instruction="Prova l'app, usa el panell de millores i posa-li el nom al final"
-        color="#0d9488"
-        bg="#f0fdfb"
-      />
+      {/* Phase timer — synced with facilitator */}
+      <PhaseTimer pagePhase={3} />
 
       <div className="flex-1 flex flex-col lg:flex-row max-w-7xl mx-auto w-full p-6 gap-6">
         {/* Left: Preview iframe */}

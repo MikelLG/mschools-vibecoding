@@ -41,15 +41,8 @@ export default function WarmupPage() {
         <div className="w-16" />
       </header>
 
-      {/* Phase timer */}
-      <PhaseTimer
-        phase={1}
-        label="Warm-up"
-        defaultMinutes={5}
-        instruction="Explora l'app i endevina el prompt que la va generar"
-        color="#ea580c"
-        bg="#fff7ed"
-      />
+      {/* Phase timer — synced with facilitator */}
+      <PhaseTimer pagePhase={1} />
 
       <div className="max-w-3xl mx-auto w-full px-6 py-8 flex-1 flex flex-col">
         {/* Intro */}
