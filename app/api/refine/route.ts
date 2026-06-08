@@ -15,8 +15,8 @@ async function generateWithRetry(prompt: string): Promise<string> {
       return result.response.text();
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      const is503 = msg.includes('503') || msg.includes('Service Unavailable') || msg.includes('high demand');
-      if (is503) continue;
+      const isRetryable = msg.includes('503') || msg.includes('Service Unavailable') || msg.includes('high demand') || msg.includes('429') || msg.includes('Too Many Requests') || msg.includes('quota');
+      if (isRetryable) continue;
       throw err;
     }
   }
