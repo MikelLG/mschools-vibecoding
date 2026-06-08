@@ -7,9 +7,11 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 const MODEL_CASCADE = [
   'gemini-2.5-flash',
+  'gemini-2.5-pro',
   'gemini-2.0-flash-lite',
   'gemini-1.5-flash',
   'gemini-1.5-flash-8b',
+  'gemini-1.5-pro',
 ];
 
 function isRetryableError(msg: string) {
@@ -23,20 +25,21 @@ function isRetryableError(msg: string) {
 
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
-async function generateWithRetry(prompt: string): Promise<string> {
-  for (let i = 0; i < MODEL_CASCADE.length; i++) {
-    const modelName = MODEL_CASCADE[i];
-    try {
-      const model = genAI.getGenerativeModel({ model: modelName });
-      const result = await model.generateContent(prompt);
-      return result.response.text();
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      if (isRetryableError(msg)) {
-        if (i < MODEL_CASCADE.length - 1) await sleep(2000);
-        continue;
+async function generateWithRetry(prompt: string, maxRounds = 6): Promise<string> {
+  for (let round = 0; round < maxRounds; round++) {
+    for (let i = 0; i < MODEL_CASCADE.length; i++) {
+      try {
+        const model = genAI.getGenerativeModel({ model: MODEL_CASCADE[i] });
+        const result = await model.generateContent(prompt);
+        return result.response.text();
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (isRetryableError(msg)) {
+          await sleep(i < MODEL_CASCADE.length - 1 ? 1500 : 5000);
+          continue;
+        }
+        throw err;
       }
-      throw err;
     }
   }
   throw new Error('OVERLOADED');
