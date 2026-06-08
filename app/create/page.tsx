@@ -111,6 +111,7 @@ export default function CreatePage() {
   const [listening, setListening] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState('');
+  const [retryInfo, setRetryInfo] = useState<{ attempt: number; countdown: number } | null>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   const selections = { eix, usuari, repte, accio, estil };
@@ -139,42 +140,67 @@ export default function CreatePage() {
   const generate = async () => {
     setGenerating(true);
     setError('');
-    try {
-      const usingVoice = voicePrompt.trim().length > 5 && completedGroups < GROUPS.length;
-      const selectedCards = [
-        { group: 'Eix', value: eix },
-        { group: 'Usuari final', value: usuari },
-        { group: 'Acció principal', value: accio },
-        { group: 'Repte', value: repte },
-        { group: 'Estil', value: estil },
-      ];
-      const promptPreview = usingVoice ? voicePrompt : `${eix} · ${usuari} · ${accio} · ${repte} · ${estil}`;
+    setRetryInfo(null);
 
-      const res = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          selectedCards: usingVoice ? [] : selectedCards,
-          promptPreview,
-          voicePrompt: usingVoice ? voicePrompt : '',
-          extraContext,
-          format: accio.toLowerCase().replace(/\s/g, '_') || 'activitat',
-          formatLabel: accio || 'Recurs educatiu',
-          sessionId: process.env.NEXT_PUBLIC_SESSION_ID ?? 'mschools-2026',
-        }),
-      });
-      if (!res.ok) {
-        if (res.status === 504 || res.status === 524) throw new Error('La generació ha trigat massa. Torna-ho a intentar.');
-        const errData = await res.json().catch(() => ({})) as { error?: string };
-        throw new Error(errData.error || `Error ${res.status} — torna-ho a intentar`);
+    const MAX_RETRIES = 3;
+    const RETRY_SECONDS = 12;
+
+    const usingVoice = voicePrompt.trim().length > 5 && completedGroups < GROUPS.length;
+    const selectedCards = [
+      { group: 'Eix', value: eix },
+      { group: 'Usuari final', value: usuari },
+      { group: 'Acció principal', value: accio },
+      { group: 'Repte', value: repte },
+      { group: 'Estil', value: estil },
+    ];
+    const promptPreview = usingVoice ? voicePrompt : `${eix} · ${usuari} · ${accio} · ${repte} · ${estil}`;
+    const payload = {
+      selectedCards: usingVoice ? [] : selectedCards,
+      promptPreview,
+      voicePrompt: usingVoice ? voicePrompt : '',
+      extraContext,
+      format: accio.toLowerCase().replace(/\s/g, '_') || 'activitat',
+      formatLabel: accio || 'Recurs educatiu',
+      sessionId: process.env.NEXT_PUBLIC_SESSION_ID ?? 'mschools-2026',
+    };
+
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const res = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) {
+          if (res.status === 504 || res.status === 524) throw new Error('La generació ha trigat massa. Torna-ho a intentar.');
+          const errData = await res.json().catch(() => ({})) as { error?: string };
+          throw new Error(errData.error || `Error ${res.status}`);
+        }
+        const { submission } = await res.json() as { submission: Submission };
+        const { saveSubmission } = await import('@/lib/firebase');
+        await saveSubmission(submission);
+        router.push(`/result/${submission.id}`);
+        return;
+      } catch (err) {
+        const msg = (err as Error).message ?? '';
+        const isOverloaded = msg === 'OVERLOADED' || msg.includes('OVERLOADED') || msg.includes('sobrecarregats');
+
+        if (isOverloaded && attempt < MAX_RETRIES) {
+          for (let cd = RETRY_SECONDS; cd >= 0; cd--) {
+            setRetryInfo({ attempt, countdown: cd });
+            if (cd > 0) await new Promise(r => setTimeout(r, 1000));
+          }
+          setRetryInfo(null);
+          continue;
+        }
+
+        setError(isOverloaded
+          ? 'Els servidors de Gemini estan sobrecarregats. Espera uns minuts i torna-ho a intentar.'
+          : msg || 'Error inesperat');
+        setGenerating(false);
+        setRetryInfo(null);
+        return;
       }
-      const { submission } = await res.json() as { submission: Submission };
-      const { saveSubmission } = await import('@/lib/firebase');
-      await saveSubmission(submission);
-      router.push(`/result/${submission.id}`);
-    } catch (err) {
-      setError((err as Error).message || 'Error inesperat');
-      setGenerating(false);
     }
   };
 
@@ -183,14 +209,40 @@ export default function CreatePage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-6" style={{ background: 'var(--bg)' }}>
         <div className="w-full max-w-lg flex flex-col items-center">
-          {/* Spinner */}
+          {/* Spinner / retry indicator */}
           <div className="relative w-16 h-16 mb-6">
             <div className="absolute inset-0 rounded-full border-4" style={{ borderColor: 'var(--border)' }} />
-            <div className="absolute inset-0 rounded-full border-4 animate-spin" style={{ borderColor: 'var(--heading)', borderTopColor: 'transparent' }} />
-            <div className="absolute inset-3 rounded-full flex items-center justify-center text-xl" style={{ background: '#f7f4f7' }}>✨</div>
+            <div className="absolute inset-0 rounded-full border-4 animate-spin"
+              style={{ borderColor: retryInfo ? '#ea580c' : 'var(--heading)', borderTopColor: 'transparent' }} />
+            <div className="absolute inset-3 rounded-full flex items-center justify-center text-xl" style={{ background: '#f7f4f7' }}>
+              {retryInfo ? '⏳' : '✨'}
+            </div>
           </div>
-          <h2 className="text-2xl font-black mb-2 text-center" style={{ color: 'var(--heading)' }}>Generant el teu recurs...</h2>
-          <p className="text-sm mb-8 text-center" style={{ color: 'var(--muted)' }}>Gemini està creant la webapp educativa.</p>
+
+          {retryInfo ? (
+            <>
+              <h2 className="text-2xl font-black mb-2 text-center" style={{ color: '#ea580c' }}>
+                Els models estan ocupats...
+              </h2>
+              <p className="text-sm mb-2 text-center" style={{ color: 'var(--muted)' }}>
+                Tornant a intentar automàticament · Intent {retryInfo.attempt} de 3
+              </p>
+              <div className="flex items-center gap-2 mb-8">
+                <div className="h-2 rounded-full flex-1" style={{ background: 'var(--border)' }}>
+                  <div className="h-full rounded-full transition-all duration-1000"
+                    style={{ width: `${((12 - retryInfo.countdown) / 12) * 100}%`, background: '#ea580c' }} />
+                </div>
+                <span className="text-sm font-mono font-bold tabular-nums w-8 text-right" style={{ color: '#ea580c' }}>
+                  {retryInfo.countdown}s
+                </span>
+              </div>
+            </>
+          ) : (
+            <>
+              <h2 className="text-2xl font-black mb-2 text-center" style={{ color: 'var(--heading)' }}>Generant el teu recurs...</h2>
+              <p className="text-sm mb-8 text-center" style={{ color: 'var(--muted)' }}>Gemini està creant la webapp educativa.</p>
+            </>
+          )}
 
           {/* Full sentence prompt */}
           <div className="w-full rounded-2xl p-5 mb-4" style={{ background: '#f7f4f7', border: '1px solid var(--border)' }}>

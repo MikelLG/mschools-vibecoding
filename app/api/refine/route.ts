@@ -5,25 +5,41 @@ export const maxDuration = 240;
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
-const MODEL_CASCADE = ['gemini-2.5-flash', 'gemini-2.0-flash-lite'];
+const MODEL_CASCADE = [
+  'gemini-2.5-flash',
+  'gemini-2.0-flash-lite',
+  'gemini-1.5-flash',
+  'gemini-1.5-flash-8b',
+];
+
+function isRetryableError(msg: string) {
+  return (
+    msg.includes('503') || msg.includes('Service Unavailable') || msg.includes('high demand') ||
+    msg.includes('429') || msg.includes('Too Many Requests') || msg.includes('quota') ||
+    msg.includes('404') || msg.includes('no longer available') || msg.includes('deprecated') ||
+    msg.includes('overloaded') || msg.includes('RESOURCE_EXHAUSTED')
+  );
+}
+
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
 async function generateWithRetry(prompt: string): Promise<string> {
-  for (const modelName of MODEL_CASCADE) {
+  for (let i = 0; i < MODEL_CASCADE.length; i++) {
+    const modelName = MODEL_CASCADE[i];
     try {
       const model = genAI.getGenerativeModel({ model: modelName });
       const result = await model.generateContent(prompt);
       return result.response.text();
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      const isRetryable =
-        msg.includes('503') || msg.includes('Service Unavailable') || msg.includes('high demand') ||
-        msg.includes('429') || msg.includes('Too Many Requests') || msg.includes('quota') ||
-        msg.includes('404') || msg.includes('no longer available') || msg.includes('deprecated');
-      if (isRetryable) continue;
+      if (isRetryableError(msg)) {
+        if (i < MODEL_CASCADE.length - 1) await sleep(2000);
+        continue;
+      }
       throw err;
     }
   }
-  throw new Error('Tots els models estan sobrecarregats. Torna-ho a intentar en uns minuts.');
+  throw new Error('OVERLOADED');
 }
 
 export async function POST(req: NextRequest) {
