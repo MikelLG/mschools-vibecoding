@@ -84,6 +84,7 @@ export default function ResultPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           rawPrompt: editablePrompt,
+          promptPreview: submission.tasca,
           pairName: groupName || submission.pairName || '',
           sessionId: process.env.NEXT_PUBLIC_SESSION_ID ?? 'mschools-2026',
         }),
