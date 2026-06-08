@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
       contextTheme: selectedCards?.find((c: {group:string}) => c.group === 'Eix')?.value ?? '',
       contextThemeLabel: selectedCards?.find((c: {group:string}) => c.group === 'Eix')?.value ?? '',
       contextDescription: extraContext ?? '',
-      tasca: rawPrompt ? 'Prompt personalitzat' : (promptPreview ?? ''),
+      tasca: promptPreview ?? (rawPrompt ? 'Prompt personalitzat' : ''),
       format: format ?? 'activitat',
       formatLabel: formatLabel ?? 'Recurs educatiu',
       prompt,
