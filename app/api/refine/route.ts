@@ -5,24 +5,22 @@ export const maxDuration = 240;
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
-async function generateWithRetry(prompt: string, retries = 3): Promise<string> {
-  for (let i = 0; i < retries; i++) {
+const MODEL_CASCADE = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+
+async function generateWithRetry(prompt: string): Promise<string> {
+  for (const modelName of MODEL_CASCADE) {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+      const model = genAI.getGenerativeModel({ model: modelName });
       const result = await model.generateContent(prompt);
       return result.response.text();
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       const is503 = msg.includes('503') || msg.includes('Service Unavailable') || msg.includes('high demand');
-      if (is503 && i < retries - 1) {
-        await new Promise(r => setTimeout(r, 3000 * (i + 1)));
-        continue;
-      }
-      if (is503) throw new Error('El model d\'IA està sobrecarregat. Torna-ho a intentar en uns segons.');
+      if (is503) continue;
       throw err;
     }
   }
-  throw new Error('No s\'ha pogut generar el recurs després de diversos intents.');
+  throw new Error('Tots els models estan sobrecarregats. Torna-ho a intentar en uns minuts.');
 }
 
 export async function POST(req: NextRequest) {
