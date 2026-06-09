@@ -13,10 +13,10 @@ const COMPETENCIES = [
 const STEPS = [
   { n: '01', title: 'El facilitador configura la sessió', desc: 'Obre /screen, selecciona la fase activa i controla els temporitzadors de totes les participants en temps real des del projector.' },
   { n: '02', title: 'Els participants accedeixen a l\'eina', desc: 'Obren el navegador i van a la URL del taller. No cal cap registre ni instal·lació. Funciona en qualsevol dispositiu amb navegador modern.' },
-  { n: '03', title: 'Warm-up · 5 minuts', desc: 'Exploren una app educativa d\'exemple ja generada i intenten endevinar quin prompt la va crear. Activa la curiositat i trenca el gel.' },
-  { n: '04', title: 'Construcció del prompt · 8 minuts', desc: 'Seleccionen 5 targetes (Eix, Usuari, Repte, Acció, Estil) i afegeixen context addicional per escrit o per veu. Es construeix un prompt ric i estructurat.' },
+  { n: '03', title: 'Warm-up · 4 minuts', desc: 'Exploren una app educativa d\'exemple ja generada i intenten endevinar quin prompt la va crear. Activa la curiositat i trenca el gel.' },
+  { n: '04', title: 'Construcció del prompt · 4 minuts', desc: 'Seleccionen 5 targetes (Eix, Usuari, Repte, Acció, Estil) i afegeixen context addicional per escrit o per veu. Es construeix un prompt ric i estructurat.' },
   { n: '05', title: 'La IA genera l\'eina educativa', desc: 'Gemini construeix una webapp educativa funcional en HTML. El sistema intenta fins a 36 vegades amb 6 models diferents per garantir que sempre funciona.' },
-  { n: '06', title: 'Iteració i millora · 5 minuts', desc: 'Proven l\'app generada, apliquen millores amb text o veu, editen el prompt complet si volen, i posen el nom al grup al final.' },
+  { n: '06', title: 'Iteració i millora · 7 minuts', desc: 'Proven l\'app generada, apliquen millores amb text o veu, editen el prompt complet si volen, posen el nom al grup i publiquen el resultat final.' },
 ];
 
 const CARDS = [
