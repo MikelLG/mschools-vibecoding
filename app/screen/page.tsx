@@ -6,6 +6,65 @@ import type { Submission, WorkshopTimer } from '@/lib/types';
 import { WORKSHOP_PHASES, getSecondsLeft } from '@/lib/workshop-phases';
 
 const SESSION_ID = process.env.NEXT_PUBLIC_SESSION_ID ?? 'mschools-2026';
+const FACILITATOR_PASSWORD = process.env.NEXT_PUBLIC_FACILITATOR_PASSWORD ?? 'mschools2026';
+const AUTH_KEY = 'facilitator_auth';
+
+function LoginGate({ onAuth }: { onAuth: () => void }) {
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === FACILITATOR_PASSWORD) {
+      sessionStorage.setItem(AUTH_KEY, '1');
+      onAuth();
+    } else {
+      setError(true);
+      setPassword('');
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#f7f4f7' }}>
+      <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-10 w-full max-w-md flex flex-col gap-6"
+        style={{ border: '1.5px solid #e5e0e5', boxShadow: '0 4px 32px rgba(94,36,64,0.08)' }}>
+
+        {/* Logo */}
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <div className="flex items-center gap-1">
+            <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 24, height: 24, background: '#00e082', borderRadius: 4, color: 'white', fontWeight: 900, fontSize: 14 }}>m</span>
+            <span style={{ fontWeight: 700, fontSize: 18, color: '#1a1a1a' }}>Schools</span>
+          </div>
+          <span style={{ color: '#d1c5d0', fontSize: 20 }}>|</span>
+          <span style={{ fontWeight: 700, fontSize: 18, color: '#5e2440' }}>Vibe Coding</span>
+        </div>
+
+        <div className="text-center">
+          <h1 className="text-xl font-black" style={{ color: '#5e2440' }}>Tauler del facilitador</h1>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-semibold" style={{ color: '#5e2440' }}>Contrasenya</label>
+          <input
+            type="password"
+            value={password}
+            onChange={e => { setPassword(e.target.value); setError(false); }}
+            autoFocus
+            className="rounded-xl px-4 py-3 text-sm focus:outline-none"
+            style={{ border: error ? '1.5px solid #dc2626' : '1.5px solid #e5e0e5', background: '#fafafa' }}
+          />
+          {error && <p className="text-xs" style={{ color: '#dc2626' }}>Contrasenya incorrecta</p>}
+        </div>
+
+        <button type="submit"
+          className="w-full rounded-xl py-3 font-bold text-white text-base transition-all hover:opacity-90"
+          style={{ background: '#00e082', color: 'white' }}>
+          Entrar
+        </button>
+      </form>
+    </div>
+  );
+}
 
 const EIXOS = [
   { value: 'Benestar social', emoji: '🤝', color: '#0d9488', bg: '#f0fdfb' },
@@ -56,6 +115,18 @@ function useLocalTimer(defaultMinutes: number) {
 
 // ── Main page ──────────────────────────────────────────────────────────────────
 export default function ScreenPage() {
+  const [authed, setAuthed] = useState(false);
+
+  useEffect(() => {
+    if (sessionStorage.getItem(AUTH_KEY) === '1') setAuthed(true);
+  }, []);
+
+  if (!authed) return <LoginGate onAuth={() => setAuthed(true)} />;
+
+  return <ScreenContent />;
+}
+
+function ScreenContent() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [showNew, setShowNew] = useState(false);
   const [latestId, setLatestId] = useState<string | null>(null);
