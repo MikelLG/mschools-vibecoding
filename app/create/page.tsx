@@ -276,15 +276,15 @@ export default function CreatePage() {
           <div className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--muted)' }}>Llegeix aquest prompt en veu alta</div>
           <p className="text-base leading-[2.6]" style={{ color: 'var(--body)' }}>
             &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de{' '}
-            <Blank label="EIX" color="#0d9488" />,{' '}
+            <Blank label="EIX" color="#0d9488" bg="#f0fdfb" />,{' '}
             pensada perquè la faci servir{' '}
-            <Blank label="USUARI" color="#7c3aed" />,{' '}
+            <Blank label="USUARI" color="#7c3aed" bg="#f5f3ff" />,{' '}
             a través de{' '}
-            <Blank label="ACCIÓ" color="#2563eb" />{' '}
+            <Blank label="ACCIÓ" color="#2563eb" bg="#eff6ff" />{' '}
             que serveixi per a{' '}
-            <Blank label="REPTE" color="#ea580c" />,{' '}
+            <Blank label="REPTE" color="#ea580c" bg="#fff7ed" />,{' '}
             amb un estil{' '}
-            <Blank label="ESTIL" color="#be185d" />,{' '}
+            <Blank label="ESTIL" color="#be185d" bg="#fdf2f8" />,{' '}
             que sigui coherent i fàcil d&apos;usar.&rdquo;
           </p>
         </div>
@@ -440,11 +440,11 @@ function promptPreviewText(eix: string, usuari: string, accio: string, repte: st
 
 // ── Sub-components ─────────────────────────────────────────────────────────────
 
-function Blank({ label, color }: { label: string; color: string }) {
+function Blank({ label, color, bg }: { label: string; color: string; bg: string }) {
   return (
     <span
-      className="inline-flex items-center px-3 py-0.5 rounded-lg text-sm font-black align-middle"
-      style={{ background: `${color}15`, color, border: `2px dashed ${color}60`, letterSpacing: 0.5 }}
+      className="inline-flex items-center px-3 py-1 rounded-lg text-sm font-black align-middle"
+      style={{ background: bg, color, border: `2px solid ${color}40`, letterSpacing: 0.5 }}
     >
       {label}
     </span>
