@@ -18,61 +18,54 @@ const EIXOS = [
 ];
 
 const USUARIS = [
-  { value: 'Docent', emoji: '👨‍🏫' },
-  { value: 'Alumnat', emoji: '👧' },
+  { value: 'Docents', emoji: '👨‍🏫' },
+  { value: 'Alumnes', emoji: '👧' },
   { value: 'Famílies', emoji: '👨‍👩‍👧' },
-  { value: 'Equip del centre', emoji: '🏫' },
 ];
 
 const REPTES_PER_USUARI: Record<string, { value: string; emoji: string }[]> = {
-  'Docent': [
+  'Docents': [
     { value: 'Gestió d\'aula', emoji: '📋' },
     { value: 'Organització del temps', emoji: '⏰' },
     { value: 'Comunicació amb famílies', emoji: '📨' },
     { value: 'Seguiment de l\'alumnat', emoji: '📊' },
-    { value: 'Preparació de classes', emoji: '📝' },
+    { value: 'Planificació de situacions d\'aprenentatge', emoji: '📝' },
     { value: 'Avaluació', emoji: '✅' },
-    { value: 'Benestar del grup', emoji: '💚' },
     { value: 'Inclusió i accessibilitat', emoji: '♿' },
   ],
-  'Alumnat': [
+  'Alumnes': [
     { value: 'Practicar un contingut', emoji: '🔁' },
     { value: 'Visualitzar un fenomen', emoji: '🔬' },
     { value: 'Autoavaluar-se', emoji: '🪞' },
     { value: 'Regular emocions', emoji: '🧘' },
     { value: 'Col·laborar en grup', emoji: '🤝' },
     { value: 'Explorar un concepte', emoji: '💡' },
-    { value: 'Jugar per aprendre', emoji: '🎮' },
+    { value: 'Jugar per a aprendre', emoji: '🎮' },
   ],
   'Famílies': [
     { value: 'Rebre informació', emoji: '📩' },
-    { value: 'Omplir formularis', emoji: '📋' },
+    { value: 'Emplenar formularis', emoji: '📋' },
     { value: 'Preparar entrevistes', emoji: '🗣️' },
     { value: 'Comprendre rutines', emoji: '🗓️' },
-    { value: 'Acompanyar el benestar', emoji: '💙' },
-  ],
-  'Equip del centre': [
-    { value: 'Recollir dades', emoji: '📊' },
-    { value: 'Organitzar torns', emoji: '🔄' },
-    { value: 'Visualitzar informació', emoji: '📈' },
-    { value: 'Coordinar equips', emoji: '🔗' },
-    { value: 'Planificar activitats', emoji: '🗓️' },
+    { value: 'Acompanyar benestar', emoji: '💙' },
+    { value: 'Seguiment del procés d\'aprenentatge', emoji: '📈' },
+    { value: 'Complementar l\'aprenentatge des de casa', emoji: '🏠' },
   ],
 };
 
 const ACCIONS = [
   { value: 'Generar grups', emoji: '👥' },
   { value: 'Crear horaris', emoji: '📅' },
-  { value: 'Recollir dades', emoji: '📊' },
-  { value: 'Mostrar un checklist', emoji: '✅' },
-  { value: 'Enviar un missatge', emoji: '📨' },
-  { value: 'Visualitzar informació', emoji: '📈' },
-  { value: 'Simular un fenomen', emoji: '⚗️' },
-  { value: 'Crear un formulari', emoji: '📝' },
+  { value: 'Classificar informació', emoji: '🗂️' },
+  { value: 'Recol·lectar dades i mostrar-los a l\'instant', emoji: '📊' },
+  { value: 'Sugerencias automàtiques', emoji: '🤖' },
+  { value: 'Comparar escenaris (abans/després, opció A/B)', emoji: '⚖️' },
+  { value: 'Simular situacions (emocionals, socials, científiques...)', emoji: '🎭' },
+  { value: 'Acompanyar una reflexió emocional', emoji: '🧘' },
   { value: 'Generar retroalimentació', emoji: '💬' },
-  { value: 'Organitzar torns', emoji: '🔄' },
+  { value: 'Facilitar una activitat creativa', emoji: '🎨' },
   { value: 'Crear un mini-joc', emoji: '🎮' },
-  { value: 'Comparar opcions', emoji: '⚖️' },
+  { value: 'Ruletes, sortejos, targetes aleatòries', emoji: '🎲' },
 ];
 
 const ESTILS = [
@@ -80,13 +73,11 @@ const ESTILS = [
   { value: 'Alt contrast', emoji: '◼' },
   { value: 'Infantil', emoji: '🎈' },
   { value: 'Científic', emoji: '🔬' },
-  { value: 'Mode pissarra', emoji: '🖊️' },
-  { value: 'Colors suaus', emoji: '🎨' },
-  { value: 'Tipografia gran', emoji: '🔠' },
+  { value: 'Creatiu / artístic', emoji: '🎨' },
+  { value: 'Ludificat', emoji: '🏆' },
   { value: 'Amb animacions', emoji: '✨' },
-  { value: 'Amb dibuixos', emoji: '🖼️' },
-  { value: 'Interactiva / gamificada', emoji: '🕹️' },
-  { value: 'Estil fitxa / sobri', emoji: '📄' },
+  { value: 'Interactiu (botons, sliders, arrossegar)', emoji: '👆' },
+  { value: 'Narratiu (per passos)', emoji: '📖' },
 ];
 
 const GROUPS = [
