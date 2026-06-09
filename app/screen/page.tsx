@@ -1,10 +1,70 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { subscribeSubmissions } from '@/lib/firebase';
-import type { Submission } from '@/lib/types';
+import { subscribeSubmissions, subscribeWorkshopTimer, updateWorkshopTimer, DEFAULT_TIMER } from '@/lib/firebase';
+import type { Submission, WorkshopTimer } from '@/lib/types';
+import { WORKSHOP_PHASES, getSecondsLeft } from '@/lib/workshop-phases';
 
 const SESSION_ID = process.env.NEXT_PUBLIC_SESSION_ID ?? 'mschools-2026';
+const FACILITATOR_PASSWORD = process.env.NEXT_PUBLIC_FACILITATOR_PASSWORD ?? 'mschools2026';
+const AUTH_KEY = 'facilitator_auth';
+
+function LoginGate({ onAuth }: { onAuth: () => void }) {
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === FACILITATOR_PASSWORD) {
+      sessionStorage.setItem(AUTH_KEY, '1');
+      onAuth();
+    } else {
+      setError(true);
+      setPassword('');
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#f7f4f7' }}>
+      <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-10 w-full max-w-md flex flex-col gap-6"
+        style={{ border: '1.5px solid #e5e0e5', boxShadow: '0 4px 32px rgba(94,36,64,0.08)' }}>
+
+        {/* Logo */}
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <div className="flex items-center gap-1">
+            <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 24, height: 24, background: '#00e082', borderRadius: 4, color: 'white', fontWeight: 900, fontSize: 14 }}>m</span>
+            <span style={{ fontWeight: 700, fontSize: 18, color: '#1a1a1a' }}>Schools</span>
+          </div>
+          <span style={{ color: '#d1c5d0', fontSize: 20 }}>|</span>
+          <span style={{ fontWeight: 700, fontSize: 18, color: '#5e2440' }}>Vibe Coding</span>
+        </div>
+
+        <div className="text-center">
+          <h1 className="text-xl font-black" style={{ color: '#5e2440' }}>Tauler del facilitador</h1>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-semibold" style={{ color: '#5e2440' }}>Contrasenya</label>
+          <input
+            type="password"
+            value={password}
+            onChange={e => { setPassword(e.target.value); setError(false); }}
+            autoFocus
+            className="rounded-xl px-4 py-3 text-sm focus:outline-none"
+            style={{ border: error ? '1.5px solid #dc2626' : '1.5px solid #e5e0e5', background: '#fafafa' }}
+          />
+          {error && <p className="text-xs" style={{ color: '#dc2626' }}>Contrasenya incorrecta</p>}
+        </div>
+
+        <button type="submit"
+          className="w-full rounded-xl py-3 font-bold text-white text-base transition-all hover:opacity-90"
+          style={{ background: '#00e082', color: 'white' }}>
+          Entrar
+        </button>
+      </form>
+    </div>
+  );
+}
 
 const EIXOS = [
   { value: 'Benestar social', emoji: '🤝', color: '#0d9488', bg: '#f0fdfb' },
@@ -15,66 +75,96 @@ const EIXOS = [
   { value: 'Cultura i diversitat', emoji: '🏛️', color: '#16a34a', bg: '#f0fdf4' },
 ];
 
-function useTimer(defaultMinutes: number) {
+// ── Local workshop-total timer ─────────────────────────────────────────────────
+function useLocalTimer(defaultMinutes: number) {
   const [inputMinutes, setInputMinutes] = useState(defaultMinutes);
   const [secondsLeft, setSecondsLeft] = useState(defaultMinutes * 60);
   const [running, setRunning] = useState(false);
-  const [finished, setFinished] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const startStop = () => {
-    if (running) {
-      clearInterval(intervalRef.current!);
-      setRunning(false);
-    } else {
-      if (secondsLeft === 0) { setSecondsLeft(inputMinutes * 60); setFinished(false); }
+    if (running) { clearInterval(intervalRef.current!); setRunning(false); }
+    else {
+      if (secondsLeft === 0) setSecondsLeft(inputMinutes * 60);
       setRunning(true);
     }
   };
-
   const reset = () => {
     clearInterval(intervalRef.current!);
     setRunning(false);
-    setFinished(false);
     setSecondsLeft(inputMinutes * 60);
   };
-
   const changeMinutes = (v: number) => {
     setInputMinutes(v);
     if (!running) setSecondsLeft(v * 60);
-    setFinished(false);
   };
 
   useEffect(() => {
-    if (running) {
-      intervalRef.current = setInterval(() => {
-        setSecondsLeft(s => {
-          if (s <= 1) {
-            clearInterval(intervalRef.current!);
-            setRunning(false);
-            setFinished(true);
-            return 0;
-          }
-          return s - 1;
-        });
-      }, 1000);
-    }
+    if (!running) return;
+    intervalRef.current = setInterval(() => {
+      setSecondsLeft(s => {
+        if (s <= 1) { clearInterval(intervalRef.current!); setRunning(false); return 0; }
+        return s - 1;
+      });
+    }, 1000);
     return () => clearInterval(intervalRef.current!);
   }, [running]);
 
-  return { inputMinutes, secondsLeft, running, finished, startStop, reset, changeMinutes };
+  return { inputMinutes, secondsLeft, running, startStop, reset, changeMinutes };
 }
 
+// ── Main page ──────────────────────────────────────────────────────────────────
 export default function ScreenPage() {
+  const [authed, setAuthed] = useState(false);
+
+  useEffect(() => {
+    if (sessionStorage.getItem(AUTH_KEY) === '1') setAuthed(true);
+  }, []);
+
+  if (!authed) return <LoginGate onAuth={() => setAuthed(true)} />;
+
+  return <ScreenContent />;
+}
+
+function ScreenContent() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [showNew, setShowNew] = useState(false);
   const [latestId, setLatestId] = useState<string | null>(null);
 
-  const workshop = useTimer(15);
-  const fase = useTimer(5);
+  // Firestore-backed phase timer
+  const [timer, setTimer] = useState<WorkshopTimer>(DEFAULT_TIMER);
+  const [localSeconds, setLocalSeconds] = useState(300);
+  const [selectedPhase, setSelectedPhase] = useState(1);
+  const [customMinutes, setCustomMinutes] = useState<Record<number, number>>({
+    1: WORKSHOP_PHASES[0].defaultMinutes,
+    2: WORKSHOP_PHASES[1].defaultMinutes,
+    3: WORKSHOP_PHASES[2].defaultMinutes,
+  });
+  const [saving, setSaving] = useState(false);
 
+  // Local workshop-total timer
+  const workshop = useLocalTimer(15);
+
+  // Subscribe to Firestore timer
   useEffect(() => {
-    const unsub = subscribeSubmissions(SESSION_ID, (subs) => {
+    const unsub = subscribeWorkshopTimer(t => {
+      setTimer(t);
+      if (t.phase > 0) setSelectedPhase(t.phase);
+    });
+    return () => unsub();
+  }, []);
+
+  // Recalculate localSeconds every 500ms from Firestore state
+  useEffect(() => {
+    const tick = () => setLocalSeconds(Math.max(0, Math.floor(getSecondsLeft(timer))));
+    tick();
+    const id = setInterval(tick, 500);
+    return () => clearInterval(id);
+  }, [timer]);
+
+  // Subscribe to submissions
+  useEffect(() => {
+    const unsub = subscribeSubmissions(SESSION_ID, subs => {
       setSubmissions(prev => {
         if (subs.length > prev.length && subs.length > 0) {
           setLatestId(subs[0].id);
@@ -87,52 +177,242 @@ export default function ScreenPage() {
     return () => unsub();
   }, []);
 
+  // ── Timer actions ────────────────────────────────────────────────────────────
+
+  const run = async (updates: Partial<WorkshopTimer>) => {
+    setSaving(true);
+    try { await updateWorkshopTimer(updates); }
+    finally { setSaving(false); }
+  };
+
+  const handleStartPhase = async () => {
+    const phase = WORKSHOP_PHASES.find(p => p.id === selectedPhase)!;
+    const durationSeconds = (customMinutes[selectedPhase] ?? phase.defaultMinutes) * 60;
+    await run({
+      phase: phase.id,
+      phaseLabel: phase.label,
+      instruction: phase.instruction,
+      color: phase.color,
+      bg: phase.bg,
+      durationSeconds,
+      startedAt: Date.now(),
+      secondsAtStart: durationSeconds,
+      running: true,
+    });
+  };
+
+  const handlePause = async () => {
+    await run({ running: false, secondsAtStart: Math.max(0, Math.floor(getSecondsLeft(timer))) });
+  };
+
+  const handleResume = async () => {
+    await run({ running: true, startedAt: Date.now() });
+  };
+
+  const handleReset = async () => {
+    const durationSeconds = (customMinutes[timer.phase] ?? WORKSHOP_PHASES.find(p => p.id === timer.phase)?.defaultMinutes ?? 5) * 60;
+    await run({ running: false, startedAt: 0, secondsAtStart: durationSeconds });
+  };
+
+  // ── Display helpers ──────────────────────────────────────────────────────────
+
+  const displayMins = Math.floor(localSeconds / 60);
+  const displaySecs = localSeconds % 60;
+  const pct = timer.durationSeconds > 0 ? localSeconds / timer.durationSeconds : 1;
+  const urgent = localSeconds <= 60 && localSeconds > 0 && timer.running;
+  const finished = timer.phase > 0 && localSeconds === 0 && timer.startedAt > 0 && !timer.running;
+  const notStarted = timer.phase === 0;
+
+  const timerColor = finished ? '#dc2626' : urgent ? '#ea580c' : (timer.color || 'var(--heading)');
+  const timerBg = finished ? '#fef2f2' : urgent ? '#fff7ed' : (timer.bg || '#f7f4f7');
+
+  const wMins = Math.floor(workshop.secondsLeft / 60);
+  const wSecs = workshop.secondsLeft % 60;
+
   const cols =
     submissions.length <= 2 ? 'grid-cols-2' :
-    submissions.length <= 6 ? 'grid-cols-3' :
-    'grid-cols-4';
+    submissions.length <= 6 ? 'grid-cols-3' : 'grid-cols-4';
 
   return (
     <main className="min-h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
 
-      {/* Header */}
+      {/* ── Header ── */}
       <header className="sticky top-0 z-10 bg-white border-b" style={{ borderColor: 'var(--border)' }}>
-        <div className="px-8 py-5">
-          <div className="flex items-start justify-between gap-8">
+        <div className="px-6 pt-4 pb-3">
 
-            {/* Left: title + live */}
-            <div className="flex flex-col justify-between gap-1 min-w-fit">
-              <h1 className="text-xl font-black leading-none" style={{ color: 'var(--heading)' }}>
+          {/* Top row: title + workshop total + live */}
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-lg font-black leading-none" style={{ color: 'var(--heading)' }}>
                 Vibe Coding · Pantalla
               </h1>
-              <p className="text-xs" style={{ color: 'var(--muted)' }}>mSchools 2026</p>
               <div className="flex items-center gap-2 mt-1">
                 <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--accent)' }} />
-                <span className="text-xs font-mono font-medium" style={{ color: 'var(--muted)' }}>
+                <span className="text-xs font-mono" style={{ color: 'var(--muted)' }}>
                   LIVE · {submissions.length} recurs{submissions.length !== 1 ? 'os' : ''}
                 </span>
               </div>
             </div>
 
-            {/* Timers */}
-            <div className="flex items-stretch gap-6">
-              <TimerBlock
-                label="⏱ Workshop"
-                sublabel="Total"
-                {...workshop}
+            {/* Workshop total — local, facilitator's reference */}
+            <div className="flex items-center gap-2 rounded-xl px-4 py-2" style={{ background: '#f7f4f7', border: '1px solid var(--border)' }}>
+              <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--muted)' }}>⏱ Workshop</span>
+              <span className="font-mono font-black text-xl tabular-nums" style={{ color: workshop.secondsLeft <= 60 && workshop.running ? '#ea580c' : 'var(--heading)' }}>
+                {wMins}:{String(wSecs).padStart(2, '0')}
+              </span>
+              <input
+                type="number" min={1} max={99} value={workshop.inputMinutes}
+                onChange={e => workshop.changeMinutes(Math.max(1, Math.min(99, Number(e.target.value))))}
+                disabled={workshop.running}
+                className="w-10 rounded-lg px-1 py-0.5 text-xs text-center font-bold focus:outline-none"
+                style={{ border: '1px solid var(--border)', background: workshop.running ? '#f0eaf0' : 'white', color: 'var(--heading)' }}
               />
-              <div className="w-px" style={{ background: 'var(--border)' }} />
-              <TimerBlock
-                label="🏃 Fase"
-                sublabel="Actual"
-                {...fase}
+              <span className="text-xs" style={{ color: 'var(--muted)' }}>min</span>
+              <button
+                onClick={workshop.startStop}
+                className="rounded-lg px-2.5 py-1 text-xs font-bold"
+                style={workshop.running ? { background: '#fff7ed', color: '#ea580c' } : { background: 'var(--heading)', color: 'white' }}
+              >
+                {workshop.running ? '⏸' : '▶'}
+              </button>
+              <button onClick={workshop.reset} className="rounded-lg px-2 py-1 text-xs" style={{ color: 'var(--muted)', border: '1px solid var(--border)' }}>↺</button>
+            </div>
+          </div>
+
+          {/* Phase selector */}
+          <div className="flex gap-2 mb-4">
+            {WORKSHOP_PHASES.map(p => {
+              const isActive = timer.phase === p.id;
+              const isSelected = selectedPhase === p.id;
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => setSelectedPhase(p.id)}
+                  className="flex-1 rounded-xl px-3 py-2.5 text-sm font-bold transition-all"
+                  style={isActive
+                    ? { background: p.color, color: 'white' }
+                    : isSelected
+                    ? { background: p.bg, color: p.color, border: `2px solid ${p.color}` }
+                    : { background: '#f7f4f7', color: 'var(--muted)', border: '1.5px solid var(--border)' }
+                  }
+                >
+                  <span className="mr-1">{p.id}</span>
+                  {p.label}
+                  {isActive && timer.running && <span className="ml-2 inline-block w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Big phase timer */}
+          <div className="relative rounded-2xl overflow-hidden mb-3"
+            style={{ background: timerBg, border: `2px solid ${timerColor}30` }}>
+
+            <div className="px-6 py-4 flex items-center justify-between gap-6">
+              {/* Time */}
+              <div className="flex flex-col">
+                <div
+                  className="font-mono font-black tabular-nums leading-none"
+                  style={{ fontSize: '5rem', color: timerColor }}
+                >
+                  {notStarted ? '--:--' : finished ? '0:00' : `${displayMins}:${String(displaySecs).padStart(2, '0')}`}
+                </div>
+                <div className="text-sm mt-1 font-medium" style={{ color: timerColor, opacity: 0.8 }}>
+                  {notStarted
+                    ? 'Selecciona una fase i prem Iniciar'
+                    : `Fase ${timer.phase} · ${timer.phaseLabel}`
+                  }
+                </div>
+                {timer.instruction && !notStarted && (
+                  <div className="text-xs mt-0.5" style={{ color: timerColor, opacity: 0.65 }}>
+                    {timer.instruction}
+                  </div>
+                )}
+              </div>
+
+              {/* Controls */}
+              <div className="flex flex-col gap-3 flex-shrink-0">
+                {/* Duration input */}
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold" style={{ color: timerColor, opacity: 0.7 }}>Durada:</span>
+                  <input
+                    type="number" min={1} max={60}
+                    value={customMinutes[selectedPhase] ?? WORKSHOP_PHASES.find(p => p.id === selectedPhase)?.defaultMinutes ?? 5}
+                    onChange={e => setCustomMinutes(prev => ({
+                      ...prev,
+                      [selectedPhase]: Math.max(1, Math.min(60, Number(e.target.value)))
+                    }))}
+                    disabled={timer.running && timer.phase === selectedPhase}
+                    className="w-14 rounded-lg px-2 py-1.5 text-sm text-center font-black focus:outline-none"
+                    style={{ border: `2px solid ${timerColor}40`, background: 'white', color: timerColor }}
+                  />
+                  <span className="text-sm font-bold" style={{ color: timerColor, opacity: 0.7 }}>min</span>
+                </div>
+
+                {/* Action buttons */}
+                <div className="flex gap-2">
+                  {/* Start / Iniciar fase */}
+                  {(!timer.running || timer.phase !== selectedPhase) && (
+                    <button
+                      onClick={handleStartPhase}
+                      disabled={saving}
+                      className="rounded-xl px-5 py-2.5 text-sm font-black transition-all"
+                      style={{ background: WORKSHOP_PHASES.find(p => p.id === selectedPhase)?.color ?? 'var(--heading)', color: 'white' }}
+                    >
+                      {timer.phase === selectedPhase && !timer.running && timer.startedAt > 0
+                        ? '↺ Reiniciar'
+                        : `▶ Iniciar fase ${selectedPhase}`}
+                    </button>
+                  )}
+
+                  {/* Pause / Resume — only when this phase is active */}
+                  {timer.phase === selectedPhase && timer.startedAt > 0 && (
+                    <>
+                      {timer.running ? (
+                        <button
+                          onClick={handlePause}
+                          disabled={saving}
+                          className="rounded-xl px-5 py-2.5 text-sm font-black transition-all"
+                          style={{ background: '#fff7ed', color: '#ea580c', border: '2px solid #ea580c50' }}
+                        >
+                          ⏸ Pausa
+                        </button>
+                      ) : (
+                        <button
+                          onClick={handleResume}
+                          disabled={saving}
+                          className="rounded-xl px-5 py-2.5 text-sm font-black transition-all"
+                          style={{ background: timerColor, color: 'white' }}
+                        >
+                          ▶ Reprendre
+                        </button>
+                      )}
+                      <button
+                        onClick={handleReset}
+                        disabled={saving}
+                        className="rounded-xl px-3 py-2.5 text-sm font-bold transition-all"
+                        style={{ color: 'var(--muted)', border: '1.5px solid var(--border)', background: 'white' }}
+                      >
+                        ↺
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Progress bar */}
+            <div className="h-2" style={{ background: `${timerColor}15` }}>
+              <div
+                className="h-full transition-all duration-500"
+                style={{ width: `${pct * 100}%`, background: timerColor, opacity: 0.5 }}
               />
             </div>
           </div>
 
           {/* Eix counts */}
           {submissions.length > 0 && (
-            <div className="mt-4 flex gap-2 flex-wrap">
+            <div className="flex gap-2 flex-wrap">
               {EIXOS.map(e => {
                 const count = submissions.filter(s => s.contextTheme === e.value || s.contextThemeLabel === e.value).length;
                 if (count === 0) return null;
@@ -162,9 +442,7 @@ export default function ScreenPage() {
         <div className="fixed top-6 right-6 z-50 rounded-2xl p-4 max-w-xs shadow-lg"
           style={{ background: '#f7f4f7', border: '1.5px solid var(--border)' }}>
           <div className="text-xs font-bold mb-1" style={{ color: 'var(--accent)' }}>✨ Nou recurs!</div>
-          <div className="text-sm font-medium" style={{ color: 'var(--heading)' }}>
-            {submissions[0]?.formatLabel}
-          </div>
+          <div className="text-sm font-medium" style={{ color: 'var(--heading)' }}>{submissions[0]?.formatLabel}</div>
           {submissions[0]?.pairName && (
             <div className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>{submissions[0].pairName}</div>
           )}
@@ -173,14 +451,14 @@ export default function ScreenPage() {
 
       {/* Empty state */}
       {submissions.length === 0 && (
-        <div className="flex-1 flex flex-col items-center justify-center text-center gap-4 py-32">
+        <div className="flex-1 flex flex-col items-center justify-center text-center gap-4 py-24">
           <div className="text-6xl">✨</div>
           <p className="text-xl font-bold" style={{ color: 'var(--heading)' }}>Esperant els primers recursos...</p>
           <p className="text-sm" style={{ color: 'var(--muted)' }}>Els recursos apareixeran aquí en temps real</p>
         </div>
       )}
 
-      {/* Grid */}
+      {/* Gallery grid */}
       {submissions.length > 0 && (
         <div className="flex-1 p-6">
           <div className={`grid gap-5 ${cols}`}>
@@ -194,107 +472,20 @@ export default function ScreenPage() {
   );
 }
 
-interface TimerBlockProps {
-  label: string;
-  sublabel: string;
-  inputMinutes: number;
-  secondsLeft: number;
-  running: boolean;
-  finished: boolean;
-  startStop: () => void;
-  reset: () => void;
-  changeMinutes: (v: number) => void;
-}
-
-function TimerBlock({ label, sublabel, inputMinutes, secondsLeft, running, finished, startStop, reset, changeMinutes }: TimerBlockProps) {
-  const mins = Math.floor(secondsLeft / 60);
-  const secs = secondsLeft % 60;
-  const pct = secondsLeft / (inputMinutes * 60);
-  const urgent = secondsLeft <= 60 && secondsLeft > 0;
-
-  const color = finished ? 'var(--accent)' : urgent ? '#ea580c' : 'var(--heading)';
-  const bgColor = finished ? '#fef2f2' : urgent ? '#fff7ed' : '#f7f4f7';
-  const borderColor = finished ? 'var(--accent)' : urgent ? '#ea580c50' : 'var(--border)';
-
-  return (
-    <div className="flex flex-col items-center gap-2 min-w-[160px]">
-      <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>
-        {label}
-      </div>
-
-      {/* Big time display */}
-      <div
-        className="relative w-full flex items-center justify-center rounded-2xl px-4 py-3 font-mono font-black tabular-nums"
-        style={{ fontSize: '3.5rem', lineHeight: 1, background: bgColor, border: `2px solid ${borderColor}`, color, minWidth: '160px' }}
-      >
-        {finished ? (
-          <span style={{ fontSize: '2rem' }}>⏰ 0:00</span>
-        ) : (
-          `${mins}:${String(secs).padStart(2, '0')}`
-        )}
-        {/* Progress bar */}
-        <div className="absolute bottom-0 left-0 h-1.5 rounded-b-2xl transition-all duration-1000"
-          style={{ width: `${pct * 100}%`, background: color, opacity: 0.35 }}
-        />
-      </div>
-
-      {/* Controls */}
-      <div className="flex items-center gap-1.5">
-        <input
-          type="number"
-          min={1} max={99}
-          value={inputMinutes}
-          onChange={e => changeMinutes(Math.max(1, Math.min(99, Number(e.target.value))))}
-          disabled={running}
-          className="w-12 rounded-lg px-1.5 py-1 text-sm text-center font-bold focus:outline-none"
-          style={{ border: '1.5px solid var(--border)', background: running ? '#f0eaf0' : 'white', color: 'var(--heading)' }}
-        />
-        <span className="text-xs" style={{ color: 'var(--muted)' }}>min</span>
-        <button
-          onClick={startStop}
-          className="rounded-lg px-3 py-1.5 text-sm font-bold transition-all"
-          style={running
-            ? { background: '#fff7ed', color: '#ea580c', border: '1.5px solid #ea580c50' }
-            : { background: 'var(--heading)', color: 'white' }
-          }
-        >
-          {running ? '⏸ Pausa' : secondsLeft === 0 ? '↺ Reinicia' : '▶ Iniciar'}
-        </button>
-        <button
-          onClick={reset}
-          className="rounded-lg px-2 py-1.5 text-sm transition-all"
-          style={{ color: 'var(--muted)', border: '1.5px solid var(--border)', background: '#f7f4f7' }}
-        >↺</button>
-      </div>
-
-      <div className="text-xs" style={{ color: 'var(--muted)' }}>{sublabel}</div>
-    </div>
-  );
-}
-
 function ScreenCard({ submission: s, isNew }: { submission: Submission; isNew: boolean }) {
   const eix = EIXOS.find(e => e.value === s.contextTheme || e.value === s.contextThemeLabel);
-
   return (
-    <a
-      href={`/app/${s.id}`}
-      target="_blank"
-      rel="noopener noreferrer"
+    <a href={`/app/${s.id}`} target="_blank" rel="noopener noreferrer"
       className="flex flex-col rounded-2xl overflow-hidden transition-all hover:scale-[1.02]"
       style={{
         border: isNew ? `2px solid var(--accent)` : '1.5px solid var(--border)',
         background: 'var(--bg)',
         boxShadow: isNew ? '0 0 24px rgba(230,57,70,0.12)' : undefined,
-      }}
-    >
+      }}>
       <div className="relative overflow-hidden" style={{ height: '200px', background: '#f7f4f7' }}>
-        <iframe
-          srcDoc={s.htmlOutput}
-          className="absolute inset-0 w-full h-full pointer-events-none"
+        <iframe srcDoc={s.htmlOutput} className="absolute inset-0 w-full h-full pointer-events-none"
           style={{ transform: 'scale(0.4)', transformOrigin: 'top left', width: '250%', height: '250%' }}
-          sandbox="allow-scripts"
-          title={s.formatLabel}
-        />
+          sandbox="allow-scripts" title={s.formatLabel} />
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 60%, #f7f4f7)' }} />
         {eix && (
           <div className="absolute top-2 left-2 rounded-full px-2.5 py-1 text-xs font-bold"
@@ -304,20 +495,15 @@ function ScreenCard({ submission: s, isNew }: { submission: Submission; isNew: b
         )}
         {isNew && (
           <div className="absolute top-2 right-2 rounded-full px-2.5 py-1 text-xs font-bold text-white"
-            style={{ background: 'var(--accent)' }}>
-            NOU ✨
-          </div>
+            style={{ background: 'var(--accent)' }}>NOU ✨</div>
         )}
       </div>
-
       <div className="p-4 flex flex-col gap-1.5">
         <div className="font-bold text-sm truncate" style={{ color: 'var(--heading)' }}>
           {s.formatLabel || 'Recurs educatiu'}
         </div>
         <p className="text-xs line-clamp-2" style={{ color: 'var(--muted)' }}>{s.tasca}</p>
-        {s.pairName && (
-          <div className="mt-1 text-xs font-bold" style={{ color: 'var(--accent)' }}>{s.pairName}</div>
-        )}
+        {s.pairName && <div className="mt-1 text-xs font-bold" style={{ color: 'var(--accent)' }}>{s.pairName}</div>}
       </div>
     </a>
   );

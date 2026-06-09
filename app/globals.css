@@ -3,12 +3,14 @@
 :root {
   --bg: #ffffff;
   --bg-soft: #f7f4f7;
-  --heading: #3d1042;
+  --heading: #5e2440;
   --body: #2d2d2d;
   --muted: #6b6b6b;
   --border: #e5e0e5;
   --accent: #c1392b;
   --accent-hover: #a03025;
+  --mschools-green: #00e082;
+  --mschools-aubergine: #5e2440;
 }
 
 body {

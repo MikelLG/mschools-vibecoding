@@ -6,6 +6,7 @@ import QRCode from 'react-qr-code';
 import { getSubmission, updateSubmission } from '@/lib/firebase';
 import type { Submission } from '@/lib/types';
 import { PhaseTimer } from '@/components/PhaseTimer';
+import { MSchoolsLogo } from '@/components/MSchoolsLogo';
 
 export default function ResultPage() {
   const { id } = useParams<{ id: string }>();
@@ -153,7 +154,7 @@ export default function ResultPage() {
         <button onClick={() => router.push('/')} className="text-sm transition-colors" style={{ color: 'var(--muted)' }}>
           ← Inici
         </button>
-        <span className="font-black" style={{ color: 'var(--heading)' }}>Vibe Coding</span>
+        <div className="flex items-center gap-2"><MSchoolsLogo size="sm" /><span style={{ color: 'var(--border)', fontSize: 16 }}>·</span><span className="font-black text-sm" style={{ color: 'var(--heading)' }}>Vibe Coding</span></div>
         <button
           onClick={() => router.push('/create')}
           className="text-sm rounded-lg px-3 py-1.5 transition-all"
@@ -163,15 +164,8 @@ export default function ResultPage() {
         </button>
       </header>
 
-      {/* Phase timer */}
-      <PhaseTimer
-        phase={3}
-        label="Itera i millora"
-        defaultMinutes={5}
-        instruction="Prova l'app, usa el panell de millores i posa-li el nom al final"
-        color="#0d9488"
-        bg="#f0fdfb"
-      />
+      {/* Phase timer — synced with facilitator */}
+      <PhaseTimer pagePhase={3} />
 
       <div className="flex-1 flex flex-col lg:flex-row max-w-7xl mx-auto w-full p-6 gap-6">
         {/* Left: Preview iframe */}
@@ -341,6 +335,15 @@ export default function ResultPage() {
               </button>
             </div>
           </div>
+
+          {/* Ticket button */}
+          <button
+            onClick={() => router.push(`/ticket/${id}`)}
+            className="rounded-2xl py-4 font-bold transition-all hover:opacity-90 hover:scale-[1.02]"
+            style={{ background: '#dc2626', color: 'white' }}
+          >
+            🎫 Imprimir tiquet del grup
+          </button>
 
           {/* New resource button */}
           <button

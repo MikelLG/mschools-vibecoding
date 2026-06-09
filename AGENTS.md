@@ -14,9 +14,9 @@ Educational webapp generator for workshops. Deployed at `mschools-vibecoding.ver
 
 ## User flow (phases)
 1. `/` — Home: what the tool is for + privacy disclaimer. Single CTA → Warm-up (no "Crear recurs" on home)
-2. `/warmup` — Phase 1 (5 min): Explore one example webapp, guess its prompt. PhaseTimer synced.
-3. `/create` — Phase 2 (8 min): Select 5 cards (Eix, Usuari, Repte, Acció, Estil) + optional extra context. PhaseTimer synced. Group name removed from here.
-4. `/result/[id]` — Phase 3 (5 min): Preview app, refine with text/voice, edit full prompt to regenerate, add group name at the end. PhaseTimer synced.
+2. `/warmup` — Phase 1 (4 min): Explore one example webapp, guess its prompt. PhaseTimer synced.
+3. `/create` — Phase 2 (4 min): Select 5 cards (Eix, Usuari, Repte, Acció, Estil) + optional extra context. PhaseTimer synced. Group name removed from here.
+4. `/result/[id]` — Phase 3 (7 min): Preview app, refine with text/voice, edit full prompt to regenerate, add group name at the end. PhaseTimer synced.
 5. `/screen` — Facilitator view: phase control panel (Firestore-backed, controls participant timers), workshop total timer (local), live card gallery.
 6. `/gallery` — Public gallery of all generated resources.
 

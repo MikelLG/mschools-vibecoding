@@ -2,107 +2,111 @@
 
 ---
 
-## 🔴 Blockers (must work on event day)
+## 🔴 Must do before workshop
 
-### Deploy
-- [ ] Fix git push (check branch name with `git branch`) and push to MikelLG/mschools-vibecoding
-- [ ] Deploy to Vercel → set all env vars in dashboard
-- [ ] Test full flow on Vercel URL from a phone
+- [ ] **Merge `feature/sync-timers` into `main`**
+  - First check Firestore security rules allow read/write on `workshop` collection
+  - Test with two browsers: `/screen` controls, `/warmup` shows synced timer
 
-### Core flow (redesign needed)
-- [ ] Redesign `/create` with 5 card groups (Eixos, Persona, Repte, Estil, Restriccions) replacing the current 4 steps
-- [ ] Add **live prompt preview panel** — always visible as users select cards, showing the pre-prompt sentence being assembled
-- [ ] Voice transcription step — mic button records the full pre-prompt sentence, speech-to-text fills the field
-- [ ] Build `/ticket/[id]` — printable page with QR + full prompt (use `window.print()`)
-- [ ] Add **iteration UI** on result page — editable prompt textarea + "Regenerar" button (one iteration allowed)
-- [ ] Gallery cards must show QR code
+- [ ] **Firestore security rules** — `workshop` collection needs read/write
+  - Go to Firebase Console → Firestore → Rules
+  - Add `match /workshop/{id} { allow read, write: if true; }`
 
-### Infrastructure
-- [x] Firebase project + Firestore database created
-- [x] Gemini API key set
-- [x] `.env.local` filled in
-- [ ] Set `NEXT_PUBLIC_SESSION_ID` per event
-- [ ] Test Firestore real-time sync on two devices
+- [ ] **Test with concurrent users** — simulate 20 people generating at once
+  - Confirm model cascade + auto-retry handles the load
+  - Check Gemini API quota settings in Google Cloud Console
+
+- [ ] **Confirm warm-up example app**
+  - Currently showing: "Emocions a l'aula" quiz
+  - Replace with the final example before workshop day
 
 ---
 
-## 🟡 Important (should work on event day)
+## 🟡 Important improvements
 
-### Workshop phases (new pages)
-- [ ] `/intro` — landing for workshop: what is Vibe Coding, strengths/weaknesses of AI, phases overview
-- [ ] `/warmup` — show 2 example webapps embedded in iframes; participants reverse-engineer the prompt
-- [ ] Home page redesign to reflect the phased flow (Intro → Warm-up → Create → Result)
+- [ ] **mSchools logo files** — replace text-based `MSchoolsLogo` with official SVG
+  - Files not yet provided; component uses `#00e082` box + "Schools" text for now
 
-### Prompt preview
-- [ ] Prompt preview updates live as each card group is selected
-- [ ] Show which parts of the prompt are still missing (greyed out placeholders)
-- [ ] On the generating screen, show the full assembled prompt that was sent to Gemini
+- [ ] **Gallery QR codes** — add small QR to each gallery card
 
-### Iteration
-- [ ] After first generation, show editable prompt in a textarea
-- [ ] "Regenerar" button triggers a second generation with the edited prompt
-- [ ] Disable regeneration after first iteration (visual indicator)
-- [ ] Keep both versions (original + iterated) accessible
-
-### Ticket (`/ticket/[id]`)
-- [ ] Large QR code (scannable from 1m distance)
-- [ ] Full prompt text displayed below
-- [ ] Pair name at the top
-- [ ] `window.print()` triggers clean print layout (hide nav, full width)
-- [ ] Link from result page: "Imprimir ticket"
-
-### Screen (`/screen`)
-- [ ] Each card shows QR code (small, scannable)
-- [ ] Test grid with 1–6 cards simultaneously
-- [ ] Confirm auto-reconnects if Firebase drops
+- [ ] **Test `/app/[id]`** — confirm full-screen sandboxed runner works for all generated formats
 
 ---
 
-## 🟢 Nice to have (if time allows)
+## 🟢 Nice to have
 
-### 5 card groups content
-- [ ] Define full list of cards for each group (Eixos, Persona, Repte, Estil, Restriccions)
-- [ ] Map each card selection to its prompt sentence fragment
-- [ ] Consider custom card descriptions per combination (e.g. Eixos=Matemàtiques + Persona=Alumne 6è → specific pre-prompt)
+- [ ] **Admin panel** — reset session / clear all submissions / export ZIP
 
-### UX polish
-- [ ] Timeout UI: if Gemini takes >20s, show "Encara generant…" with progress dots
-- [ ] Retry button on error state
-- [ ] Auto-grow textarea on voice transcription step
-- [ ] Haptic feedback on mobile when a card is selected
+- [ ] **Refine auto-retry UI** — same countdown/auto-retry as generate (only in create page now)
 
-### Gallery
-- [ ] QR code on each gallery card (small)
-- [ ] Filter by card group (Eixos, Persona, etc.)
-- [ ] Search by prompt text
+- [ ] **Gallery filters** — by Eix, by format, by group name
 
-### Admin
-- [ ] `/admin` — password protected (env var `ADMIN_PASSWORD`)
-- [ ] Reset session button
-- [ ] Export all submissions as ZIP
-
-### Prompt quality
-- [ ] Test all 6 format types (quiz, activitat, rúbrica, formulari, joc, suport)
-- [ ] Refine format-specific instructions in `buildPrompt()` based on test results
-- [ ] Add `temperature: 1.0` for more creative outputs
+- [ ] **Screen projector mode** — hide card gallery, show only the phase timer
 
 ---
 
 ## ✅ Done
 
-- [x] Next.js 16 scaffold (TypeScript + Tailwind + App Router)
-- [x] Firebase + Gemini + react-qr-code installed
-- [x] `lib/types.ts` — option constants and Submission type
-- [x] `lib/firebase.ts` — save, get, list, subscribe helpers
-- [x] `app/api/generate/route.ts` — Gemini call with rich format-specific prompt
-- [x] `app/page.tsx` — home page
-- [x] `app/create/page.tsx` — 4-step flow (to be redesigned to 5 card groups)
-- [x] `app/result/[id]/page.tsx` — iframe preview + QR + prompt summary
-- [x] `app/app/[id]/page.tsx` — full-screen sandboxed runner
-- [x] `app/screen/page.tsx` — live collective 75" display
-- [x] `app/gallery/page.tsx` — filterable gallery
-- [x] `.env.local` filled with real Firebase + Gemini keys
-- [x] End-to-end test on localhost: all 4 steps → generation → result ✅
-- [x] `/screen` shows new submissions in real time ✅
-- [x] Gemini prompt improved with format-specific instructions
-- [x] `--hostname 0.0.0.0` added to dev script for network access
+### This session (2026-06-09)
+- [x] Phase 4 "Publica i imprimeix" added to WORKSHOP_PHASES (2 min, red)
+- [x] Final timings: 4+4+5+2 = 15 min total
+- [x] `/ticket/[id]` page — thermal CK710 format (80mm), QR, group name, pre-prompt, 5 card badges, print button
+- [x] Result page: "🎫 Imprimir tiquet del grup" button → `/ticket/[id]`
+- [x] `/screen` login gate — password via `NEXT_PUBLIC_FACILITATOR_PASSWORD`, sessionStorage auth
+- [x] Create page: voice-first flow — pre-prompt template with blanks, big mic button, transcript → generate
+- [x] Digital card picker collapsed behind "Selecció digital" toggle
+- [x] Card definitions updated to match physical Miro cards:
+  - Usuari: Docents / Alumnes / Famílies (removed Equip del centre)
+  - Reptes Docents: +Planificació de situacions d'aprenentatge, removed Preparació/Benestar
+  - Reptes Famílies: +Seguiment del procés, +Complementar des de casa, Omplir→Emplenar
+  - Accions: full new set of 12 cards
+  - Estils: 9 cards (Creatiu/artístic, Ludificat, Interactiu, Narratiu per passos)
+
+### Previous session (2026-06-08)
+- [x] `/guiadocent` — full teacher's guide page (mSchools style)
+- [x] mSchools branding — `MSchoolsLogo` component, `#00e082` green + `#5e2440` aubergine CSS vars
+- [x] Logo in all page headers (home, warmup, create, result)
+- [x] Phase timings: 4+4+7 = 15 min (then updated to 4+4+5+2 = 15 min with phase 4)
+- [x] Warm-up: two-column layout, left sidebar + 85vh iframe, scrollable
+
+### Core flow
+- [x] Voice-first create: read pre-prompt aloud → transcript → generate
+- [x] 5-card digital fallback (hidden toggle)
+- [x] Live prompt preview bar
+- [x] Extra context field (voice + text)
+- [x] Group name at END of flow (result page)
+- [x] Generating screen with prompt preview + auto-retry countdown
+
+### Generation & AI
+- [x] Gemini cascade: 6 models × 6 rounds = 36 attempts
+- [x] 404 / deprecated / 429 / 503 all retryable
+- [x] UI auto-retry: 10 × 10s countdown
+- [x] `rawPrompt` bypass for direct prompt editing
+- [x] Pre-Prompt preserved when regenerating from edited full prompt
+
+### Pages
+- [x] Home: disclaimer, single CTA → Warm-up
+- [x] Warm-up: example app, reveal mechanic, phase timer
+- [x] Create: voice-first, digital fallback, phase timer
+- [x] Result: iframe, QR, refine panel, editable prompt, group name, ticket button
+- [x] Ticket: thermal print (CK710 80mm), QR, cards, pre-prompt
+- [x] Screen: login gate, phase controls, workshop timer, live gallery
+- [x] Gallery: all submissions
+- [x] Guia docent: full teacher guide
+
+### Infrastructure
+- [x] Firebase Firestore (submissions + workshop timer)
+- [x] Gemini API with billing
+- [x] Vercel deploy at `mschools-vibecoding.vercel.app`
+- [x] `maxDuration = 240`, session ID env var
+- [x] Firestore-backed synced timers on `feature/sync-timers` branch
+
+---
+
+#### PREGUNTES:
+
+1. ~~Al final el tema tiquets si que es fará o no?~~ ✅ Fet
+2. ~~La organització dels timings será 4/4/5/5?~~ ✅ 4+4+5+2 = 15 min
+3. Quina app volem enseñar com a exemple de warm-up?
+4. ~~Tema veure el warmup gran i visualitzar correctament.~~ ✅ Fet (2-col layout)
+5. ~~Com volem la part de crear el prompt?~~ ✅ Veu principal + selecció digital oculta
