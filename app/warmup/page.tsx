@@ -32,9 +32,9 @@ export default function WarmupPage() {
   const [revealed, setRevealed] = useState(false);
 
   return (
-    <main style={{ display: 'flex', flexDirection: 'column', height: '100dvh', background: 'var(--bg)' }}>
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b flex-shrink-0" style={{ borderColor: 'var(--border)' }}>
+    <main style={{ display: 'grid', gridTemplateRows: 'auto auto 1fr', height: '100dvh', background: 'var(--bg)', overflow: 'hidden' }}>
+      {/* Header — row 1 */}
+      <header className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
         <button onClick={() => router.push('/')} className="text-sm" style={{ color: 'var(--muted)' }}>
           ← Inici
         </button>
@@ -42,12 +42,11 @@ export default function WarmupPage() {
         <div className="w-16" />
       </header>
 
-      {/* Phase timer */}
-      <div className="flex-shrink-0">
-        <PhaseTimer pagePhase={1} />
-      </div>
+      {/* Phase timer — row 2 */}
+      <PhaseTimer pagePhase={1} />
 
-      <div style={{ display: 'flex', flex: '1 1 0', minHeight: 0, overflow: 'hidden' }}>
+      {/* Two-column area — row 3: fills exact remaining height */}
+      <div style={{ display: 'flex', overflow: 'hidden', minHeight: 0 }}>
 
         {/* Left panel — instructions + reveal */}
         <div className="flex flex-col px-6 py-6 gap-5 overflow-y-auto" style={{ width: 320, minWidth: 300, minHeight: 0, flexShrink: 0, borderRight: '1.5px solid var(--border)' }}>
