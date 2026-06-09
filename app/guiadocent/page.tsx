@@ -16,7 +16,8 @@ const STEPS = [
   { n: '03', title: 'Warm-up · 4 minuts', desc: 'Exploren una app educativa d\'exemple ja generada i intenten endevinar quin prompt la va crear. Activa la curiositat i trenca el gel.' },
   { n: '04', title: 'Construcció del prompt · 4 minuts', desc: 'Seleccionen 5 targetes (Eix, Usuari, Repte, Acció, Estil) i afegeixen context addicional per escrit o per veu. Es construeix un prompt ric i estructurat.' },
   { n: '05', title: 'La IA genera l\'eina educativa', desc: 'Gemini construeix una webapp educativa funcional en HTML. El sistema intenta fins a 36 vegades amb 6 models diferents per garantir que sempre funciona.' },
-  { n: '06', title: 'Iteració i millora · 7 minuts', desc: 'Proven l\'app generada, apliquen millores amb text o veu, editen el prompt complet si volen, posen el nom al grup i publiquen el resultat final.' },
+  { n: '06', title: 'Iteració i millora · 5 minuts', desc: 'Proven l\'app generada, apliquen millores amb text o veu, editen el prompt complet si volen i posen el nom al grup.' },
+  { n: '07', title: 'Publica i imprimeix · 2 minuts', desc: 'Imprimeixen el tiquet del grup: QR, nom i prompt. L\'eina queda publicada a la galeria pública del taller.' },
 ];
 
 const CARDS = [
@@ -66,12 +67,7 @@ export default function GuiaDocentPage() {
           <p style={{ fontSize: 18, color: '#555', maxWidth: 560, margin: '0 auto 28px', lineHeight: 1.6 }}>
             Una activitat per crear eines educatives amb IA de manera col·laborativa, creativa i reflexiva.
           </p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', marginBottom: 32 }}>
-            {['Secundària', 'Batxillerat', 'Cicles Formatius', 'Formació Docent'].map(l => (
-              <span key={l} style={{ border: '1.5px solid #d1c5d0', borderRadius: 999, padding: '4px 14px', fontSize: 13, color: '#555', background: 'white' }}>{l}</span>
-            ))}
-          </div>
-          <Link href="/screen" style={{ display: 'inline-block', background: '#00e082', color: 'white', fontWeight: 700, fontSize: 15, padding: '12px 28px', borderRadius: 999, textDecoration: 'none' }}>
+<Link href="/screen" style={{ display: 'inline-block', background: '#00e082', color: 'white', fontWeight: 700, fontSize: 15, padding: '12px 28px', borderRadius: 999, textDecoration: 'none' }}>
             Tauler del facilitador →
           </Link>
         </div>

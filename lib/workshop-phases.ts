@@ -28,9 +28,17 @@ export const WORKSHOP_PHASES: Phase[] = [
     id: 3,
     label: 'Itera i millora',
     instruction: "Prova l'app, aplica millores i posa-li el nom al final",
-    defaultMinutes: 7,
+    defaultMinutes: 5,
     color: '#0d9488',
     bg: '#f0fdfb',
+  },
+  {
+    id: 4,
+    label: 'Publica i imprimeix',
+    instruction: "Imprimeix el tiquet del grup i comparteix l'app",
+    defaultMinutes: 2,
+    color: '#dc2626',
+    bg: '#fff1f2',
   },
 ];
 

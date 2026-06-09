@@ -336,6 +336,15 @@ export default function ResultPage() {
             </div>
           </div>
 
+          {/* Ticket button */}
+          <button
+            onClick={() => router.push(`/ticket/${id}`)}
+            className="rounded-2xl py-4 font-bold transition-all hover:opacity-90 hover:scale-[1.02]"
+            style={{ background: '#dc2626', color: 'white' }}
+          >
+            🎫 Imprimir tiquet del grup
+          </button>
+
           {/* New resource button */}
           <button
             onClick={() => router.push('/create')}
