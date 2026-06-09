@@ -185,7 +185,7 @@ export default function CreatePage() {
           body: JSON.stringify(payload),
         });
         if (!res.ok) {
-          if (res.status === 504 || res.status === 524) throw new Error('La generació ha trigat massa. Torna-ho a intentar.');
+          if (res.status === 504 || res.status === 524) throw new Error('OVERLOADED');
           const errData = await res.json().catch(() => ({})) as { error?: string };
           throw new Error(errData.error || `Error ${res.status}`);
         }
