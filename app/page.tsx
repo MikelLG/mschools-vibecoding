@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { MSchoolsLogo } from '@/components/MSchoolsLogo';
 
 const FOR = [
   {
@@ -54,10 +55,15 @@ export default function Home() {
 
       {/* Nav */}
       <nav className="flex items-center justify-between px-8 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
-        <span className="font-black text-lg tracking-tight" style={{ color: 'var(--heading)' }}>
-          mSchools · Vibe Coding
-        </span>
         <div className="flex items-center gap-3">
+          <MSchoolsLogo />
+          <span style={{ color: 'var(--border)', fontSize: 18 }}>·</span>
+          <span className="font-black text-base tracking-tight" style={{ color: 'var(--heading)' }}>Vibe Coding</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <Link href="/guiadocent" className="text-sm font-medium px-4 py-2 rounded-lg" style={{ color: 'var(--muted)' }}>
+            Guia docent
+          </Link>
           <Link href="/gallery" className="text-sm font-medium px-4 py-2 rounded-lg" style={{ color: 'var(--muted)' }}>
             Galeria
           </Link>

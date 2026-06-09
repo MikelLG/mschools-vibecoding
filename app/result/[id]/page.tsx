@@ -6,6 +6,7 @@ import QRCode from 'react-qr-code';
 import { getSubmission, updateSubmission } from '@/lib/firebase';
 import type { Submission } from '@/lib/types';
 import { PhaseTimer } from '@/components/PhaseTimer';
+import { MSchoolsLogo } from '@/components/MSchoolsLogo';
 
 export default function ResultPage() {
   const { id } = useParams<{ id: string }>();
@@ -153,7 +154,7 @@ export default function ResultPage() {
         <button onClick={() => router.push('/')} className="text-sm transition-colors" style={{ color: 'var(--muted)' }}>
           ← Inici
         </button>
-        <span className="font-black" style={{ color: 'var(--heading)' }}>Vibe Coding</span>
+        <div className="flex items-center gap-2"><MSchoolsLogo size="sm" /><span style={{ color: 'var(--border)', fontSize: 16 }}>·</span><span className="font-black text-sm" style={{ color: 'var(--heading)' }}>Vibe Coding</span></div>
         <button
           onClick={() => router.push('/create')}
           className="text-sm rounded-lg px-3 py-1.5 transition-all"

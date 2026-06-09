@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import EXAMPLES from '@/lib/examples.json';
 import { PhaseTimer } from '@/components/PhaseTimer';
+import { MSchoolsLogo } from '@/components/MSchoolsLogo';
 
 function WBadge({ v, color, bg, emoji }: { v: string; color: string; bg: string; emoji: string }) {
   return (
@@ -37,7 +38,7 @@ export default function WarmupPage() {
         <button onClick={() => router.push('/')} className="text-sm" style={{ color: 'var(--muted)' }}>
           ← Inici
         </button>
-        <span className="font-black" style={{ color: 'var(--heading)' }}>Vibe Coding</span>
+        <div className="flex items-center gap-2"><MSchoolsLogo size="sm" /><span style={{ color: 'var(--border)', fontSize: 16 }}>·</span><span className="font-black text-sm" style={{ color: 'var(--heading)' }}>Vibe Coding</span></div>
         <div className="w-16" />
       </header>
 
