@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { MSchoolsLogo } from '@/components/MSchoolsLogo';
 import { getSubmission } from '@/lib/firebase';
 import type { Submission } from '@/lib/types';
 
@@ -58,12 +59,12 @@ export default function AppRunnerPage() {
             ← Enrere
           </button>
           <span className="text-xs text-[#555]">|</span>
-          <span className="text-xs text-[#555]">{submission.rolLabel} · {submission.contextThemeLabel} · {submission.formatLabel}</span>
+          <span className="text-xs text-[#555] max-w-xs truncate">{submission.tasca || submission.formatLabel}</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs font-black text-[#e63946]">VIBE CODING</span>
+          <MSchoolsLogo size="sm" />
           {submission.pairName && (
-            <span className="text-xs text-[#555]">— {submission.pairName}</span>
+            <span className="text-xs text-[#888]">— {submission.pairName}</span>
           )}
         </div>
       </div>
