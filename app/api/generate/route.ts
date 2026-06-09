@@ -12,12 +12,16 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 // All known Gemini models — 404s are caught and skipped automatically
 const MODEL_CASCADE = [
-  'gemini-2.5-flash',
-  'gemini-2.5-pro',
-  'gemini-2.0-flash-lite',
-  'gemini-1.5-flash',
-  'gemini-1.5-flash-8b',
-  'gemini-1.5-pro',
+  'gemini-3.5-flash',       // newest stable — fastest + best quality
+  'gemini-3.1-pro',         // preview — most capable
+  'gemini-3-flash',         // fast frontier
+  'gemini-3.1-flash-lite',  // lite, very fast
+  'gemini-2.5-flash',       // proven reliable
+  'gemini-2.5-pro',         // proven reliable
+  'gemini-2.0-flash-lite',  // fallback
+  'gemini-1.5-flash',       // fallback
+  'gemini-1.5-flash-8b',    // fallback
+  'gemini-1.5-pro',         // last resort
 ];
 
 function isRetryableError(msg: string) {
