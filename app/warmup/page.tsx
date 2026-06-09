@@ -32,24 +32,25 @@ export default function WarmupPage() {
   const [revealed, setRevealed] = useState(false);
 
   return (
-    <main style={{ display: 'grid', gridTemplateRows: 'auto auto 1fr', height: '100dvh', background: 'var(--bg)', overflow: 'hidden' }}>
-      {/* Header — row 1 */}
+    <main className="min-h-screen" style={{ background: 'var(--bg)' }}>
+      {/* Header */}
       <header className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
-        <button onClick={() => router.push('/')} className="text-sm" style={{ color: 'var(--muted)' }}>
-          ← Inici
-        </button>
-        <div className="flex items-center gap-2"><MSchoolsLogo size="sm" /><span style={{ color: 'var(--border)', fontSize: 16 }}>·</span><span className="font-black text-sm" style={{ color: 'var(--heading)' }}>Vibe Coding</span></div>
+        <button onClick={() => router.push('/')} className="text-sm" style={{ color: 'var(--muted)' }}>← Inici</button>
+        <div className="flex items-center gap-2">
+          <MSchoolsLogo size="sm" />
+          <span style={{ color: 'var(--border)', fontSize: 16 }}>·</span>
+          <span className="font-black text-sm" style={{ color: 'var(--heading)' }}>Vibe Coding</span>
+        </div>
         <div className="w-16" />
       </header>
 
-      {/* Phase timer — row 2 */}
       <PhaseTimer pagePhase={1} />
 
-      {/* Two-column area — row 3: fills exact remaining height */}
-      <div style={{ display: 'flex', overflow: 'hidden', minHeight: 0 }}>
+      {/* Two-column layout */}
+      <div className="flex" style={{ alignItems: 'flex-start' }}>
 
-        {/* Left panel — instructions + reveal */}
-        <div className="flex flex-col px-6 py-6 gap-5 overflow-y-auto" style={{ width: 320, minWidth: 300, minHeight: 0, flexShrink: 0, borderRight: '1.5px solid var(--border)' }}>
+        {/* Left panel — sticky sidebar */}
+        <div className="flex flex-col px-6 py-6 gap-5" style={{ width: 320, minWidth: 300, flexShrink: 0, borderRight: '1.5px solid var(--border)', position: 'sticky', top: 40, maxHeight: 'calc(100vh - 40px)', overflowY: 'auto' }}>
           <div>
             <h1 className="text-xl font-black mb-1" style={{ color: 'var(--heading)' }}>Endevina el prompt</h1>
             <p className="text-sm leading-relaxed" style={{ color: 'var(--muted)' }}>
@@ -66,8 +67,7 @@ export default function WarmupPage() {
             </ol>
           </div>
 
-          {/* Reveal area */}
-          <div className="rounded-xl p-5 flex-1" style={{ background: '#f7f4f7', border: '1.5px solid var(--border)' }}>
+          <div className="rounded-xl p-5" style={{ background: '#f7f4f7', border: '1.5px solid var(--border)' }}>
             {!revealed ? (
               <div className="flex flex-col items-center text-center gap-4">
                 <p className="text-sm font-medium" style={{ color: 'var(--heading)' }}>
@@ -115,8 +115,8 @@ export default function WarmupPage() {
           </button>
         </div>
 
-        {/* Right panel — full-height iframe */}
-        <div style={{ flex: '1 1 0', display: 'flex', flexDirection: 'column', minHeight: 0, minWidth: 0 }}>
+        {/* Right panel — iframe, tall enough to show the full app */}
+        <div className="flex-1 flex flex-col">
           <div className="flex items-center gap-1.5 px-4 py-2 border-b" style={{ background: '#f7f4f7', borderColor: 'var(--border)' }}>
             <div className="w-3 h-3 rounded-full" style={{ background: '#e5e5e5' }} />
             <div className="w-3 h-3 rounded-full" style={{ background: '#e5e5e5' }} />
@@ -126,7 +126,7 @@ export default function WarmupPage() {
           <iframe
             key={example.id}
             srcDoc={example.html}
-            style={{ flex: '1 1 0', width: '100%', minHeight: 0, border: 'none', display: 'block' }}
+            style={{ width: '100%', height: '85vh', border: 'none', display: 'block' }}
             sandbox="allow-scripts allow-forms"
             title={example.title}
           />
