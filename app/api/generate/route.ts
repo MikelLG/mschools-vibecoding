@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
 
     const { text, model: modelUsed } = await generateWithRetry(prompt);
 
-    let htmlOutput = text;
+    let htmlOutput = text
       .replace(/^```html\s*/i, '')
       .replace(/^```\s*/i, '')
       .replace(/\s*```$/i, '')
