@@ -32,9 +32,9 @@ export default function WarmupPage() {
   const [revealed, setRevealed] = useState(false);
 
   return (
-    <main className="h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
+    <main style={{ display: 'flex', flexDirection: 'column', height: '100dvh', background: 'var(--bg)' }}>
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
+      <header className="flex items-center justify-between px-6 py-4 border-b flex-shrink-0" style={{ borderColor: 'var(--border)' }}>
         <button onClick={() => router.push('/')} className="text-sm" style={{ color: 'var(--muted)' }}>
           ← Inici
         </button>
@@ -42,13 +42,15 @@ export default function WarmupPage() {
         <div className="w-16" />
       </header>
 
-      {/* Phase timer — synced with facilitator */}
-      <PhaseTimer pagePhase={1} />
+      {/* Phase timer */}
+      <div className="flex-shrink-0">
+        <PhaseTimer pagePhase={1} />
+      </div>
 
-      <div className="flex flex-1 overflow-hidden" style={{ minHeight: 0 }}>
+      <div style={{ display: 'flex', flex: '1 1 0', minHeight: 0, overflow: 'hidden' }}>
 
         {/* Left panel — instructions + reveal */}
-        <div className="flex flex-col px-6 py-6 gap-5 overflow-y-auto" style={{ width: 320, minWidth: 300, borderRight: '1.5px solid var(--border)' }}>
+        <div className="flex flex-col px-6 py-6 gap-5 overflow-y-auto" style={{ width: 320, minWidth: 300, minHeight: 0, flexShrink: 0, borderRight: '1.5px solid var(--border)' }}>
           <div>
             <h1 className="text-xl font-black mb-1" style={{ color: 'var(--heading)' }}>Endevina el prompt</h1>
             <p className="text-sm leading-relaxed" style={{ color: 'var(--muted)' }}>
@@ -115,7 +117,7 @@ export default function WarmupPage() {
         </div>
 
         {/* Right panel — full-height iframe */}
-        <div className="flex-1 flex flex-col" style={{ minHeight: 0 }}>
+        <div style={{ flex: '1 1 0', display: 'flex', flexDirection: 'column', minHeight: 0, minWidth: 0 }}>
           <div className="flex items-center gap-1.5 px-4 py-2 border-b" style={{ background: '#f7f4f7', borderColor: 'var(--border)' }}>
             <div className="w-3 h-3 rounded-full" style={{ background: '#e5e5e5' }} />
             <div className="w-3 h-3 rounded-full" style={{ background: '#e5e5e5' }} />
@@ -125,8 +127,7 @@ export default function WarmupPage() {
           <iframe
             key={example.id}
             srcDoc={example.html}
-            className="flex-1 w-full"
-            style={{ border: 'none', display: 'block' }}
+            style={{ flex: '1 1 0', width: '100%', minHeight: 0, border: 'none', display: 'block' }}
             sandbox="allow-scripts allow-forms"
             title={example.title}
           />
