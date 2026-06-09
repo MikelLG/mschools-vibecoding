@@ -24,9 +24,10 @@ interface UserState {
   htmlLen: number;
   error: string;
   startedAt: number;
+  model: string;
 }
 
-const INITIAL: UserState = { status: 'idle', elapsed: 0, htmlLen: 0, error: '', startedAt: 0 };
+const INITIAL: UserState = { status: 'idle', elapsed: 0, htmlLen: 0, error: '', startedAt: 0, model: '' };
 
 export default function LoadTestPage() {
   const [users, setUsers] = useState<UserState[]>(Array(10).fill(null).map(() => ({ ...INITIAL })));
@@ -76,9 +77,10 @@ export default function LoadTestPage() {
           return;
         }
 
-        const data = await res.json() as { submission?: { htmlOutput?: string } };
+        const data = await res.json() as { submission?: { htmlOutput?: string }; modelUsed?: string };
         const htmlLen = data.submission?.htmlOutput?.length ?? 0;
-        updateUser(i, { status: 'success', elapsed, htmlLen });
+        const model = data.modelUsed ?? '';
+        updateUser(i, { status: 'success', elapsed, htmlLen, model });
       } catch (err) {
         clearTimeout(timer);
         const elapsed = (Date.now() - startAll) / 1000;
@@ -223,6 +225,11 @@ function UserCard({ index, user, prompt }: { index: number; user: UserState; pro
           <div className="text-xs" style={{ color: 'var(--muted)' }}>
             {user.elapsed.toFixed(1)}s
             {user.status === 'success' && ` · ${(user.htmlLen / 1000).toFixed(1)}kb`}
+          </div>
+        )}
+        {user.model && (
+          <div className="text-xs font-bold truncate" style={{ color: statusColor, opacity: 0.7 }}>
+            {user.model.replace('gemini-', '')}
           </div>
         )}
         {user.error && (

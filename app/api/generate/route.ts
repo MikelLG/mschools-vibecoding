@@ -33,25 +33,31 @@ function isRetryableError(msg: string) {
   );
 }
 
+function isGoneError(msg: string) {
+  // Model doesn't exist — skip immediately, no sleep needed
+  return msg.includes('404') || msg.includes('no longer available') || msg.includes('deprecated');
+}
+
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
-// Tries every model in the cascade, then repeats the whole cascade up to maxRounds times.
-// This means if all models are busy right now, we wait and try again rather than giving up.
-async function generateWithRetry(prompt: string, maxRounds = 6): Promise<string> {
+async function generateWithRetry(prompt: string, maxRounds = 6): Promise<{ text: string; model: string }> {
   for (let round = 0; round < maxRounds; round++) {
     for (let i = 0; i < MODEL_CASCADE.length; i++) {
+      const modelId = MODEL_CASCADE[i];
       try {
-        const model = genAI.getGenerativeModel({ model: MODEL_CASCADE[i] });
+        const model = genAI.getGenerativeModel({ model: modelId });
         const result = await model.generateContent(prompt);
-        return result.response.text();
+        return { text: result.response.text(), model: modelId };
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         if (isRetryableError(msg)) {
-          // Small pause before next model; longer pause before starting a new round
-          await sleep(i < MODEL_CASCADE.length - 1 ? 1500 : 5000);
+          if (!isGoneError(msg)) {
+            // Only sleep for capacity errors (429/503), not for missing models (404)
+            await sleep(i < MODEL_CASCADE.length - 1 ? 1500 : 5000);
+          }
           continue;
         }
-        throw err; // non-retryable (bad request, auth, etc.) — fail immediately
+        throw err;
       }
     }
   }
@@ -65,9 +71,9 @@ export async function POST(req: NextRequest) {
 
     const prompt = rawPrompt ?? buildPrompt({ selectedCards: selectedCards ?? [], promptPreview, voicePrompt, extraContext, formatLabel, format });
 
-    let htmlOutput = await generateWithRetry(prompt);
+    const { text, model: modelUsed } = await generateWithRetry(prompt);
 
-    htmlOutput = htmlOutput
+    let htmlOutput = text;
       .replace(/^```html\s*/i, '')
       .replace(/^```\s*/i, '')
       .replace(/\s*```$/i, '')
@@ -91,7 +97,7 @@ export async function POST(req: NextRequest) {
       sessionId: sessionId ?? process.env.NEXT_PUBLIC_SESSION_ID ?? 'default',
     };
 
-    return NextResponse.json({ submission });
+    return NextResponse.json({ submission, modelUsed });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error('[generate]', message);
