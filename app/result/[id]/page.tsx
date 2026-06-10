@@ -186,8 +186,8 @@ export default function ResultPage() {
             <div className="text-xs font-bold uppercase tracking-widest" style={{ color: '#0d9488' }}>Com funciona</div>
             <ol className="text-sm flex flex-col gap-2" style={{ color: 'var(--body)' }}>
               <li>1. Revisa la webapp generada. Pots accedir-hi a través del QR també.</li>
-              <li>2. Edita el prompt o sol·licita una millora a la barra lateral.</li>
-              <li>3. Posa nom al teu recurs i clica <strong>Finalitzar</strong>.</li>
+              <li>2. Si vols canviar algo, tens dues opcions aquí sota: <strong>edita el prompt</strong> directament, o <strong>descriu la millora</strong> i la IA l&apos;aplica.</li>
+              <li>3. Quan estigui llesta, clica <strong>Finalitzar</strong> per posar-li nom i imprimir el tiquet.</li>
             </ol>
           </div>
         </div>
