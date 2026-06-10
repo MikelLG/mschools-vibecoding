@@ -172,7 +172,28 @@ export default function ResultPage() {
       {/* Phase timer — synced with facilitator */}
       <PhaseTimer pagePhase={3} />
 
-      <div className="flex-1 flex flex-col lg:flex-row max-w-7xl mx-auto w-full p-6 gap-6">
+      <div className="flex" style={{ alignItems: 'flex-start' }}>
+
+        {/* Left sticky sidebar — instructions */}
+        <div className="flex flex-col px-6 py-6 gap-5" style={{ width: 280, minWidth: 260, flexShrink: 0, borderRight: '1.5px solid var(--border)', position: 'sticky', top: 40, maxHeight: 'calc(100vh - 40px)', overflowY: 'auto' }}>
+          <div>
+            <h1 className="text-xl font-black mb-1" style={{ color: 'var(--heading)' }}>Itera i millora</h1>
+            <p className="text-sm leading-relaxed" style={{ color: 'var(--muted)' }}>
+              Revisa la webapp i ajusta-la fins que estigui llesta.
+            </p>
+          </div>
+          <div className="rounded-xl p-4 flex flex-col gap-2" style={{ background: '#f0fdfb', border: '1.5px solid #0d948825' }}>
+            <div className="text-xs font-bold uppercase tracking-widest" style={{ color: '#0d9488' }}>Com funciona</div>
+            <ol className="text-sm flex flex-col gap-2" style={{ color: 'var(--body)' }}>
+              <li>1. Revisa la webapp generada. Pots accedir-hi a través del QR també.</li>
+              <li>2. Edita el prompt o sol·licita una millora a la barra lateral.</li>
+              <li>3. Posa nom al teu recurs i clica <strong>Finalitzar</strong>.</li>
+            </ol>
+          </div>
+        </div>
+
+        {/* Main content */}
+        <div className="flex-1 flex flex-col lg:flex-row p-6 gap-6">
         {/* Left: Preview iframe */}
         <div className="flex-1 flex flex-col gap-4">
           {/* Tags */}
@@ -226,8 +247,9 @@ export default function ResultPage() {
           {editablePrompt && (
             <div className="rounded-2xl p-5 flex flex-col gap-3" style={{ border: '1.5px solid var(--border)', background: '#f7f4f7' }}>
               <div className="flex items-center justify-between">
-                <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>
-                  Prompt enviat a Gemini
+                <div>
+                  <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Prompt enviat a Gemini</div>
+                  <div className="text-xs mt-0.5" style={{ color: 'var(--muted)', opacity: 0.7 }}>Edita'l si és necessari per ajustar el resultat.</div>
                 </div>
                 {promptEdited && (
                   <span className="text-xs font-medium" style={{ color: '#0d9488' }}>Editat ✓</span>
@@ -259,16 +281,6 @@ export default function ResultPage() {
 
         {/* Right: QR + info */}
         <div className="w-full lg:w-72 flex flex-col gap-4">
-
-          {/* How it works */}
-          <div className="rounded-xl p-4 flex flex-col gap-2" style={{ background: '#f0fdfb', border: '1.5px solid #0d948825' }}>
-            <div className="text-xs font-bold uppercase tracking-widest" style={{ color: '#0d9488' }}>Com funciona</div>
-            <ol className="text-sm flex flex-col gap-2" style={{ color: 'var(--body)' }}>
-              <li>1. Revisa la webapp generada. Pots accedir-hi a través del QR també.</li>
-              <li>2. Edita el prompt enviat a Gemini o sol·licita una millora.</li>
-              <li>3. Posa nom al teu recurs quan estigui correcte i clica <strong>Finalitzar</strong>.</li>
-            </ol>
-          </div>
 
           {/* QR card */}
           <div className="rounded-2xl p-6 flex flex-col items-center gap-4" style={{ border: '1.5px solid var(--border)', background: '#f7f4f7' }}>
@@ -336,10 +348,10 @@ export default function ResultPage() {
             </button>
           </div>
 
-          {/* Group name — save at the end */}
-          <div className="rounded-2xl p-5 flex flex-col gap-3" style={{ border: '1.5px solid var(--border)', background: '#f7f4f7' }}>
-            <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>👥 Identificar el recurs</div>
-            <p className="text-xs" style={{ color: 'var(--muted)' }}>Opcional. Afegiu el nom del vostre grup per identificar el recurs a la galeria.</p>
+          {/* Group name + Finalitzar */}
+          <div className="rounded-2xl p-5 flex flex-col gap-3" style={{ border: '2px solid var(--heading)', background: '#f7f4f7' }}>
+            <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--heading)' }}>👥 Nom del grup</div>
+            <p className="text-xs" style={{ color: 'var(--muted)' }}>Poseu el nom del vostre grup per identificar el recurs.</p>
             <div className="flex gap-2">
               <input
                 type="text"
@@ -355,22 +367,20 @@ export default function ResultPage() {
                 className="rounded-xl px-3 py-2 text-sm font-bold transition-all flex-shrink-0"
                 style={groupNameSaved
                   ? { background: '#f0fdfb', color: '#0d9488', border: '1.5px solid #0d9488' }
-                  : { background: 'var(--heading)', color: 'white' }
+                  : { background: 'var(--border)', color: 'var(--muted)' }
                 }
               >
                 {groupNameSaved ? '✓' : 'Desar'}
               </button>
             </div>
+            <button
+              onClick={async () => { await saveGroupName(); router.push(`/ticket/${id}`); }}
+              className="w-full rounded-xl py-3.5 text-base font-black transition-all hover:opacity-90 hover:scale-[1.01]"
+              style={{ background: 'var(--heading)', color: 'white' }}
+            >
+              Finalitzar →
+            </button>
           </div>
-
-          {/* Ticket button */}
-          <button
-            onClick={() => router.push(`/ticket/${id}`)}
-            className="rounded-2xl py-4 font-bold transition-all hover:opacity-90 hover:scale-[1.02]"
-            style={{ background: '#dc2626', color: 'white' }}
-          >
-            🎫 Imprimir tiquet del grup
-          </button>
 
           {/* New resource button */}
           <button
@@ -390,7 +400,8 @@ export default function ResultPage() {
             🖼️ Veure la galeria completa
           </a>
         </div>
-      </div>
+        </div> {/* end main content */}
+      </div> {/* end outer flex */}
     </main>
   );
 }
