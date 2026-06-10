@@ -259,6 +259,17 @@ export default function ResultPage() {
 
         {/* Right: QR + info */}
         <div className="w-full lg:w-72 flex flex-col gap-4">
+
+          {/* How it works */}
+          <div className="rounded-xl p-4 flex flex-col gap-2" style={{ background: '#f0fdfb', border: '1.5px solid #0d948825' }}>
+            <div className="text-xs font-bold uppercase tracking-widest" style={{ color: '#0d9488' }}>Com funciona</div>
+            <ol className="text-sm flex flex-col gap-2" style={{ color: 'var(--body)' }}>
+              <li>1. Revisa la webapp generada. Pots accedir-hi a través del QR també.</li>
+              <li>2. Edita el prompt enviat a Gemini o sol·licita una millora.</li>
+              <li>3. Posa nom al teu recurs quan estigui correcte i clica <strong>Finalitzar</strong>.</li>
+            </ol>
+          </div>
+
           {/* QR card */}
           <div className="rounded-2xl p-6 flex flex-col items-center gap-4" style={{ border: '1.5px solid var(--border)', background: '#f7f4f7' }}>
             <div className="text-sm font-bold" style={{ color: 'var(--heading)' }}>Accedeix al recurs</div>
