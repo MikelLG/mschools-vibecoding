@@ -159,7 +159,7 @@ export default function TicketPage() {
                 placeholder="Ex: Grup 3, Equip B, Anna & Marc..."
                 value={groupName}
                 onChange={e => { setGroupName(e.target.value); setSaved(false); }}
-                onKeyDown={e => { if (e.key === 'Enter') saveAndPrint(); }}
+                onKeyDown={e => { if (e.key === 'Enter') sendToQueue(); }}
                 className="flex-1 rounded-xl px-4 py-3 text-base font-bold focus:outline-none"
                 style={{ background: '#f7f4f7', border: '1.5px solid var(--border)', color: 'var(--heading)' }}
                 autoFocus

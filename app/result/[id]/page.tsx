@@ -293,7 +293,7 @@ export default function ResultPage() {
             <button onClick={handleRefine} disabled={!refineText.trim() || refining}
               className="rounded-xl py-3 text-sm font-bold transition-all"
               style={refineText.trim() && !refining ? { background: 'var(--heading)', color: 'white' } : { background: '#e8e2e8', color: 'var(--muted)', cursor: 'not-allowed' }}>
-              {refining ? '⏳ Millorant...' : '✨ Aplicar millores'}
+              {refining ? <span>⏳ Millorant… <span className="font-normal text-xs opacity-70">Espera uns segons</span></span> : '✨ Aplicar millores'}
             </button>
           </div>
         </div>
