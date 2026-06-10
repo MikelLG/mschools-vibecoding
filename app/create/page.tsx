@@ -362,8 +362,9 @@ export default function CreatePage() {
           </div>
         </div>
 
-        {/* Right content */}
-        <div className="flex-1 px-6 py-8 flex flex-col gap-8" style={{ maxWidth: 640 }}>
+        {/* Right content — centered in remaining space */}
+        <div className="flex-1 flex justify-center py-8">
+        <div className="w-full px-6 flex flex-col gap-8" style={{ maxWidth: 560 }}>
 
         {/* Pre-prompt template — what they need to read */}
         <div className="rounded-2xl p-6" style={{ background: '#f7f4f7', border: '1.5px solid var(--border)' }}>
@@ -527,7 +528,8 @@ export default function CreatePage() {
           </div>
         )}
 
-        </div> {/* end right content */}
+        </div> {/* end inner max-width */}
+        </div> {/* end right centered wrapper */}
       </div> {/* end two-column flex */}
     </main>
   );
