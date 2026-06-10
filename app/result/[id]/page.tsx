@@ -368,36 +368,62 @@ export default function ResultPage() {
   );
 }
 
+// ── Card value lists (for voice transcript parsing) ───────────────────────────
+const _EIXOS    = ['Benestar social','Educació mediàtica','Consciència social','Art i creativitat','Equitat i inclusió','Cultura i diversitat'];
+const _USUARIS  = ['Docents','Alumnes','Famílies'];
+const _ACCIONS  = ['Generar grups','Crear horaris','Classificar informació','Recol·lectar dades i mostrar-los a l\'instant','Suggerències automàtiques','Comparar escenaris (abans/després, opció A/B)','Simular situacions (emocionals, socials, científiques...)','Acompanyar una reflexió emocional','Generar retroalimentació','Facilitar una activitat creativa','Crear un mini-joc','Ruletes, sortejos, targetes aleatòries'];
+const _REPTES   = ['Gestió d\'aula','Organització del temps','Comunicació amb famílies','Seguiment de l\'alumnat','Planificació de situacions d\'aprenentatge','Avaluació','Inclusió i accessibilitat','Practicar un contingut','Visualitzar un fenomen','Autoavaluar-se','Regular emocions','Col·laborar en grup','Explorar un concepte','Jugar per a aprendre','Rebre informació','Emplenar formularis','Preparar entrevistes','Comprendre rutines','Acompanyar benestar','Seguiment del procés d\'aprenentatge','Complementar l\'aprenentatge des de casa'];
+const _ESTILS   = ['Minimalista','Alt contrast','Infantil','Científic','Creatiu / artístic','Ludificat','Amb animacions','Interactiu (botons, sliders, arrossegar)','Narratiu (per passos)'];
+
+const _STOP = new Set(['a','de','d','el','la','els','les','i','o','un','una','amb','per','que','en','al','del','hi','es','se']);
+function _norm(s: string) { return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[·''`()[\],./]/g,' ').replace(/\s+/g,' ').trim(); }
+function _kw(s: string) { return _norm(s).split(' ').filter(w => w.length > 2 && !_STOP.has(w)); }
+function _best(cards: string[], t: string): string | undefined {
+  let best: string | undefined; let top = 0.49;
+  for (const c of cards) { const kw = _kw(c); if (!kw.length) continue; const sc = kw.filter(w => t.includes(w)).length / kw.length; if (sc > top) { top = sc; best = c; } }
+  return best;
+}
+function _parse(text: string) {
+  const t = _norm(text);
+  return { eix: _best(_EIXOS,t), usuari: _best(_USUARIS,t), accio: _best(_ACCIONS,t), repte: _best(_REPTES,t), estil: _best(_ESTILS,t) };
+}
+
 function PromptSentence({ tasca }: { tasca: string }) {
   const parts = tasca.split(' · ');
-  if (parts.length < 5) {
+  let eix: string, usuari: string, accio: string, repte: string, estil: string;
+  if (parts.length >= 5) {
+    [eix, usuari, accio, repte, estil] = parts;
+  } else {
+    const p = _parse(tasca);
+    eix = p.eix ?? ''; usuari = p.usuari ?? ''; accio = p.accio ?? ''; repte = p.repte ?? ''; estil = p.estil ?? '';
+  }
+  if (!eix && !usuari && !accio && !repte && !estil) {
     return <p className="text-sm italic leading-relaxed" style={{ color: 'var(--muted)' }}>&ldquo;{tasca}&rdquo;</p>;
   }
-  const [eix, usuari, accio, repte, estil] = parts;
   return (
     <p className="text-sm leading-[2.4]" style={{ color: 'var(--body)' }}>
       &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de{' '}
-      <Badge v={eix} color="#0d9488" bg="#f0fdfb" />,{' '}
+      <Badge v={eix} label="EIX" color="#0d9488" bg="#f0fdfb" />,{' '}
       pensada perquè la faci servir{' '}
-      <Badge v={usuari} color="#7c3aed" bg="#f5f3ff" />,{' '}
+      <Badge v={usuari} label="USUARI" color="#7c3aed" bg="#f5f3ff" />,{' '}
       a través de{' '}
-      <Badge v={accio} color="#2563eb" bg="#eff6ff" />{' '}
+      <Badge v={accio} label="ACCIÓ" color="#2563eb" bg="#eff6ff" />{' '}
       que serveixi per a{' '}
-      <Badge v={repte} color="#ea580c" bg="#fff7ed" />,{' '}
+      <Badge v={repte} label="REPTE" color="#ea580c" bg="#fff7ed" />,{' '}
       amb un estil{' '}
-      <Badge v={estil} color="#be185d" bg="#fdf2f8" />,{' '}
+      <Badge v={estil} label="ESTIL" color="#be185d" bg="#fdf2f8" />,{' '}
       que sigui coherent i fàcil d&apos;usar.&rdquo;
     </p>
   );
 }
 
-function Badge({ v, color, bg }: { v: string; color: string; bg: string }) {
+function Badge({ v, label, color, bg }: { v: string; label: string; color: string; bg: string }) {
   return (
     <span
       className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold align-middle"
-      style={{ color, background: bg, border: `1.5px solid ${color}50` }}
+      style={{ color, background: v ? bg : 'white', border: `1.5px solid ${v ? color : color + '50'}` }}
     >
-      {v}
+      {v || label}
     </span>
   );
 }

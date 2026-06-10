@@ -214,9 +214,12 @@ export default function CreatePage() {
     const MAX_RETRIES = 10;
     const RETRY_SECONDS = 10;
 
+    const { eix: dEix, usuari: dUsuari, accio: dAccio, repte: dRepte, estil: dEstil } = detectedCards;
     const promptPreview = usingDigital
       ? `${eix} · ${usuari} · ${accio} · ${repte} · ${estil}`
-      : voicePrompt;
+      : (dEix && dUsuari && dAccio && dRepte && dEstil)
+        ? `${dEix} · ${dUsuari} · ${dAccio} · ${dRepte} · ${dEstil}`
+        : voicePrompt;
 
     const payload = {
       selectedCards: usingDigital ? [
