@@ -142,13 +142,29 @@ export default function TicketPage() {
         </div>
 
         {/* ── Screen view ──────────────────────────────────────────────────── */}
-        <div className="screen-only max-w-2xl mx-auto px-6 py-8 flex flex-col gap-6">
+        <div className="screen-only flex" style={{ alignItems: 'flex-start' }}>
 
-          {/* Title */}
-          <div>
-            <h1 className="text-2xl font-black" style={{ color: 'var(--heading)' }}>Publicació i tiquet</h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--muted)' }}>Posa nom al vostre grup i imprimiu el tiquet físic.</p>
+          {/* Left sidebar — instructions */}
+          <div className="flex flex-col px-6 py-6 gap-5" style={{ width: 280, minWidth: 260, flexShrink: 0, borderRight: '1.5px solid var(--border)', position: 'sticky', top: 40, maxHeight: 'calc(100vh - 40px)', overflowY: 'auto' }}>
+            <div>
+              <h1 className="text-xl font-black mb-1" style={{ color: 'var(--heading)' }}>Publicació i tiquet</h1>
+              <p className="text-sm leading-relaxed" style={{ color: 'var(--muted)' }}>
+                Últim pas — identifica el recurs i imprimeix el tiquet físic.
+              </p>
+            </div>
+            <div className="rounded-xl p-4 flex flex-col gap-2" style={{ background: '#f0fdfb', border: '1.5px solid #0d948825' }}>
+              <div className="text-xs font-bold uppercase tracking-widest" style={{ color: '#0d9488' }}>Com funciona</div>
+              <ol className="text-sm flex flex-col gap-2" style={{ color: 'var(--body)' }}>
+                <li>1. Escriu el <strong>nom del vostre grup</strong> al camp.</li>
+                <li>2. Prem <strong>Enviar a la impressora</strong> — el facilitador el rebrà i l&apos;imprimirà automàticament.</li>
+                <li>3. <strong>Escaneja el QR</strong> del tiquet per accedir a la vostra webapp des de qualsevol dispositiu.</li>
+              </ol>
+            </div>
           </div>
+
+          {/* Main content */}
+          <div className="flex-1 flex justify-center py-8">
+          <div className="w-full px-6 flex flex-col gap-6" style={{ maxWidth: 560 }}>
 
           {/* Group name input */}
           <div className="rounded-2xl p-5 flex flex-col gap-3" style={{ border: '2px solid var(--heading)', background: 'white' }}>
@@ -255,7 +271,9 @@ export default function TicketPage() {
             </a>
           </div>
 
-        </div>
+          </div> {/* end inner max-width */}
+          </div> {/* end right centered wrapper */}
+        </div> {/* end outer flex */}
       </main>
     </>
   );
