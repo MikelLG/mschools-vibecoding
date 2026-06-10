@@ -341,17 +341,29 @@ export default function CreatePage() {
 
       <PhaseTimer pagePhase={2} />
 
-      <div className="max-w-2xl mx-auto w-full px-6 py-8 flex flex-col gap-8">
+      <div className="flex" style={{ alignItems: 'flex-start' }}>
 
-        {/* How it works */}
-        <div className="rounded-xl p-4 flex flex-col gap-2" style={{ background: '#f0fdfb', border: '1.5px solid #0d948825' }}>
-          <div className="text-xs font-bold uppercase tracking-widest" style={{ color: '#0d9488' }}>Com funciona</div>
-          <ol className="text-sm flex flex-col gap-1.5" style={{ color: 'var(--body)' }}>
-            <li>1. Agafa una targeta de cada color del mazo</li>
-            <li>2. Llegeix la frase de baix substituint els espais de colors pels valors de les teves targetes</li>
-            <li>3. Prem el micròfon i grava la frase en veu alta</li>
-          </ol>
+        {/* Left sidebar — sticky instructions */}
+        <div className="flex flex-col px-6 py-6 gap-5" style={{ width: 300, minWidth: 280, flexShrink: 0, borderRight: '1.5px solid var(--border)', position: 'sticky', top: 40, maxHeight: 'calc(100vh - 40px)', overflowY: 'auto' }}>
+          <div>
+            <h1 className="text-xl font-black mb-1" style={{ color: 'var(--heading)' }}>Construeix el prompt</h1>
+            <p className="text-sm leading-relaxed" style={{ color: 'var(--muted)' }}>
+              Agafa les teves targetes físiques i dicta el prompt en veu alta.
+            </p>
+          </div>
+          <div className="rounded-xl p-4 flex flex-col gap-2" style={{ background: '#f0fdfb', border: '1.5px solid #0d948825' }}>
+            <div className="text-xs font-bold uppercase tracking-widest" style={{ color: '#0d9488' }}>Com funciona</div>
+            <ol className="text-sm flex flex-col gap-2" style={{ color: 'var(--body)' }}>
+              <li>1. Agafa una targeta de cada color del mazo</li>
+              <li>2. Llegeix la frase substituint els espais de colors pels valors de les teves targetes</li>
+              <li>3. Prem el micròfon i grava la frase en veu alta</li>
+              <li>4. Pots donar-li context addicional per personalitzar-lo més (edat, assignatura, durada…)</li>
+            </ol>
+          </div>
         </div>
+
+        {/* Right content */}
+        <div className="flex-1 px-6 py-8 flex flex-col gap-8" style={{ maxWidth: 640 }}>
 
         {/* Pre-prompt template — what they need to read */}
         <div className="rounded-2xl p-6" style={{ background: '#f7f4f7', border: '1.5px solid var(--border)' }}>
@@ -515,7 +527,8 @@ export default function CreatePage() {
           </div>
         )}
 
-      </div>
+        </div> {/* end right content */}
+      </div> {/* end two-column flex */}
     </main>
   );
 }
