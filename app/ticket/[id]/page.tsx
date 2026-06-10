@@ -130,6 +130,14 @@ export default function TicketPage() {
                 <div style={{ borderTop: '1px dashed #ccc', paddingTop: 6, fontSize: 9, lineHeight: 1.6, fontStyle: 'italic', color: '#333' }}>
                   &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de <strong>{parts[0]}</strong>, pensada perquè la faci servir <strong>{parts[1]}</strong>, a través de <strong>{parts[2]}</strong> que serveixi per a <strong>{parts[3]}</strong>, amb un estil <strong>{parts[4]}</strong>, que sigui coherent i fàcil d&apos;usar.&rdquo;
                 </div>
+                {submission.refinements && submission.refinements.length > 0 && (
+                  <div style={{ borderTop: '1px dashed #ccc', marginTop: 6, paddingTop: 6, fontSize: 9 }}>
+                    <div style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 3 }}>Millores aplicades</div>
+                    {submission.refinements.map((r, i) => (
+                      <div key={i} style={{ lineHeight: 1.5 }}>{i + 1}. {r}</div>
+                    ))}
+                  </div>
+                )}
               </>
             ) : (
               <div style={{ fontSize: 10, fontStyle: 'italic', lineHeight: 1.5 }}>{submission.tasca}</div>
@@ -246,6 +254,16 @@ export default function TicketPage() {
                         &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de <strong>{parts[0]}</strong>, pensada perquè la faci servir <strong>{parts[1]}</strong>, a través de <strong>{parts[2]}</strong> que serveixi per a <strong>{parts[3]}</strong>, amb un estil <strong>{parts[4]}</strong>, que sigui coherent i fàcil d&apos;usar.&rdquo;
                       </p>
                     </div>
+                    {submission.refinements && submission.refinements.length > 0 && (
+                      <div className="pt-3 border-t flex flex-col gap-1" style={{ borderColor: 'var(--border)' }}>
+                        <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Millores aplicades</div>
+                        {submission.refinements.map((r, i) => (
+                          <div key={i} className="text-xs flex gap-1.5" style={{ color: 'var(--body)' }}>
+                            <span style={{ color: 'var(--muted)' }}>{i + 1}.</span><span>{r}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </>
                 ) : (
                   <p className="text-sm italic leading-relaxed" style={{ color: 'var(--body)' }}>&ldquo;{submission.tasca}&rdquo;</p>
