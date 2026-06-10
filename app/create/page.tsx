@@ -354,10 +354,10 @@ export default function CreatePage() {
           <div className="rounded-xl p-4 flex flex-col gap-2" style={{ background: '#f0fdfb', border: '1.5px solid #0d948825' }}>
             <div className="text-xs font-bold uppercase tracking-widest" style={{ color: '#0d9488' }}>Com funciona</div>
             <ol className="text-sm flex flex-col gap-2" style={{ color: 'var(--body)' }}>
-              <li>1. Agafa una targeta de cada color del mazo</li>
-              <li>2. Llegeix la frase substituint els espais de colors pels valors de les teves targetes</li>
-              <li>3. Prem el micròfon i grava la frase en veu alta</li>
-              <li>4. Pots donar-li context addicional per personalitzar-lo més (edat, assignatura, durada…)</li>
+              <li>1. Agafa <strong>una targeta de cada color</strong> del mazo</li>
+              <li>2. <strong>Llegeix la frase</strong> substituint els espais pels valors de les teves targetes</li>
+              <li>3. Prem el <strong>micròfon</strong> i <strong>grava la frase</strong> en veu alta</li>
+              <li>4. Afegeix <strong>context addicional</strong> si vols personalitzar-lo més (edat, assignatura, durada…)</li>
             </ol>
           </div>
         </div>

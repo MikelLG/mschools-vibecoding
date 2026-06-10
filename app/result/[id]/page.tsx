@@ -185,8 +185,8 @@ export default function ResultPage() {
           <div className="rounded-xl p-4 flex flex-col gap-2" style={{ background: '#f0fdfb', border: '1.5px solid #0d948825' }}>
             <div className="text-xs font-bold uppercase tracking-widest" style={{ color: '#0d9488' }}>Com funciona</div>
             <ol className="text-sm flex flex-col gap-2" style={{ color: 'var(--body)' }}>
-              <li>1. Revisa la webapp generada. Pots accedir-hi a través del QR també.</li>
-              <li>2. Si vols canviar algo, tens dues opcions aquí sota: <strong>edita el prompt</strong> directament, o <strong>descriu la millora</strong> i la IA l&apos;aplica.</li>
+              <li>1. <strong>Revisa la webapp</strong> generada. Pots accedir-hi a través del <strong>QR</strong> també.</li>
+              <li>2. Si vols canviar algo, tens dues opcions: <strong>edita el prompt</strong> directament, o <strong>descriu la millora</strong> i la IA l&apos;aplica.</li>
               <li>3. Quan estigui llesta, clica <strong>Finalitzar</strong>.</li>
             </ol>
           </div>

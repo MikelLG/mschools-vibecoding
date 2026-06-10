@@ -61,9 +61,9 @@ export default function WarmupPage() {
           <div className="rounded-xl p-4 flex flex-col gap-2" style={{ background: '#f0fdfb', border: '1.5px solid #0d948825' }}>
             <div className="text-xs font-bold uppercase tracking-widest" style={{ color: '#0d9488' }}>Com funciona</div>
             <ol className="text-sm flex flex-col gap-1.5" style={{ color: 'var(--body)' }}>
-              <li>1. Juga amb l&apos;app — toca-ho tot</li>
+              <li>1. <strong>Juga amb l&apos;app</strong> — toca-ho tot</li>
               <li>2. Pensa quin podria ser el <strong>Eix</strong>, <strong>Usuari</strong>, <strong>Acció</strong>, <strong>Repte</strong> i <strong>Estil</strong></li>
-              <li>3. Clica &ldquo;Revela el prompt&rdquo;</li>
+              <li>3. Clica <strong>&ldquo;Revela el prompt&rdquo;</strong></li>
             </ol>
           </div>
 
