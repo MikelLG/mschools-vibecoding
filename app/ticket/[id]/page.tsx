@@ -170,47 +170,53 @@ export default function TicketPage() {
             </div>
           </div>
 
-          {/* Main content */}
-          <div className="flex-1 flex justify-center py-8">
-          <div className="w-full px-6 flex flex-col gap-6" style={{ maxWidth: 560 }}>
+          {/* Main content — two columns: input left, preview right */}
+          <div className="flex-1 flex gap-6 p-6" style={{ alignItems: 'flex-start' }}>
 
-          {/* Group name input */}
-          <div className="rounded-2xl p-5 flex flex-col gap-3" style={{ border: '2px solid var(--heading)', background: 'white' }}>
-            <div className="text-sm font-bold" style={{ color: 'var(--heading)' }}>👥 Nom del grup</div>
-            <div className="flex gap-2">
+          {/* Left: group name input */}
+          <div className="flex flex-col gap-4" style={{ width: 300, flexShrink: 0 }}>
+            <div className="rounded-2xl p-5 flex flex-col gap-3" style={{ border: '2px solid var(--heading)', background: 'white' }}>
+              <div className="text-sm font-bold" style={{ color: 'var(--heading)' }}>👥 Nom del grup</div>
               <input
                 type="text"
                 placeholder="Ex: Grup 3, Equip B, Anna & Marc..."
                 value={groupName}
                 onChange={e => { setGroupName(e.target.value); setSaved(false); }}
                 onKeyDown={e => { if (e.key === 'Enter') sendToQueue(); }}
-                className="flex-1 rounded-xl px-4 py-3 text-base font-bold focus:outline-none"
+                className="w-full rounded-xl px-4 py-3 text-base font-bold focus:outline-none"
                 style={{ background: '#f7f4f7', border: '1.5px solid var(--border)', color: 'var(--heading)' }}
                 autoFocus
               />
+              {!queued ? (
+                <>
+                  <button onClick={sendToQueue}
+                    className="w-full rounded-xl py-4 text-lg font-black transition-all hover:opacity-90"
+                    style={{ background: 'var(--heading)', color: 'white' }}>
+                    🖨️ Enviar a la impressora
+                  </button>
+                  {queueError && <p className="text-xs text-center" style={{ color: '#dc2626' }}>⚠️ {queueError}</p>}
+                </>
+              ) : (
+                <div className="rounded-xl py-4 text-center flex flex-col gap-1" style={{ background: '#f0fdf4', border: '1.5px solid #bbf7d0' }}>
+                  <span className="text-lg font-black" style={{ color: '#16a34a' }}>✓ Tiquet enviat!</span>
+                  <span className="text-xs" style={{ color: '#16a34a' }}>El facilitador l&apos;imprimirà en breus.</span>
+                </div>
+              )}
             </div>
-            {!queued ? (
-              <>
-                <button
-                  onClick={sendToQueue}
-                  className="w-full rounded-xl py-4 text-lg font-black transition-all hover:opacity-90"
-                  style={{ background: 'var(--heading)', color: 'white' }}
-                >
-                  🖨️ Enviar a la impressora
-                </button>
-                {queueError && <p className="text-xs text-center" style={{ color: '#dc2626' }}>⚠️ {queueError}</p>}
-                {saved && <p className="text-xs text-center" style={{ color: '#0d9488' }}>✓ Nom desat</p>}
-              </>
-            ) : (
-              <div className="rounded-xl py-4 text-center flex flex-col gap-1" style={{ background: '#f0fdf4', border: '1.5px solid #bbf7d0' }}>
-                <span className="text-lg font-black" style={{ color: '#16a34a' }}>✓ Tiquet enviat!</span>
-                <span className="text-xs" style={{ color: '#16a34a' }}>El facilitador l&apos;imprimirà en breus.</span>
-              </div>
-            )}
+            <div className="flex gap-2">
+              <button onClick={() => router.push(`/result/${id}`)} className="flex-1 rounded-xl py-2.5 text-sm font-bold transition-all"
+                style={{ border: '1.5px solid var(--border)', background: 'white', color: 'var(--muted)' }}>
+                ← Tornar
+              </button>
+              <a href="/gallery" className="flex-1 rounded-xl py-2.5 text-sm font-bold text-center transition-all"
+                style={{ border: '1.5px solid var(--border)', background: 'white', color: 'var(--muted)' }}>
+                🖼️ Galeria
+              </a>
+            </div>
           </div>
 
-          {/* Ticket preview */}
-          <div className="rounded-3xl bg-white p-8" style={{ boxShadow: '0 4px 32px rgba(94,36,64,0.10)', border: '2px solid var(--border)' }}>
+          {/* Right: ticket preview — always visible, updates live */}
+          <div className="flex-1 rounded-3xl bg-white p-8" style={{ boxShadow: '0 4px 32px rgba(94,36,64,0.10)', border: '2px solid var(--border)' }}>
             <div className="flex items-center justify-between mb-6 pb-4 border-b" style={{ borderColor: 'var(--border)' }}>
               <div>
                 <MSchoolsLogo size="md" />
@@ -277,20 +283,7 @@ export default function TicketPage() {
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex gap-3">
-            <button onClick={() => router.push(`/result/${id}`)} className="flex-1 rounded-xl py-3 text-sm font-bold transition-all"
-              style={{ border: '1.5px solid var(--border)', background: 'white', color: 'var(--muted)' }}>
-              ← Tornar al resultat
-            </button>
-            <a href="/gallery" className="flex-1 rounded-xl py-3 text-sm font-bold text-center transition-all"
-              style={{ border: '1.5px solid var(--border)', background: 'white', color: 'var(--muted)' }}>
-              🖼️ Veure la galeria
-            </a>
-          </div>
-
-          </div> {/* end inner max-width */}
-          </div> {/* end right centered wrapper */}
+          </div> {/* end two-column */}
         </div> {/* end outer flex */}
       </main>
     </>
