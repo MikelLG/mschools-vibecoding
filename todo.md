@@ -12,6 +12,17 @@
   - Currently showing: "Emocions a l'aula" quiz
   - Replace with the final example before workshop day
 
+- [ ] **Printer setup on screen computer (CK710)**
+  - Allow popups from `mschools-vibecoding.vercel.app` in Chrome (one-time, address bar)
+  - Set CK710 as default printer on the facilitator machine
+  - Confirm Chrome print dialog picks 80mm paper size (no margins, roll paper)
+  - Test full flow: participant sends ticket → screen auto-prints → ticket comes out
+  - Test recovery: turn printer off, send tickets, turn back on → reprint from Historial
+
+- [ ] **Set `NEXT_PUBLIC_SESSION_ID`** in Vercel env to the final session value before workshop day
+
+- [ ] **Mobile smoke test** — voice transcription on iOS Safari and Android Chrome
+
 ---
 
 ## 🟡 Important improvements
@@ -105,4 +116,9 @@
 3. Quina app volem enseñar com a exemple de warm-up?
 4. ~~Tema veure el warmup gran i visualitzar correctament.~~ ✅ Fet (2-col layout)
 5. ~~Com volem la part de crear el prompt?~~ ✅ Veu principal + selecció digital oculta
-6. Do we want the timer to work automatically? I mean, when we press start workshop it keeps running the different sections with the specified time. ??
+6. ~~Do we want the timer to work automatically? I mean, when we press start workshop it keeps running the different sections with the specified time.~~ ✅ Fet — Auto toggle on screen, starts Phase 1 on workshop start, auto-advances through all phases
+
+
+![alt text](image.png)
+
+![alt text](image-1.png)

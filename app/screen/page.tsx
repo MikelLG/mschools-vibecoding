@@ -214,6 +214,48 @@ function ScreenContent() {
   const pendingCount = printQueue.filter(i => i.status === 'pending' || i.status === 'printing').length;
   const errorCount = printQueue.filter(i => i.status === 'error').length;
 
+  // Auto-advance phases
+  const [autoAdvance, setAutoAdvance] = useState(true);
+  const prevSecondsRef = useRef(-1);
+  const advancingRef = useRef(false);
+
+  useEffect(() => {
+    const prev = prevSecondsRef.current;
+    prevSecondsRef.current = localSeconds;
+    if (prev > 0 && localSeconds === 0 && timer.running && !advancingRef.current && autoAdvance && timer.phase > 0) {
+      const currentIndex = WORKSHOP_PHASES.findIndex(p => p.id === timer.phase);
+      const nextPhase = WORKSHOP_PHASES[currentIndex + 1];
+      if (nextPhase) {
+        advancingRef.current = true;
+        const duration = (customMinutes[nextPhase.id] ?? nextPhase.defaultMinutes) * 60;
+        setTimeout(async () => {
+          setSelectedPhase(nextPhase.id);
+          await updateWorkshopTimer({
+            phase: nextPhase.id, phaseLabel: nextPhase.label, instruction: nextPhase.instruction,
+            color: nextPhase.color, bg: nextPhase.bg,
+            durationSeconds: duration, startedAt: Date.now(), secondsAtStart: duration, running: true,
+          });
+          advancingRef.current = false;
+        }, 1500);
+      }
+    }
+  }, [localSeconds, timer.running, timer.phase, autoAdvance, customMinutes]);
+
+  const handleWorkshopStart = () => {
+    if (!workshop.running) {
+      // Starting workshop — also kick off Phase 1
+      const phase1 = WORKSHOP_PHASES[0];
+      const duration = (customMinutes[phase1.id] ?? phase1.defaultMinutes) * 60;
+      updateWorkshopTimer({
+        phase: phase1.id, phaseLabel: phase1.label, instruction: phase1.instruction,
+        color: phase1.color, bg: phase1.bg,
+        durationSeconds: duration, startedAt: Date.now(), secondsAtStart: duration, running: true,
+      });
+      setSelectedPhase(phase1.id);
+    }
+    workshop.startStop();
+  };
+
   // Subscribe to submissions
   useEffect(() => {
     const unsub = subscribeSubmissions(SESSION_ID, subs => {
@@ -321,13 +363,23 @@ function ScreenContent() {
               />
               <span className="text-xs" style={{ color: 'var(--muted)' }}>min</span>
               <button
-                onClick={workshop.startStop}
+                onClick={handleWorkshopStart}
                 className="rounded-lg px-2.5 py-1 text-xs font-bold"
                 style={workshop.running ? { background: '#fff7ed', color: '#ea580c' } : { background: 'var(--heading)', color: 'white' }}
               >
                 {workshop.running ? '⏸' : '▶'}
               </button>
               <button onClick={workshop.reset} className="rounded-lg px-2 py-1 text-xs" style={{ color: 'var(--muted)', border: '1px solid var(--border)' }}>↺</button>
+              {/* Auto-advance toggle */}
+              <div className="flex items-center gap-1.5 ml-1 pl-3" style={{ borderLeft: '1px solid var(--border)' }}>
+                <span className="text-xs" style={{ color: 'var(--muted)' }}>Auto</span>
+                <button onClick={() => setAutoAdvance(v => !v)}
+                  className="w-9 h-5 rounded-full transition-all relative flex-shrink-0"
+                  style={{ background: autoAdvance ? '#00e082' : '#d1c5d0' }}>
+                  <span className="absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-all"
+                    style={{ left: autoAdvance ? '1.125rem' : '0.125rem' }} />
+                </button>
+              </div>
             </div>
           </div>
 
