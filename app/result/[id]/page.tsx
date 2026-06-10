@@ -251,9 +251,7 @@ export default function ResultPage() {
                   <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Prompt enviat a Gemini</div>
                   <div className="text-xs mt-0.5" style={{ color: 'var(--muted)', opacity: 0.7 }}>Edita'l si és necessari per ajustar el resultat.</div>
                 </div>
-                {promptEdited && (
-                  <span className="text-xs font-medium" style={{ color: '#0d9488' }}>Editat ✓</span>
-                )}
+                {promptEdited && <span className="text-xs font-medium" style={{ color: '#0d9488' }}>Editat ✓</span>}
               </div>
               <textarea
                 value={editablePrompt}
@@ -263,54 +261,15 @@ export default function ResultPage() {
                 style={{ background: 'white', border: `1px solid ${promptEdited ? '#0d9488' : 'var(--border)'}`, color: 'var(--body)', fontFamily: 'monospace' }}
               />
               {promptEdited && (
-                <button
-                  onClick={handleRegenerate}
-                  disabled={regenerating}
-                  className="rounded-xl py-2.5 text-sm font-bold transition-all"
-                  style={regenerating
-                    ? { background: '#e8e2e8', color: 'var(--muted)', cursor: 'not-allowed' }
-                    : { background: '#0d9488', color: 'white' }
-                  }
-                >
+                <button onClick={handleRegenerate} disabled={regenerating} className="rounded-xl py-2.5 text-sm font-bold transition-all"
+                  style={regenerating ? { background: '#e8e2e8', color: 'var(--muted)', cursor: 'not-allowed' } : { background: '#0d9488', color: 'white' }}>
                   {regenerating ? '⏳ Generant...' : '🔄 Regenerar amb aquest prompt'}
                 </button>
               )}
             </div>
           )}
-        </div>
 
-        {/* Right: QR + info */}
-        <div className="w-full lg:w-72 flex flex-col gap-4">
-
-          {/* QR card */}
-          <div className="rounded-2xl p-6 flex flex-col items-center gap-4" style={{ border: '1.5px solid var(--border)', background: '#f7f4f7' }}>
-            <div className="text-sm font-bold" style={{ color: 'var(--heading)' }}>Accedeix al recurs</div>
-            {appUrl && (
-              <div className="bg-white p-3 rounded-xl" style={{ border: '1px solid var(--border)' }}>
-                <QRCode value={appUrl} size={160} />
-              </div>
-            )}
-            <div className="text-xs text-center break-all" style={{ color: 'var(--muted)' }}>{appUrl}</div>
-          </div>
-
-          {/* Pre-Prompt summary */}
-          <div className="rounded-2xl p-5 flex flex-col gap-3" style={{ border: '1.5px solid var(--border)', background: '#f7f4f7' }}>
-            <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Pre-Prompt</div>
-            <PromptSentence tasca={submission.tasca} />
-            {submission.refinements && submission.refinements.length > 0 && (
-              <div className="flex flex-col gap-1 pt-2 border-t" style={{ borderColor: 'var(--border)' }}>
-                <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Millores aplicades</div>
-                {submission.refinements.map((r, i) => (
-                  <div key={i} className="text-xs flex items-start gap-1.5" style={{ color: 'var(--body)' }}>
-                    <span style={{ color: 'var(--muted)' }}>{i + 1}.</span>
-                    <span>{r}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Refine section */}
+          {/* Refine section — lives in left column, below the prompt */}
           <div className="rounded-2xl p-5 flex flex-col gap-3" style={{ border: '1.5px solid var(--border)', background: '#f7f4f7' }}>
             <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>✏️ Millorar el recurs</div>
             <p className="text-xs" style={{ color: 'var(--muted)' }}>Descriu els canvis i la IA modificarà l&apos;app mantenint el contingut existent.</p>
@@ -323,81 +282,60 @@ export default function ResultPage() {
                 className="w-full rounded-xl px-3 py-2.5 pr-10 text-sm focus:outline-none resize-none"
                 style={{ background: 'white', border: '1.5px solid var(--border)', color: 'var(--body)' }}
               />
-              <button
-                type="button"
-                onClick={startRefineVoice}
+              <button type="button" onClick={startRefineVoice}
                 className="absolute right-2 bottom-2 w-8 h-8 rounded-full flex items-center justify-center text-sm"
-                style={refineListening
-                  ? { background: 'var(--accent)', color: 'white' }
-                  : { background: '#f7f4f7', border: '1px solid var(--border)', color: 'var(--muted)' }
-                }
-              >🎤</button>
+                style={refineListening ? { background: 'var(--accent)', color: 'white' } : { background: '#f7f4f7', border: '1px solid var(--border)', color: 'var(--muted)' }}>
+                🎤
+              </button>
             </div>
             {refineListening && <p className="text-xs animate-pulse" style={{ color: 'var(--accent)' }}>🔴 Escoltant...</p>}
             {refineError && <p className="text-xs" style={{ color: 'var(--accent)' }}>⚠️ {refineError}</p>}
-            <button
-              onClick={handleRefine}
-              disabled={!refineText.trim() || refining}
+            <button onClick={handleRefine} disabled={!refineText.trim() || refining}
               className="rounded-xl py-3 text-sm font-bold transition-all"
-              style={refineText.trim() && !refining
-                ? { background: 'var(--heading)', color: 'white' }
-                : { background: '#e8e2e8', color: 'var(--muted)', cursor: 'not-allowed' }
-              }
-            >
+              style={refineText.trim() && !refining ? { background: 'var(--heading)', color: 'white' } : { background: '#e8e2e8', color: 'var(--muted)', cursor: 'not-allowed' }}>
               {refining ? '⏳ Millorant...' : '✨ Aplicar millores'}
             </button>
           </div>
+        </div>
 
-          {/* Group name + Finalitzar */}
-          <div className="rounded-2xl p-5 flex flex-col gap-3" style={{ border: '2px solid var(--heading)', background: '#f7f4f7' }}>
-            <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--heading)' }}>👥 Nom del grup</div>
-            <p className="text-xs" style={{ color: 'var(--muted)' }}>Poseu el nom del vostre grup per identificar el recurs.</p>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                placeholder="Ex: Grup 3, Equip B, Anna & Marc..."
-                value={groupName}
-                onChange={e => setGroupName(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') saveGroupName(); }}
-                className="flex-1 rounded-xl px-3 py-2 text-sm focus:outline-none"
-                style={{ background: 'white', border: '1.5px solid var(--border)', color: 'var(--body)' }}
-              />
-              <button
-                onClick={saveGroupName}
-                className="rounded-xl px-3 py-2 text-sm font-bold transition-all flex-shrink-0"
-                style={groupNameSaved
-                  ? { background: '#f0fdfb', color: '#0d9488', border: '1.5px solid #0d9488' }
-                  : { background: 'var(--border)', color: 'var(--muted)' }
-                }
-              >
-                {groupNameSaved ? '✓' : 'Desar'}
-              </button>
-            </div>
-            <button
-              onClick={async () => { await saveGroupName(); router.push(`/ticket/${id}`); }}
-              className="w-full rounded-xl py-3.5 text-base font-black transition-all hover:opacity-90 hover:scale-[1.01]"
-              style={{ background: 'var(--heading)', color: 'white' }}
-            >
-              Finalitzar →
-            </button>
+        {/* Right: QR + Pre-prompt + Finalitzar */}
+        <div className="w-full lg:w-72 flex flex-col gap-4">
+
+          {/* QR card */}
+          <div className="rounded-2xl p-5 flex flex-col items-center gap-3" style={{ border: '1.5px solid var(--border)', background: '#f7f4f7' }}>
+            <div className="text-sm font-bold" style={{ color: 'var(--heading)' }}>Accedeix al recurs</div>
+            {appUrl && <div className="bg-white p-3 rounded-xl" style={{ border: '1px solid var(--border)' }}><QRCode value={appUrl} size={150} /></div>}
+            <div className="text-xs text-center break-all" style={{ color: 'var(--muted)' }}>{appUrl}</div>
           </div>
 
-          {/* New resource button */}
+          {/* Pre-Prompt summary */}
+          <div className="rounded-2xl p-5 flex flex-col gap-3" style={{ border: '1.5px solid var(--border)', background: '#f7f4f7' }}>
+            <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Pre-Prompt</div>
+            <PromptSentence tasca={submission.tasca} />
+            {submission.refinements && submission.refinements.length > 0 && (
+              <div className="flex flex-col gap-1 pt-2 border-t" style={{ borderColor: 'var(--border)' }}>
+                <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Millores aplicades</div>
+                {submission.refinements.map((r, i) => (
+                  <div key={i} className="text-xs flex items-start gap-1.5" style={{ color: 'var(--body)' }}>
+                    <span style={{ color: 'var(--muted)' }}>{i + 1}.</span><span>{r}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Finalitzar */}
           <button
-            onClick={() => router.push('/create')}
-            className="rounded-2xl py-4 font-bold transition-all hover:opacity-90 hover:scale-[1.02]"
+            onClick={() => router.push(`/ticket/${id}`)}
+            className="w-full rounded-2xl py-5 text-lg font-black transition-all hover:opacity-90 hover:scale-[1.01]"
             style={{ background: 'var(--heading)', color: 'white' }}
           >
-            ✨ Crear un altre recurs
+            Finalitzar →
           </button>
 
-          {/* Gallery link */}
-          <a
-            href="/gallery"
-            className="rounded-2xl py-3 text-center text-sm transition-all"
-            style={{ border: '1.5px solid var(--border)', background: '#f7f4f7', color: 'var(--muted)' }}
-          >
-            🖼️ Veure la galeria completa
+          <a href="/gallery" className="rounded-xl py-2.5 text-center text-sm transition-all"
+            style={{ border: '1.5px solid var(--border)', background: '#f7f4f7', color: 'var(--muted)' }}>
+            🖼️ Veure la galeria
           </a>
         </div>
         </div> {/* end main content */}
