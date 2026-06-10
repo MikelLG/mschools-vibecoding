@@ -65,8 +65,9 @@ export default function ResultPage() {
         throw new Error(errData.error || 'Error en la millora');
       }
       const { htmlOutput } = await res.json() as { htmlOutput: string };
-      await updateSubmission(submission.id, { htmlOutput });
-      setSubmission(prev => prev ? { ...prev, htmlOutput } : prev);
+      const refinements = [...(submission.refinements ?? []), refineText.trim()];
+      await updateSubmission(submission.id, { htmlOutput, refinements });
+      setSubmission(prev => prev ? { ...prev, htmlOutput, refinements } : prev);
       setRefineText('');
     } catch (err) {
       setRefineError((err as Error).message || 'Error inesperat');
@@ -269,6 +270,17 @@ export default function ResultPage() {
           <div className="rounded-2xl p-5 flex flex-col gap-3" style={{ border: '1.5px solid var(--border)', background: '#f7f4f7' }}>
             <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Pre-Prompt</div>
             <PromptSentence tasca={submission.tasca} />
+            {submission.refinements && submission.refinements.length > 0 && (
+              <div className="flex flex-col gap-1 pt-2 border-t" style={{ borderColor: 'var(--border)' }}>
+                <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Millores aplicades</div>
+                {submission.refinements.map((r, i) => (
+                  <div key={i} className="text-xs flex items-start gap-1.5" style={{ color: 'var(--body)' }}>
+                    <span style={{ color: 'var(--muted)' }}>{i + 1}.</span>
+                    <span>{r}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Refine section */}

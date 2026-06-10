@@ -24,6 +24,7 @@ export interface Submission {
   formatLabel: string;
   prompt: string;
   htmlOutput: string;
+  refinements?: string[];
   createdAt: number;
   sessionId: string;
 }
