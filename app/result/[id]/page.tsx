@@ -187,7 +187,7 @@ export default function ResultPage() {
             <ol className="text-sm flex flex-col gap-2" style={{ color: 'var(--body)' }}>
               <li>1. Revisa la webapp generada. Pots accedir-hi a través del QR també.</li>
               <li>2. Si vols canviar algo, tens dues opcions aquí sota: <strong>edita el prompt</strong> directament, o <strong>descriu la millora</strong> i la IA l&apos;aplica.</li>
-              <li>3. Quan estigui llesta, clica <strong>Finalitzar</strong> per posar-li nom i imprimir el tiquet.</li>
+              <li>3. Quan estigui llesta, clica <strong>Finalitzar</strong>.</li>
             </ol>
           </div>
         </div>
