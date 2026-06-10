@@ -149,7 +149,7 @@ export default function Home() {
 
         {/* Footer note */}
         <p className="text-center text-xs mb-8" style={{ color: 'var(--muted)' }}>
-          ~15 minuts · Gemini
+          ~15 minuts
         </p>
 
         {/* Next step CTA */}
