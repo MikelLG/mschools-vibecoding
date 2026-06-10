@@ -4,14 +4,6 @@
 
 ## 🔴 Must do before workshop
 
-- [ ] **Merge `feature/sync-timers` into `main`**
-  - First check Firestore security rules allow read/write on `workshop` collection
-  - Test with two browsers: `/screen` controls, `/warmup` shows synced timer
-
-- [ ] **Firestore security rules** — `workshop` collection needs read/write
-  - Go to Firebase Console → Firestore → Rules
-  - Add `match /workshop/{id} { allow read, write: if true; }`
-
 - [ ] **Test with concurrent users** — simulate 20 people generating at once
   - Confirm model cascade + auto-retry handles the load
   - Check Gemini API quota settings in Google Cloud Console
@@ -46,6 +38,9 @@
 ---
 
 ## ✅ Done
+
+- [x] Firestore rules confirmed OK (wildcard rule covers `workshop` until July 2026)
+- [x] Merged `feature/sync-timers` → `main`, pushed to Vercel
 
 ### This session (2026-06-09)
 - [x] Phase 4 "Publica i imprimeix" added to WORKSHOP_PHASES (2 min, red)
@@ -110,3 +105,4 @@
 3. Quina app volem enseñar com a exemple de warm-up?
 4. ~~Tema veure el warmup gran i visualitzar correctament.~~ ✅ Fet (2-col layout)
 5. ~~Com volem la part de crear el prompt?~~ ✅ Veu principal + selecció digital oculta
+6. Do we want the timer to work automatically? I mean, when we press start workshop it keeps running the different sections with the specified time. ??

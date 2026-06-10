@@ -1,6 +1,6 @@
 import { initializeApp, getApps } from 'firebase/app';
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, orderBy, onSnapshot, Timestamp } from 'firebase/firestore';
-import type { Submission, WorkshopTimer } from './types';
+import type { Submission, WorkshopTimer, PrintQueueItem } from './types';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -74,6 +74,40 @@ export function subscribeWorkshopTimer(cb: (timer: WorkshopTimer) => void) {
 }
 
 // ── Submissions ────────────────────────────────────────────────────────────────
+
+// ── Print queue ────────────────────────────────────────────────────────────────
+
+export async function addToPrintQueue(item: Omit<PrintQueueItem, 'id'>): Promise<string> {
+  const ref = doc(collection(db, 'printQueue'));
+  await setDoc(ref, { ...item, createdAt: Timestamp.fromMillis(item.createdAt) });
+  return ref.id;
+}
+
+export async function updatePrintQueueItem(id: string, updates: Partial<Omit<PrintQueueItem, 'id'>>) {
+  const ref = doc(db, 'printQueue', id);
+  await setDoc(ref, updates, { merge: true });
+}
+
+export async function getPrintQueueItem(id: string): Promise<PrintQueueItem | null> {
+  const ref = doc(db, 'printQueue', id);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return null;
+  const data = snap.data();
+  return { ...data, id: snap.id, createdAt: (data.createdAt as Timestamp).toMillis() } as PrintQueueItem;
+}
+
+export function subscribePrintQueue(sessionId: string, cb: (items: PrintQueueItem[]) => void) {
+  const q = query(collection(db, 'printQueue'), orderBy('createdAt', 'asc'));
+  return onSnapshot(q, snap => {
+    const items = snap.docs
+      .map(d => {
+        const data = d.data();
+        return { ...data, id: d.id, createdAt: (data.createdAt as Timestamp).toMillis() } as PrintQueueItem;
+      })
+      .filter(item => item.sessionId === sessionId);
+    cb(items);
+  });
+}
 
 export function subscribeSubmissions(sessionId: string, cb: (submissions: Submission[]) => void, allSessions = false) {
   const q = query(collection(db, 'submissions'), orderBy('createdAt', 'desc'));

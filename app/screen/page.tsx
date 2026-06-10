@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { subscribeSubmissions, subscribeWorkshopTimer, updateWorkshopTimer, DEFAULT_TIMER } from '@/lib/firebase';
-import type { Submission, WorkshopTimer } from '@/lib/types';
+import { subscribeSubmissions, subscribeWorkshopTimer, updateWorkshopTimer, DEFAULT_TIMER, subscribePrintQueue, updatePrintQueueItem } from '@/lib/firebase';
+import type { Submission, WorkshopTimer, PrintQueueItem } from '@/lib/types';
 import { WORKSHOP_PHASES, getSecondsLeft } from '@/lib/workshop-phases';
 
 const SESSION_ID = process.env.NEXT_PUBLIC_SESSION_ID ?? 'mschools-2026';
@@ -161,6 +161,58 @@ function ScreenContent() {
     const id = setInterval(tick, 500);
     return () => clearInterval(id);
   }, [timer]);
+
+  // Print queue
+  const [printQueue, setPrintQueue] = useState<PrintQueueItem[]>([]);
+  const [autoPrint, setAutoPrint] = useState(() => {
+    if (typeof window !== 'undefined') return localStorage.getItem('autoPrint') !== 'off';
+    return true;
+  });
+  const [printTab, setPrintTab] = useState<'cua' | 'historial'>('cua');
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const printingRef = useRef<Set<string>>(new Set());
+
+  const openPrintWindow = (queueId: string) => {
+    window.open(`/print/${queueId}`, `print_${queueId}`, 'width=480,height=700,popup=1');
+  };
+
+  useEffect(() => {
+    const unsub = subscribePrintQueue(SESSION_ID, items => {
+      setPrintQueue(items);
+    });
+    return () => unsub();
+  }, []);
+
+  // Auto-print: fire for each new pending item
+  useEffect(() => {
+    if (!autoPrint) return;
+    const pending = printQueue.filter(i => i.status === 'pending' && !printingRef.current.has(i.id));
+    for (const item of pending) {
+      printingRef.current.add(item.id);
+      openPrintWindow(item.id);
+    }
+  }, [printQueue, autoPrint]);
+
+  const toggleAutoPrint = (val: boolean) => {
+    setAutoPrint(val);
+    localStorage.setItem('autoPrint', val ? 'on' : 'off');
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const reprintSelected = () => {
+    for (const id of selectedIds) openPrintWindow(id);
+    setSelectedIds(new Set());
+  };
+
+  const pendingCount = printQueue.filter(i => i.status === 'pending' || i.status === 'printing').length;
+  const errorCount = printQueue.filter(i => i.status === 'error').length;
 
   // Subscribe to submissions
   useEffect(() => {
@@ -455,6 +507,80 @@ function ScreenContent() {
           <div className="text-6xl">✨</div>
           <p className="text-xl font-bold" style={{ color: 'var(--heading)' }}>Esperant els primers recursos...</p>
           <p className="text-sm" style={{ color: 'var(--muted)' }}>Els recursos apareixeran aquí en temps real</p>
+        </div>
+      )}
+
+      {/* Print queue panel */}
+      {printQueue.length > 0 && (
+        <div className="mx-6 mt-4 rounded-2xl overflow-hidden" style={{ border: '1.5px solid var(--border)', background: 'white' }}>
+          {/* Panel header */}
+          <div className="flex items-center justify-between px-5 py-3 border-b" style={{ borderColor: 'var(--border)', background: '#f7f4f7' }}>
+            <div className="flex items-center gap-3">
+              <span className="font-bold text-sm" style={{ color: 'var(--heading)' }}>🖨️ Impressora</span>
+              {pendingCount > 0 && <span className="rounded-full px-2 py-0.5 text-xs font-black text-white" style={{ background: '#ea580c' }}>{pendingCount}</span>}
+              {errorCount > 0 && <span className="rounded-full px-2 py-0.5 text-xs font-black text-white" style={{ background: '#dc2626' }}>⚠️ {errorCount} error{errorCount > 1 ? 's' : ''}</span>}
+            </div>
+            <div className="flex items-center gap-4">
+              {selectedIds.size > 0 && (
+                <button onClick={reprintSelected} className="text-xs font-bold px-3 py-1.5 rounded-lg"
+                  style={{ background: 'var(--heading)', color: 'white' }}>
+                  Reimprimir {selectedIds.size} seleccionats
+                </button>
+              )}
+              <div className="flex items-center gap-2">
+                <span className="text-xs" style={{ color: 'var(--muted)' }}>Auto-impressió</span>
+                <button onClick={() => toggleAutoPrint(!autoPrint)}
+                  className="w-10 h-5 rounded-full transition-all relative"
+                  style={{ background: autoPrint ? '#00e082' : '#d1c5d0' }}>
+                  <span className="absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all shadow-sm"
+                    style={{ left: autoPrint ? '1.25rem' : '0.125rem' }} />
+                </button>
+              </div>
+              <div className="flex rounded-lg overflow-hidden" style={{ border: '1px solid var(--border)' }}>
+                {(['cua', 'historial'] as const).map(t => (
+                  <button key={t} onClick={() => setPrintTab(t)}
+                    className="px-3 py-1 text-xs font-bold capitalize transition-all"
+                    style={printTab === t ? { background: 'var(--heading)', color: 'white' } : { color: 'var(--muted)' }}>
+                    {t === 'cua' ? `Cua (${pendingCount})` : `Historial (${printQueue.length})`}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Queue / History list */}
+          <div className="max-h-48 overflow-y-auto">
+            {(printTab === 'cua'
+              ? printQueue.filter(i => i.status === 'pending' || i.status === 'printing')
+              : printQueue
+            ).map(item => {
+              const statusColor = { pending: '#ea580c', printing: '#2563eb', printed: '#16a34a', error: '#dc2626' }[item.status];
+              const statusLabel = { pending: '🟡 Pendent', printing: '🔵 Imprimint...', printed: '✓ Imprès', error: '❌ Error' }[item.status];
+              return (
+                <div key={item.id} className="flex items-center gap-3 px-5 py-2.5 border-b text-sm" style={{ borderColor: '#f0eaf0' }}>
+                  <input type="checkbox" checked={selectedIds.has(item.id)} onChange={() => toggleSelect(item.id)}
+                    className="rounded" />
+                  <span className="font-bold flex-1" style={{ color: 'var(--heading)' }}>
+                    {item.pairName || <span style={{ color: 'var(--muted)', fontStyle: 'italic' }}>Sense nom</span>}
+                  </span>
+                  <span className="text-xs" style={{ color: 'var(--muted)' }}>
+                    {new Date(item.createdAt).toLocaleTimeString('ca-ES', { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                  <span className="text-xs font-bold" style={{ color: statusColor }}>{statusLabel}</span>
+                  <button onClick={() => openPrintWindow(item.id)}
+                    className="text-xs px-2 py-1 rounded-lg font-bold transition-all"
+                    style={{ background: '#f7f4f7', border: '1px solid var(--border)', color: 'var(--muted)' }}>
+                    Reimprimir
+                  </button>
+                </div>
+              );
+            })}
+            {printTab === 'cua' && pendingCount === 0 && (
+              <div className="px-5 py-4 text-xs text-center" style={{ color: 'var(--muted)' }}>
+                Cap tiquet pendent. Els nous tiquets apareixeran aquí automàticament.
+              </div>
+            )}
+          </div>
         </div>
       )}
 

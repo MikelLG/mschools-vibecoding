@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import QRCode from 'react-qr-code';
-import { getSubmission, updateSubmission } from '@/lib/firebase';
+import { getSubmission, updateSubmission, addToPrintQueue } from '@/lib/firebase';
 import type { Submission } from '@/lib/types';
 import { PhaseTimer } from '@/components/PhaseTimer';
 import { MSchoolsLogo } from '@/components/MSchoolsLogo';
@@ -15,6 +15,8 @@ export default function TicketPage() {
   const [appUrl, setAppUrl] = useState('');
   const [groupName, setGroupName] = useState('');
   const [saved, setSaved] = useState(false);
+  const [queued, setQueued] = useState(false);
+  const [queueError, setQueueError] = useState('');
 
   useEffect(() => {
     getSubmission(id).then(s => {
@@ -24,14 +26,31 @@ export default function TicketPage() {
     setAppUrl(`${window.location.origin}/app/${id}`);
   }, [id]);
 
-  const saveAndPrint = async () => {
+  const sendToQueue = async () => {
     if (!submission) return;
-    if (groupName.trim() && groupName !== submission.pairName) {
-      await updateSubmission(submission.id, { pairName: groupName.trim() });
-      setSubmission(prev => prev ? { ...prev, pairName: groupName.trim() } : prev);
-      setSaved(true);
+    setQueueError('');
+    const name = groupName.trim();
+    try {
+      if (name && name !== submission.pairName) {
+        await updateSubmission(submission.id, { pairName: name });
+        setSubmission(prev => prev ? { ...prev, pairName: name } : prev);
+        setSaved(true);
+      }
+      await addToPrintQueue({
+        submissionId: submission.id,
+        sessionId: submission.sessionId ?? process.env.NEXT_PUBLIC_SESSION_ID ?? 'mschools-2026',
+        pairName: name || submission.pairName || '',
+        tasca: submission.tasca ?? '',
+        formatLabel: submission.formatLabel ?? '',
+        appUrl,
+        createdAt: Date.now(),
+        status: 'pending',
+        retryCount: 0,
+      });
+      setQueued(true);
+    } catch {
+      setQueueError('No s\'ha pogut enviar. Comprova la connexió i torna-ho a intentar.');
     }
-    window.print();
   };
 
   if (!submission) {
@@ -146,14 +165,24 @@ export default function TicketPage() {
                 autoFocus
               />
             </div>
-            <button
-              onClick={saveAndPrint}
-              className="w-full rounded-xl py-4 text-lg font-black transition-all hover:opacity-90"
-              style={{ background: 'var(--heading)', color: 'white' }}
-            >
-              🖨️ Desar nom i imprimir tiquet
-            </button>
-            {saved && <p className="text-xs text-center" style={{ color: '#0d9488' }}>✓ Nom desat correctament</p>}
+            {!queued ? (
+              <>
+                <button
+                  onClick={sendToQueue}
+                  className="w-full rounded-xl py-4 text-lg font-black transition-all hover:opacity-90"
+                  style={{ background: 'var(--heading)', color: 'white' }}
+                >
+                  🖨️ Enviar a la impressora
+                </button>
+                {queueError && <p className="text-xs text-center" style={{ color: '#dc2626' }}>⚠️ {queueError}</p>}
+                {saved && <p className="text-xs text-center" style={{ color: '#0d9488' }}>✓ Nom desat</p>}
+              </>
+            ) : (
+              <div className="rounded-xl py-4 text-center flex flex-col gap-1" style={{ background: '#f0fdf4', border: '1.5px solid #bbf7d0' }}>
+                <span className="text-lg font-black" style={{ color: '#16a34a' }}>✓ Tiquet enviat!</span>
+                <span className="text-xs" style={{ color: '#16a34a' }}>El facilitador l&apos;imprimirà en breus.</span>
+              </div>
+            )}
           </div>
 
           {/* Ticket preview */}

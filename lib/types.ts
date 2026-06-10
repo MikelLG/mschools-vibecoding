@@ -10,6 +10,20 @@ export interface WorkshopTimer {
   running: boolean;
 }
 
+export interface PrintQueueItem {
+  id: string;
+  submissionId: string;
+  sessionId: string;
+  pairName: string;
+  tasca: string;
+  formatLabel?: string;
+  appUrl: string;
+  createdAt: number;
+  status: 'pending' | 'printing' | 'printed' | 'error';
+  retryCount: number;
+  printedAt?: number;
+}
+
 export interface Submission {
   id: string;
   stationId: number;
