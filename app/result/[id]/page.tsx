@@ -66,8 +66,11 @@ export default function ResultPage() {
       }
       const { htmlOutput } = await res.json() as { htmlOutput: string };
       const refinements = [...(submission.refinements ?? []), refineText.trim()];
-      await updateSubmission(submission.id, { htmlOutput, refinements });
-      setSubmission(prev => prev ? { ...prev, htmlOutput, refinements } : prev);
+      const refinementsBlock = '\n\n## MILLORES APLICADES\n' + refinements.map((r, i) => `${i + 1}. ${r}`).join('\n');
+      const basePrompt = submission.prompt.replace(/\n\n## MILLORES APLICADES[\s\S]*$/, '');
+      const updatedPrompt = basePrompt + refinementsBlock;
+      await updateSubmission(submission.id, { htmlOutput, refinements, prompt: updatedPrompt });
+      setSubmission(prev => prev ? { ...prev, htmlOutput, refinements, prompt: updatedPrompt } : prev);
       setRefineText('');
     } catch (err) {
       setRefineError((err as Error).message || 'Error inesperat');
