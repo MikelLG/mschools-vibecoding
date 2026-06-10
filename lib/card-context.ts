@@ -31,14 +31,14 @@ Pot incloure referents culturals diversos, evitant la centralitat d'una sola cul
 };
 
 export const USUARI_CONTEXT: Record<string, string> = {
-  'Docent': `L'usuari és un/a docent d'educació primària, secundària o cicles formatius.
+  'Docents': `L'usuari és un/a docent d'educació primària, secundària o cicles formatius.
 Té competència digital mitjana. Prefereix apps intuïtives que no requereixin formació prèvia.
 L'usarà principalment a l'aula o en preparació de classes, amb poc temps disponible.
 La interfície ha de ser eficient: poques accions per arribar al resultat.
 Ha de funcionar bé en un ordinador de sobretaula o portàtil.
 Pot necessitar imprimir o compartir el resultat amb alumnes o famílies.`,
 
-  'Alumnat': `L'usuari és alumnat d'entre 6 i 18 anys (adaptar la complexitat al context descrit).
+  'Alumnes': `L'usuari és alumnat d'entre 6 i 18 anys (adaptar la complexitat al context descrit).
 La interfície ha de ser visual, motivadora i fàcil d'usar sense instruccions prèvies.
 Ha de funcionar bé en tauleta o mòbil, a més d'ordinador.
 El text ha de ser llegible (mida gran), amb suport visual (icones, colors, il·lustracions).
@@ -52,12 +52,14 @@ Ha de funcionar perfectament en mòbil (és el dispositiu principal de les famí
 La informació ha de ser concisa i accionable: "Heu de fer X" o "El vostre fill/a ha fet Y".
 Pot incloure notificacions, recordatoris visuals o passos molt simples.`,
 
-  'Equip del centre': `L'usuari és un membre de l'equip del centre: director/a, cap d'estudis o coordinador/a.
-Té competència digital alta. Valora l'eficiència, la claredat i la capacitat de prendre decisions.
-L'usarà en un context professional: reunions, planificació, gestió administrativa.
-La interfície ha de ser formal però accessible. Pot ser més densa en informació que per a altres usuaris.
-Ha de funcionar bé en ordinador. Pot necessitar exportar dades o generar informes.
-Valora la visualització de dades, els resums executius i les eines de comparació.`,
+  // Legacy aliases
+  'Docent': `L'usuari és un/a docent d'educació primària, secundària o cicles formatius.
+Té competència digital mitjana. Prefereix apps intuïtives que no requereixin formació prèvia.
+L'usarà principalment a l'aula o en preparació de classes, amb poc temps disponible.
+La interfície ha de ser eficient: poques accions per arribar al resultat.`,
+  'Alumnat': `L'usuari és alumnat d'entre 6 i 18 anys (adaptar la complexitat al context descrit).
+La interfície ha de ser visual, motivadora i fàcil d'usar sense instruccions prèvies.
+Ha de funcionar bé en tauleta o mòbil, a més d'ordinador.`,
 };
 
 export const REPTE_CONTEXT: Record<string, string> = {
@@ -124,10 +126,24 @@ Contextos habituals: trivials, jocs de rol educatiu, reptes per temps, escape ro
 Ha d'incloure elements de joc reals: punts, nivells, reptes, retroalimentació positiva.
 L'objectiu educatiu ha d'estar integrat en la mecànica del joc, no com a afegit.`,
 
+  'Jugar per a aprendre': `L'alumne necessita aprendre a través d'una experiència lúdica i motivadora.
+Contextos habituals: trivials, jocs de rol educatiu, reptes per temps, escape rooms temàtics, jocs de memòria, simulacions.
+Ha d'incloure elements de joc reals: punts, nivells, reptes, retroalimentació positiva.
+L'objectiu educatiu ha d'estar integrat en la mecànica del joc, no com a afegit.`,
+
+  // Reptes Docents — key variants
+  'Planificació de situacions d\'aprenentatge': `El docent necessita preparar materials, activitats o recursos per a una sessió concreta.
+Contextos habituals: generar exercicis, crear fitxes, dissenyar activitats interactives, preparar preguntes de debat, adaptar contingut per a nivells diferents.
+El resultat ha de ser directament usable a l'aula, sense edició addicional.`,
+
   // Famílies
   'Rebre informació': `La família necessita rebre informació clara sobre el que passa al centre.
 Ha de ser concisa, visual i fàcil de llegir en menys de 2 minuts.
 Evitar jergues educatives. Usar llenguatge directe i accionable.`,
+
+  'Emplenar formularis': `La família necessita completar formularis de forma ràpida i sense errors.
+Ha de guiar pas a pas, validar camps en temps real i confirmar l'enviament.
+Ha de funcionar perfectament en mòbil.`,
 
   'Omplir formularis': `La família necessita completar formularis de forma ràpida i sense errors.
 Ha de guiar pas a pas, validar camps en temps real i confirmar l'enviament.
@@ -139,8 +155,19 @@ Pot incloure preguntes freqüents, espai per anotar temes a tractar, recordatori
   'Comprendre rutines': `La família necessita entendre els horaris, protocols i rutines del centre.
 Ha de ser molt visual: calendaris, icones, codis de color. Evitar text llarg.`,
 
+  'Acompanyar benestar': `La família necessita eines per acompanyar el benestar emocional del seu fill/a des de casa.
+Ha de ser càlida, senzilla i pràctica. Pot incloure activitats per fer junts.`,
+
   'Acompanyar el benestar': `La família necessita eines per acompanyar el benestar emocional del seu fill/a des de casa.
 Ha de ser càlida, senzilla i pràctica. Pot incloure activitats per fer junts.`,
+
+  'Seguiment del procés d\'aprenentatge': `La família necessita fer seguiment del progrés del seu fill/a de forma visual i comprensible.
+Ha de mostrar avenços, assoliments i àrees de millora sense tecnicismes.
+Ha de ser motivadora i orientada a l'acció: "Com puc ajudar des de casa?"`,
+
+  'Complementar l\'aprenentatge des de casa': `La família necessita recursos pràctics per reforçar l'aprenentatge escolar a casa.
+Ha d'incloure activitats breus, clares i fàcils de fer sense preparació prèvia.
+Ha de ser accessible per a qualsevol nivell de competència digital.`,
 
   // Equip del centre
   'Recollir dades': `L'equip necessita recollir i visualitzar dades del centre de forma estructurada.
@@ -168,47 +195,61 @@ Ha de permetre regenerar els grups si el resultat no convenç.`,
 Ha de permetre definir dies, franges horàries i assignar contingut a cada cel·la.
 Ha de ser llegible d'un cop d'ull i exportable (o imprimible).`,
 
-  'Recollir dades': `L'app recull informació estructurada a través d'un formulari o registre.
-Ha de permetre entrada múltiple i mostrar un resum o visualització dels resultats.
-En mode demo (sense backend): guardar les dades en memòria i mostrar-les en resum.`,
+  'Classificar informació': `L'app permet organitzar i categoritzar informació de forma interactiva.
+L'usuari arrossega, ordena o etiqueta elements en categories.
+Ha d'incloure retroalimentació visual i un resum de la classificació al final.
+Pot incloure mecàniques d'arrossegar i deixar anar (drag & drop).`,
 
-  'Mostrar un checklist': `L'app és una llista de verificació interactiva amb passos seqüencials.
-L'usuari marca elements com a completats. Ha de mostrar el progrés visual (barra o comptador).
-Els elements han d'estar ordenats lògicament. Pot incloure subcategories si cal.
-Implementació: checkboxes HTML amb JavaScript per actualitzar l'estat i el progrés.`,
+  'Recol·lectar dades i mostrar-los a l\'instant': `L'app recull informació a través d'un formulari i la mostra visualment en temps real.
+Ha de permetre entrada múltiple i actualitzar els gràfics o resum automàticament.
+Presentar els resultats amb visualitzacions clares: barres, pastís, xifres destacades.
+En mode demo (sense backend): guardar les dades en memòria del navegador.`,
 
-  'Enviar un missatge': `L'app genera missatges o comunicats adaptats a la situació i al destinatari.
-Ha de permetre personalitzar el to (formal, proper, urgent) i el format (WhatsApp, carta, email).
-El text generat ha de ser directament copiejable o imprimible.`,
+  'Suggerències automàtiques': `L'app genera suggerències personalitzades basant-se en les opcions triades per l'usuari.
+L'usuari introdueix el seu context o preferències i l'app proposa recursos, activitats o estratègies.
+Les suggerències han de ser concretes, accionables i rellevants per al context educatiu.`,
 
-  'Visualitzar informació': `L'app presenta dades o conceptes de forma visual: gràfics, mapes, diagrames o línies del temps.
-Ha d'incloure elements interactius (filtres, zoom, selecció) per facilitar la comprensió.
-Ha de tenir explicacions breus integrades que ajudin a interpretar el que es veu.`,
+  'Comparar escenaris (abans/després, opció A/B)': `L'app presenta una comparació visual entre dos estats, opcions o moments.
+Ha de mostrar les diferències de forma clara: columnes, slider abans/després, o pestanyes A/B.
+L'usuari ha de poder explorar les diferències de forma interactiva.
+Útil per a anàlisi crítica, presa de decisions o comprensió de canvis.`,
 
-  'Simular un fenomen': `L'app visualitza un procés o fenomen de forma interactiva.
-Ha d'incloure elements animats o dinàmics que l'usuari pugui controlar (play/pause, paràmetres).
-Ha de tenir explicacions breus integrades que ajudin a comprendre el que es veu.`,
+  'Simular situacions (emocionals, socials, científiques...)': `L'app simula una situació real o hipotètica en la qual l'usuari pren decisions.
+Cada decisió porta a una conseqüència diferent (arbre de decisions o escenaris ramificats).
+Ha d'incloure feedback per cada elecció i un resum final de l'aprenentatge.
+Adequat per a educació emocional, dilemes ètics, experiments científics o situacions socials.`,
 
-  'Crear un formulari': `L'app recull informació a través d'un formulari estructurat.
-Ha d'incloure validació en temps real i confirmació d'enviament.
-Els camps han de tenir etiquetes clares i ajuda contextual si cal.
-En mode demo (sense backend): guardar les respostes en memòria i mostrar-les en resum.`,
+  'Acompanyar una reflexió emocional': `L'app guia l'usuari en un procés de reflexió sobre les seves emocions o experiències.
+Ha d'incloure preguntes obertes o guiades, espai per escriure o triar, i un tancament positiu.
+El to ha de ser càlid, no invasiu i respectuós. Evitar jutjar o prescriure respostes.
+Pot incloure tècniques de mindfulness, escala d'emocions o diari emocional interactiu.`,
 
   'Generar retroalimentació': `L'app genera feedback personalitzat basant-se en la informació introduïda.
 Pot ser sobre el treball d'un alumne, el comportament del grup o una situació concreta.
 El feedback ha de ser constructiu, específic i orientat a la millora.`,
 
-  'Organitzar torns': `L'app gestiona torns de participació de forma equitativa i visual.
-Ha de poder ordenar aleatòriament, marcar qui ja ha participat i reiniciar la roda.`,
+  'Facilitar una activitat creativa': `L'app proporciona un espai o estructura per a l'expressió creativa de l'usuari.
+Pot incloure reptes creatius, plantilles obertes, generació de idees o producció lliure.
+Ha de fomentar l'autonomia i la creativitat, sense limitar les respostes possibles.
+El disseny ha de ser visualment inspirador i estimulant.`,
 
   'Crear un mini-joc': `L'app és un joc educatiu senzill amb mecàniques de gamificació.
 Ha d'incloure puntuació, retroalimentació immediata i un objectiu clar.
 El contingut educatiu ha d'estar integrat en la mecànica del joc.
 Exemples: trivial, joc de memòria, ordenar seqüències, associar conceptes.`,
 
+  'Ruletes, sortejos, targetes aleatòries': `L'app genera elements aleatoris de forma visual i atractiva.
+Pot ser una ruleta giratòria, un sorteig de noms, targetes aleatòries o daus temàtics.
+Ha de tenir una animació clara del procés i mostrar el resultat de forma destacada.
+Útil per a dinàmiques d'aula, assignació de rols o activitats d'atzar educatiu.`,
+
+  // Legacy keys
+  'Recollir dades': `L'app recull informació estructurada a través d'un formulari o registre.
+Ha de permetre entrada múltiple i mostrar un resum o visualització dels resultats.`,
+  'Simular un fenomen': `L'app visualitza un procés o fenomen de forma interactiva.
+Ha d'incloure elements animats o dinàmics que l'usuari pugui controlar.`,
   'Comparar opcions': `L'app presenta una comparació estructurada entre dues o més opcions.
-Ha de mostrar criteris, avantatges i desavantatges de forma visual.
-Pot incloure una recomanació final basada en els criteris introduïts.`,
+Ha de mostrar criteris i diferències de forma visual.`,
 };
 
 export const ESTIL_CONTEXT: Record<string, string> = {
@@ -254,18 +295,33 @@ Transicions suaves entre estats. Elements que apareixen amb fade o slide.
 Feedback visual animat quan l'usuari fa una acció correcta o completa una tasca.
 No abusar: les animacions han de tenir propòsit, no ser decoratives.`,
 
-  'Amb dibuixos': `Disseny que usa il·lustracions simples o icones estil sketch/doodle.
-Estètica handmade o artesanal. Línies irregulars, colors plans.
-Adequat per a activitats creatives o de primària.
-Pot usar SVG inline o emoji per simular il·lustracions.`,
+  'Creatiu / artístic': `Disseny expressiu, visual i estèticament atrevit. Colors vius o paletes inusuals.
+Tipografies expressives. Espai per a la creació, la producció i l'expressió personal.
+Elements visuals inspiradors: formes orgàniques, textures, il·lustracions.
+El disseny ha de transmetre llibertat creativa i convidar a l'expressió.`,
 
-  'Interactiva / gamificada': `Disseny que incorpora mecàniques de joc visuals: barres de progrés, estrelles, nivells, medalles.
+  'Ludificat': `Disseny que incorpora mecàniques de joc visuals: barres de progrés, estrelles, nivells, medalles.
 Colors vius i contrastats. Tipografia bold i enèrgica.
-Sons i animacions de recompensa (simulats amb CSS/JS).
+Animacions de recompensa en cada acció correcta (simulats amb CSS/JS).
 El disseny ha de transmetre emoció i motivació des del primer moment.`,
 
+  'Interactiu (botons, sliders, arrossegar)': `Disseny centrat en la interacció física directa: botons grans, sliders, elements arrossegables.
+Cada acció ha de tenir resposta visual immediata (canvi de color, animació, so).
+La interfície ha de ser intuïtiva: l'usuari sap què fer sense llegir instruccions.
+Prioritzar elements tàctils pensats per a pantalla tàctil (mòbil i tauleta).`,
+
+  'Narratiu (per passos)': `Disseny estructurat com una història o procés seqüencial. Un pas visible a la vegada.
+Navegació lineal clara: anterior / següent. Indicador de progrés visible.
+El to i el disseny han d'acompanyar la narrativa: càlid, seqüencial, sense salts.
+Cada pas ha d'incloure context suficient per seguir sense perdre el fil.`,
+
+  // Legacy keys
+  'Amb dibuixos': `Disseny que usa il·lustracions simples o icones estil sketch/doodle.
+Estètica handmade o artesanal. Línies irregulars, colors plans.
+Adequat per a activitats creatives o de primària.`,
+  'Interactiva / gamificada': `Disseny que incorpora mecàniques de joc visuals: barres de progrés, estrelles, nivells, medalles.
+Colors vius i contrastats. Tipografia bold i enèrgica.`,
   'Estil fitxa / sobri': `Disseny estructurat com una fitxa o document formal.
 Camps clarament delimitats, etiquetes, seccions amb capçaleres.
-Colors neutres. Adequat per a formularis, registres i informes.
-Estil professional i sobri. Pot incloure logo o capçalera del centre.`,
+Colors neutres. Adequat per a formularis, registres i informes.`,
 };

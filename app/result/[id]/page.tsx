@@ -71,6 +71,7 @@ export default function ResultPage() {
       const updatedPrompt = basePrompt + refinementsBlock;
       await updateSubmission(submission.id, { htmlOutput, refinements, prompt: updatedPrompt });
       setSubmission(prev => prev ? { ...prev, htmlOutput, refinements, prompt: updatedPrompt } : prev);
+      setEditablePrompt(updatedPrompt);
       setRefineText('');
     } catch (err) {
       setRefineError((err as Error).message || 'Error inesperat');
