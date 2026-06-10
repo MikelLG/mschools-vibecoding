@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Submission } from '@/lib/types';
 import { PhaseTimer } from '@/components/PhaseTimer';
@@ -88,6 +88,50 @@ const GROUPS = [
   { id: 'estil', label: 'Estil', color: '#be185d', bg: '#fdf2f8', emoji: '🎨' },
 ];
 
+// ── Transcript parser ──────────────────────────────────────────────────────────
+
+type DetectedCards = { eix?: string; usuari?: string; accio?: string; repte?: string; estil?: string };
+
+const STOP = new Set(['a', 'de', 'd', 'el', 'la', 'els', 'les', 'i', 'o', 'un', 'una', 'amb', 'per', 'que', 'en', 'al', 'del', 'hi', 'es', 'se', 'una']);
+
+function norm(s: string) {
+  return s.toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[·''`()[\],.\/]/g, ' ')
+    .replace(/\s+/g, ' ').trim();
+}
+
+function keyWords(s: string): string[] {
+  return norm(s).split(' ').filter(w => w.length > 2 && !STOP.has(w));
+}
+
+function matchScore(cardValue: string, t: string): number {
+  const kw = keyWords(cardValue);
+  if (!kw.length) return 0;
+  return kw.filter(w => t.includes(w)).length / kw.length;
+}
+
+function bestMatch(cards: { value: string }[], t: string): string | undefined {
+  let best: string | undefined;
+  let bestScore = 0.49; // must beat 50%
+  for (const c of cards) {
+    const score = matchScore(c.value, t);
+    if (score > bestScore) { bestScore = score; best = c.value; }
+  }
+  return best;
+}
+
+function parseTranscript(text: string): DetectedCards {
+  const t = norm(text);
+  return {
+    eix:    bestMatch(EIXOS, t),
+    usuari: bestMatch(USUARIS, t),
+    accio:  bestMatch(ACCIONS, t),
+    repte:  bestMatch(Object.values(REPTES_PER_USUARI).flat(), t),
+    estil:  bestMatch(ESTILS, t),
+  };
+}
+
 // ── Component ──────────────────────────────────────────────────────────────────
 
 export default function CreatePage() {
@@ -97,6 +141,11 @@ export default function CreatePage() {
   const [voicePrompt, setVoicePrompt] = useState('');
   const [listening, setListening] = useState(false);
   const [extraContext, setExtraContext] = useState('');
+  const [detectedCards, setDetectedCards] = useState<DetectedCards>({});
+
+  useEffect(() => {
+    setDetectedCards(voicePrompt.trim() ? parseTranscript(voicePrompt) : {});
+  }, [voicePrompt]);
 
   // Digital fallback
   const [showDigital, setShowDigital] = useState(false);
@@ -127,9 +176,17 @@ export default function CreatePage() {
     if (!SR) return;
     const rec = new SR();
     rec.lang = 'ca-ES';
-    rec.continuous = false;
-    rec.interimResults = false;
-    rec.onresult = (e: SpeechRecognitionEvent) => setVoicePrompt(e.results[0][0].transcript);
+    rec.continuous = true;
+    rec.interimResults = true;
+    let accumulated = '';
+    rec.onresult = (e: SpeechRecognitionEvent) => {
+      let interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        if (e.results[i].isFinal) accumulated += e.results[i][0].transcript + ' ';
+        else interim = e.results[i][0].transcript;
+      }
+      setVoicePrompt((accumulated + interim).trim());
+    };
     rec.onend = () => setListening(false);
     rec.start();
     recognitionRef.current = rec;
@@ -248,7 +305,19 @@ export default function CreatePage() {
           )}
           <div className="w-full rounded-2xl p-5" style={{ background: '#f7f4f7', border: '1px solid var(--border)' }}>
             <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--muted)' }}>El teu prompt</div>
-            <p className="text-sm italic leading-relaxed" style={{ color: 'var(--body)' }}>&ldquo;{voicePrompt || promptPreviewText(eix, usuari, accio, repte, estil)}&rdquo;</p>
+            <p className="text-sm leading-[2.6]" style={{ color: 'var(--body)' }}>
+              &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de{' '}
+              <Blank label="EIX" color="#0d9488" bg="#f0fdfb" detected={usingDigital ? eix : detectedCards.eix} />,{' '}
+              pensada perquè la faci servir{' '}
+              <Blank label="USUARI" color="#7c3aed" bg="#f5f3ff" detected={usingDigital ? usuari : detectedCards.usuari} />,{' '}
+              a través de{' '}
+              <Blank label="ACCIÓ" color="#2563eb" bg="#eff6ff" detected={usingDigital ? accio : detectedCards.accio} />{' '}
+              que serveixi per a{' '}
+              <Blank label="REPTE" color="#ea580c" bg="#fff7ed" detected={usingDigital ? repte : detectedCards.repte} />,{' '}
+              amb un estil{' '}
+              <Blank label="ESTIL" color="#be185d" bg="#fdf2f8" detected={usingDigital ? estil : detectedCards.estil} />,{' '}
+              que sigui coherent i fàcil d&apos;usar.&rdquo;
+            </p>
             {extraContext && <p className="mt-2 text-sm border-t pt-2" style={{ color: 'var(--muted)', borderColor: 'var(--border)' }}>+ {extraContext}</p>}
           </div>
         </div>
@@ -271,20 +340,30 @@ export default function CreatePage() {
 
       <div className="max-w-2xl mx-auto w-full px-6 py-8 flex flex-col gap-8">
 
+        {/* How it works */}
+        <div className="rounded-xl p-4 flex flex-col gap-2" style={{ background: '#f0fdfb', border: '1.5px solid #0d948825' }}>
+          <div className="text-xs font-bold uppercase tracking-widest" style={{ color: '#0d9488' }}>Com funciona</div>
+          <ol className="text-sm flex flex-col gap-1.5" style={{ color: 'var(--body)' }}>
+            <li>1. Agafa una targeta de cada color del mazo</li>
+            <li>2. Llegeix la frase de baix substituint els espais de colors pels valors de les teves targetes</li>
+            <li>3. Prem el micròfon i grava la frase en veu alta</li>
+          </ol>
+        </div>
+
         {/* Pre-prompt template — what they need to read */}
         <div className="rounded-2xl p-6" style={{ background: '#f7f4f7', border: '1.5px solid var(--border)' }}>
           <div className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--muted)' }}>Llegeix aquest prompt en veu alta</div>
           <p className="text-base leading-[2.6]" style={{ color: 'var(--body)' }}>
             &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de{' '}
-            <Blank label="EIX" color="#0d9488" bg="#f0fdfb" />,{' '}
+            <Blank label="EIX" color="#0d9488" bg="#f0fdfb" detected={detectedCards.eix} />,{' '}
             pensada perquè la faci servir{' '}
-            <Blank label="USUARI" color="#7c3aed" bg="#f5f3ff" />,{' '}
+            <Blank label="USUARI" color="#7c3aed" bg="#f5f3ff" detected={detectedCards.usuari} />,{' '}
             a través de{' '}
-            <Blank label="ACCIÓ" color="#2563eb" bg="#eff6ff" />{' '}
+            <Blank label="ACCIÓ" color="#2563eb" bg="#eff6ff" detected={detectedCards.accio} />{' '}
             que serveixi per a{' '}
-            <Blank label="REPTE" color="#ea580c" bg="#fff7ed" />,{' '}
+            <Blank label="REPTE" color="#ea580c" bg="#fff7ed" detected={detectedCards.repte} />,{' '}
             amb un estil{' '}
-            <Blank label="ESTIL" color="#be185d" bg="#fdf2f8" />,{' '}
+            <Blank label="ESTIL" color="#be185d" bg="#fdf2f8" detected={detectedCards.estil} />,{' '}
             que sigui coherent i fàcil d&apos;usar.&rdquo;
           </p>
         </div>
@@ -315,7 +394,13 @@ export default function CreatePage() {
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1">
                   <div className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: 'var(--heading)' }}>✓ Transcripció</div>
-                  <p className="text-sm leading-relaxed" style={{ color: 'var(--body)' }}>&ldquo;{voicePrompt}&rdquo;</p>
+                  <textarea
+                    value={voicePrompt}
+                    onChange={e => setVoicePrompt(e.target.value)}
+                    rows={3}
+                    className="w-full text-sm leading-relaxed resize-none focus:outline-none"
+                    style={{ color: 'var(--body)', background: 'transparent' }}
+                  />
                 </div>
                 <button type="button" onClick={() => setVoicePrompt('')} className="text-xs mt-1 flex-shrink-0" style={{ color: 'var(--muted)' }}>
                   ✕ Repetir
@@ -440,13 +525,18 @@ function promptPreviewText(eix: string, usuari: string, accio: string, repte: st
 
 // ── Sub-components ─────────────────────────────────────────────────────────────
 
-function Blank({ label, color, bg }: { label: string; color: string; bg: string }) {
+function Blank({ label, color, bg, detected }: { label: string; color: string; bg: string; detected?: string }) {
   return (
     <span
-      className="inline-flex items-center px-3 py-1 rounded-lg text-sm font-black align-middle"
-      style={{ background: bg, color, border: `2px solid ${color}40`, letterSpacing: 0.5 }}
+      className="inline-flex items-center px-3 py-1 rounded-lg text-sm font-black align-middle transition-all"
+      style={{
+        background: detected ? bg : 'white',
+        color,
+        border: `2px solid ${detected ? color : color + '50'}`,
+        letterSpacing: 0.5,
+      }}
     >
-      {label}
+      {detected ?? label}
     </span>
   );
 }
