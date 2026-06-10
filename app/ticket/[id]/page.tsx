@@ -214,6 +214,18 @@ export default function TicketPage() {
             </div>
           </div>
 
+          {/* Actions */}
+          <div className="flex gap-3">
+            <button onClick={() => router.push(`/result/${id}`)} className="flex-1 rounded-xl py-3 text-sm font-bold transition-all"
+              style={{ border: '1.5px solid var(--border)', background: 'white', color: 'var(--muted)' }}>
+              ← Tornar al resultat
+            </button>
+            <a href="/gallery" className="flex-1 rounded-xl py-3 text-sm font-bold text-center transition-all"
+              style={{ border: '1.5px solid var(--border)', background: 'white', color: 'var(--muted)' }}>
+              🖼️ Veure la galeria
+            </a>
+          </div>
+
         </div>
       </main>
     </>

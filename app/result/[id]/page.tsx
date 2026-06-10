@@ -333,10 +333,6 @@ export default function ResultPage() {
             Finalitzar →
           </button>
 
-          <a href="/gallery" className="rounded-xl py-2.5 text-center text-sm transition-all"
-            style={{ border: '1.5px solid var(--border)', background: '#f7f4f7', color: 'var(--muted)' }}>
-            🖼️ Veure la galeria
-          </a>
         </div>
         </div> {/* end main content */}
       </div> {/* end outer flex */}
