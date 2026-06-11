@@ -22,7 +22,8 @@ function ask(rl, question, def = '') {
 }
 
 function run(cmd, opts = {}) {
-  return execSync(cmd, { cwd: ROOT, encoding: 'utf8', ...opts }).trim();
+  const out = execSync(cmd, { cwd: ROOT, encoding: 'utf8', ...opts });
+  return out?.trim() ?? '';
 }
 
 async function checkPkg(name) {
