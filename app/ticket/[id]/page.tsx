@@ -217,72 +217,127 @@ export default function TicketPage() {
             </div>
           </div>
 
-          {/* Right: ticket preview — always visible, updates live */}
-          <div className="flex-1 rounded-3xl bg-white p-8" style={{ boxShadow: '0 4px 32px rgba(94,36,64,0.10)', border: '2px solid var(--border)' }}>
-            <div className="flex items-center justify-between mb-6 pb-4 border-b" style={{ borderColor: 'var(--border)' }}>
-              <div>
-                <MSchoolsLogo size="md" />
-                <div className="text-xs mt-1 font-semibold tracking-widest uppercase" style={{ color: 'var(--muted)' }}>Vibe Coding · mSchools 2026</div>
-              </div>
-              <div className="text-right">
-                <div className="text-2xl font-black" style={{ color: 'var(--heading)' }}>
-                  {displayName || <span style={{ color: 'var(--border)' }}>Sense nom</span>}
-                </div>
-                <div className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>
-                  {new Date(submission.createdAt).toLocaleDateString('ca-ES', { day: '2-digit', month: 'long', year: 'numeric' })}
-                </div>
-              </div>
-            </div>
+          {/* Right: both previews side by side */}
+          <div className="flex-1 flex gap-6 items-start">
 
-            <div className="flex gap-8 items-start">
-              <div className="flex flex-col items-center gap-2 flex-shrink-0">
-                {appUrl && <QRCode value={appUrl} size={160} />}
-                <div className="text-xs text-center" style={{ color: 'var(--muted)', maxWidth: 160, wordBreak: 'break-all' }}>{appUrl}</div>
-              </div>
-              <div className="flex-1">
-                <div className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--heading)' }}>El nostre recurs</div>
-                {hasCards ? (
-                  <>
-                    <div className="flex flex-col gap-2 mb-3">
-                      {[
-                        { label: 'Eix', value: parts[0], color: '#0d9488', bg: '#f0fdfb' },
-                        { label: 'Usuari', value: parts[1], color: '#7c3aed', bg: '#f5f3ff' },
-                        { label: 'Acció', value: parts[2], color: '#2563eb', bg: '#eff6ff' },
-                        { label: 'Repte', value: parts[3], color: '#ea580c', bg: '#fff7ed' },
-                        { label: 'Estil', value: parts[4], color: '#be185d', bg: '#fdf2f8' },
-                      ].map(({ label, value, color, bg }) => (
-                        <div key={label} className="flex items-center gap-2">
-                          <span className="text-xs font-bold w-12 flex-shrink-0" style={{ color: 'var(--muted)' }}>{label}</span>
-                          <span className="text-sm font-semibold px-2.5 py-0.5 rounded-md" style={{ color, background: bg, border: `1.5px solid ${color}30` }}>{value}</span>
-                        </div>
-                      ))}
+            {/* Fancy card preview */}
+            <div className="flex-1 flex flex-col gap-2">
+              <div className="text-xs font-bold uppercase tracking-widest text-center" style={{ color: 'var(--muted)' }}>Vista digital</div>
+              <div className="rounded-3xl bg-white p-6" style={{ boxShadow: '0 4px 32px rgba(94,36,64,0.10)', border: '2px solid var(--border)' }}>
+                <div className="flex items-center justify-between mb-4 pb-3 border-b" style={{ borderColor: 'var(--border)' }}>
+                  <div>
+                    <MSchoolsLogo size="sm" />
+                    <div className="text-xs mt-0.5 font-semibold tracking-widest uppercase" style={{ color: 'var(--muted)' }}>Vibe Coding · mSchools 2026</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-lg font-black" style={{ color: 'var(--heading)' }}>
+                      {displayName || <span style={{ color: 'var(--border)' }}>Sense nom</span>}
                     </div>
-                    <div className="pt-3 border-t" style={{ borderColor: 'var(--border)' }}>
-                      <p className="text-xs italic leading-relaxed" style={{ color: 'var(--muted)' }}>
-                        &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de <strong>{parts[0]}</strong>, pensada perquè la faci servir <strong>{parts[1]}</strong>, a través de <strong>{parts[2]}</strong> que serveixi per a <strong>{parts[3]}</strong>, amb un estil <strong>{parts[4]}</strong>, que sigui coherent i fàcil d&apos;usar.&rdquo;
-                      </p>
+                    <div className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>
+                      {new Date(submission.createdAt).toLocaleDateString('ca-ES', { day: '2-digit', month: 'long', year: 'numeric' })}
                     </div>
-                    {submission.refinements && submission.refinements.length > 0 && (
-                      <div className="pt-3 border-t flex flex-col gap-1" style={{ borderColor: 'var(--border)' }}>
-                        <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Millores aplicades</div>
-                        {submission.refinements.map((r, i) => (
-                          <div key={i} className="text-xs flex gap-1.5" style={{ color: 'var(--body)' }}>
-                            <span style={{ color: 'var(--muted)' }}>{i + 1}.</span><span>{r}</span>
+                  </div>
+                </div>
+                <div className="flex gap-4 items-start">
+                  <div className="flex flex-col items-center gap-1 flex-shrink-0">
+                    {appUrl && <QRCode value={appUrl} size={100} />}
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--heading)' }}>El nostre recurs</div>
+                    {hasCards ? (
+                      <div className="flex flex-col gap-1.5">
+                        {[
+                          { label: 'Eix', value: parts[0], color: '#0d9488', bg: '#f0fdfb' },
+                          { label: 'Usuari', value: parts[1], color: '#7c3aed', bg: '#f5f3ff' },
+                          { label: 'Acció', value: parts[2], color: '#2563eb', bg: '#eff6ff' },
+                          { label: 'Repte', value: parts[3], color: '#ea580c', bg: '#fff7ed' },
+                          { label: 'Estil', value: parts[4], color: '#be185d', bg: '#fdf2f8' },
+                        ].map(({ label, value, color, bg }) => (
+                          <div key={label} className="flex items-center gap-1.5">
+                            <span className="text-xs font-bold w-10 flex-shrink-0" style={{ color: 'var(--muted)' }}>{label}</span>
+                            <span className="text-xs font-semibold px-2 py-0.5 rounded" style={{ color, background: bg, border: `1.5px solid ${color}30` }}>{value}</span>
                           </div>
                         ))}
                       </div>
+                    ) : (
+                      <p className="text-xs italic" style={{ color: 'var(--body)' }}>{submission.tasca}</p>
                     )}
-                  </>
-                ) : (
-                  <p className="text-sm italic leading-relaxed" style={{ color: 'var(--body)' }}>&ldquo;{submission.tasca}&rdquo;</p>
+                  </div>
+                </div>
+                {hasCards && (
+                  <div className="mt-3 pt-3 border-t" style={{ borderColor: 'var(--border)' }}>
+                    <p className="text-xs italic leading-relaxed" style={{ color: 'var(--muted)' }}>
+                      &ldquo;...dins l&apos;eix de <strong>{parts[0]}</strong>, per a <strong>{parts[1]}</strong>, a través de <strong>{parts[2]}</strong>, per a <strong>{parts[3]}</strong>, estil <strong>{parts[4]}</strong>.&rdquo;
+                    </p>
+                  </div>
                 )}
+                <div className="mt-3 pt-2 border-t flex items-center justify-between" style={{ borderColor: 'var(--border)' }}>
+                  <div className="text-xs" style={{ color: 'var(--muted)' }}>Escaneja el QR</div>
+                  <div className="text-xs font-bold" style={{ color: 'var(--heading)' }}>mschools-vibecoding.vercel.app</div>
+                </div>
               </div>
             </div>
 
-            <div className="mt-6 pt-4 border-t flex items-center justify-between" style={{ borderColor: 'var(--border)' }}>
-              <div className="text-xs" style={{ color: 'var(--muted)' }}>Escaneja el codi QR per obrir l&apos;eina generada</div>
-              <div className="text-xs font-bold" style={{ color: 'var(--heading)' }}>mschools-vibecoding.vercel.app</div>
+            {/* Thermal receipt preview */}
+            <div className="flex flex-col gap-2 flex-shrink-0">
+              <div className="text-xs font-bold uppercase tracking-widest text-center" style={{ color: 'var(--muted)' }}>Tiquet imprès</div>
+              <div style={{
+                fontFamily: "'Arial', sans-serif", fontSize: 11, color: '#000', background: '#fff',
+                width: 240, boxShadow: '0 4px 24px rgba(0,0,0,0.13)', padding: '10px 8px',
+                border: '1px solid #ddd',
+              }}>
+                <div style={{ textAlign: 'center', paddingBottom: 6 }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 3, marginBottom: 2 }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 16, height: 16, background: '#000', borderRadius: 2, color: '#fff', fontWeight: 900, fontSize: 10 }}>m</span>
+                    <span style={{ fontWeight: 800, fontSize: 12, letterSpacing: -0.5 }}>Schools</span>
+                  </div>
+                  <div style={{ fontSize: 7, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase' }}>Vibe Coding · mSchools 2026</div>
+                </div>
+                <div style={{ borderTop: '2px solid #000', borderBottom: '1px solid #000', padding: '5px 0', textAlign: 'center', marginBottom: 6 }}>
+                  <div style={{ fontSize: 6, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 1 }}>Grup</div>
+                  <div style={{ fontWeight: 900, fontSize: 15, letterSpacing: 0.5 }}>{displayName || <span style={{ color: '#aaa' }}>—</span>}</div>
+                </div>
+                <div style={{ textAlign: 'center', margin: '0 0 3px' }}>
+                  {appUrl && <QRCode value={appUrl} size={150} style={{ maxWidth: '100%' }} />}
+                </div>
+                <div style={{ textAlign: 'center', fontSize: 6, marginBottom: 6, color: '#555', wordBreak: 'break-all', padding: '0 2px' }}>{appUrl}</div>
+                <div style={{ borderTop: '2px solid #000', paddingTop: 5 }}>
+                  <div style={{ fontWeight: 800, fontSize: 6, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 3 }}>El nostre recurs</div>
+                  {hasCards ? (
+                    <>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 9, marginBottom: 5 }}>
+                        <tbody>
+                          {[['Eix', parts[0]], ['Usuari', parts[1]], ['Acció', parts[2]], ['Repte', parts[3]], ['Estil', parts[4]]].map(([label, value]) => (
+                            <tr key={label} style={{ borderBottom: '1px solid #eee' }}>
+                              <td style={{ fontWeight: 700, padding: '2px 5px 2px 0', width: 32, fontSize: 6, textTransform: 'uppercase', color: '#555' }}>{label}</td>
+                              <td style={{ padding: '2px 0', fontWeight: 600 }}>{value}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      <div style={{ borderTop: '1px dashed #ccc', paddingTop: 3, fontSize: 7, lineHeight: 1.5, fontStyle: 'italic', color: '#333' }}>
+                        &ldquo;...de <strong>{parts[0]}</strong>, per a <strong>{parts[1]}</strong>, via <strong>{parts[2]}</strong>, per a <strong>{parts[3]}</strong>, estil <strong>{parts[4]}</strong>.&rdquo;
+                      </div>
+                      {submission.refinements && submission.refinements.length > 0 && (
+                        <div style={{ borderTop: '1px dashed #ccc', marginTop: 3, paddingTop: 3, fontSize: 7 }}>
+                          <div style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 2 }}>Millores</div>
+                          {submission.refinements.map((r, i) => (
+                            <div key={i} style={{ lineHeight: 1.4 }}>{i + 1}. {r}</div>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div style={{ fontSize: 8, fontStyle: 'italic', lineHeight: 1.5 }}>{submission.tasca}</div>
+                  )}
+                </div>
+                <div style={{ borderTop: '2px solid #000', marginTop: 6, paddingTop: 3, textAlign: 'center' }}>
+                  <div style={{ fontSize: 6 }}>Escaneja el QR per obrir l&apos;eina</div>
+                  <div style={{ fontSize: 6, color: '#555' }}>{new Date(submission.createdAt).toLocaleDateString('ca-ES', { day: '2-digit', month: 'long', year: 'numeric' })}</div>
+                </div>
+              </div>
             </div>
+
           </div>
 
           </div> {/* end two-column */}
