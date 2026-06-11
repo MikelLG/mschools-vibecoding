@@ -17,7 +17,18 @@ Quan el servidor d'impressió està en marxa:
 
 - **Node.js 18 o superior** — [descarregar a nodejs.org](https://nodejs.org)
 - El repositori del projecte clonat (`git clone ...`)
-- El fitxer **`.env.local`** al directori arrel del projecte (demanar-lo al responsable tècnic — conté les claus de Firebase i Gemini)
+- El fitxer **`.env.local`** al directori arrel del projecte — el servidor d'impressió només necessita les 6 variables de Firebase (no cal la clau de Gemini):
+
+```bash
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+NEXT_PUBLIC_FIREBASE_APP_ID=
+```
+
+Demana aquests valors al responsable tècnic del projecte.
 
 ---
 
