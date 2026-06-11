@@ -129,7 +129,7 @@ export default function TicketPage() {
                   </tbody>
                 </table>
                 <div style={{ borderTop: '1px dashed #ccc', paddingTop: 6, fontSize: 9, lineHeight: 1.6, fontStyle: 'italic', color: '#333' }}>
-                  &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de <strong>{parts[0]}</strong>, pensada perquè la faci servir <strong>{parts[1]}</strong>, a través de <strong>{parts[2]}</strong> que serveixi per a <strong>{parts[3]}</strong>, amb un estil <strong>{parts[4]}</strong>, que sigui coherent i fàcil d&apos;usar.&rdquo;
+                  &ldquo;Crea una aplicació web emmarcada dins de l&apos;eix de <strong>{parts[0]}</strong>, pensada perquè la utilitzi <strong>{parts[1]}</strong>, serveixi per <strong>{parts[3]}</strong>, a través de <strong>{parts[2]}</strong>, amb un estil <strong>{parts[4]}</strong>, que resulti coherent i fàcil d&apos;usar.&rdquo;
                 </div>
                 {submission.refinements && submission.refinements.length > 0 && (
                   <div style={{ borderTop: '1px dashed #ccc', marginTop: 6, paddingTop: 6, fontSize: 9 }}>
@@ -271,7 +271,7 @@ export default function TicketPage() {
                 {hasCards && (
                   <div className="mt-3 pt-3 border-t" style={{ borderColor: 'var(--border)' }}>
                     <p className="text-xs italic leading-relaxed" style={{ color: 'var(--muted)' }}>
-                      &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de <strong>{parts[0]}</strong>, pensada perquè la faci servir <strong>{parts[1]}</strong>, a través de <strong>{parts[2]}</strong> que serveixi per a <strong>{parts[3]}</strong>, amb un estil <strong>{parts[4]}</strong>, que sigui coherent i fàcil d&apos;usar.&rdquo;
+                      &ldquo;Crea una aplicació web emmarcada dins de l&apos;eix de <strong>{parts[0]}</strong>, pensada perquè la utilitzi <strong>{parts[1]}</strong>, serveixi per <strong>{parts[3]}</strong>, a través de <strong>{parts[2]}</strong>, amb un estil <strong>{parts[4]}</strong>, que resulti coherent i fàcil d&apos;usar.&rdquo;
                     </p>
                   </div>
                 )}
@@ -330,7 +330,7 @@ export default function TicketPage() {
                         </tbody>
                       </table>
                       <div style={{ borderTop: '1px dashed #ccc', paddingTop: 3, fontSize: 7, lineHeight: 1.5, fontStyle: 'italic', color: '#333' }}>
-                        &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de <strong>{parts[0]}</strong>, pensada perquè la faci servir <strong>{parts[1]}</strong>, a través de <strong>{parts[2]}</strong> que serveixi per a <strong>{parts[3]}</strong>, amb un estil <strong>{parts[4]}</strong>, que sigui coherent i fàcil d&apos;usar.&rdquo;
+                        &ldquo;Crea una aplicació web emmarcada dins de l&apos;eix de <strong>{parts[0]}</strong>, pensada perquè la utilitzi <strong>{parts[1]}</strong>, serveixi per <strong>{parts[3]}</strong>, a través de <strong>{parts[2]}</strong>, amb un estil <strong>{parts[4]}</strong>, que resulti coherent i fàcil d&apos;usar.&rdquo;
                       </div>
                       {submission.refinements && submission.refinements.length > 0 && (
                         <div style={{ borderTop: '1px dashed #ccc', marginTop: 3, paddingTop: 3, fontSize: 7 }}>

@@ -90,17 +90,17 @@ export default function WarmupPage() {
                   El prompt que vam usar
                 </div>
                 <p className="text-sm leading-[2.4]" style={{ color: 'var(--body)' }}>
-                  &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de{' '}
+                  &ldquo;Crea una aplicació web emmarcada dins de l&apos;eix de{' '}
                   <WBadge v={PROMPT.eix} color="#0d9488" bg="#f0fdfb" emoji="🎯" />,{' '}
-                  pensada perquè la faci servir{' '}
+                  pensada perquè la utilitzi{' '}
                   <WBadge v={PROMPT.usuari} color="#7c3aed" bg="#f5f3ff" emoji="👤" />,{' '}
-                  a través de{' '}
-                  <WBadge v={PROMPT.accio} color="#2563eb" bg="#eff6ff" emoji="⚡" />{' '}
-                  que serveixi per a{' '}
+                  serveixi per{' '}
                   <WBadge v={PROMPT.repte} color="#ea580c" bg="#fff7ed" emoji="💡" />,{' '}
+                  a través de{' '}
+                  <WBadge v={PROMPT.accio} color="#2563eb" bg="#eff6ff" emoji="⚡" />,{' '}
                   amb un estil{' '}
                   <WBadge v={PROMPT.estil} color="#be185d" bg="#fdf2f8" emoji="🎨" />,{' '}
-                  que sigui coherent i fàcil d&apos;usar.&rdquo;
+                  que resulti coherent i fàcil d&apos;usar.&rdquo;
                 </p>
               </div>
             )}

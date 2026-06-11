@@ -309,17 +309,17 @@ export default function CreatePage() {
           <div className="w-full rounded-2xl p-5" style={{ background: '#f7f4f7', border: '1px solid var(--border)' }}>
             <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--muted)' }}>El teu pre-prompt</div>
             <p className="text-sm leading-[2.6]" style={{ color: 'var(--body)' }}>
-              &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de{' '}
+              &ldquo;Crea una aplicació web emmarcada dins de l&apos;eix de{' '}
               <Blank label="EIX" color="#0d9488" bg="#f0fdfb" detected={usingDigital ? eix : detectedCards.eix} />,{' '}
-              pensada perquè la faci servir{' '}
+              pensada perquè la utilitzi{' '}
               <Blank label="USUARI" color="#7c3aed" bg="#f5f3ff" detected={usingDigital ? usuari : detectedCards.usuari} />,{' '}
-              a través de{' '}
-              <Blank label="ACCIÓ" color="#2563eb" bg="#eff6ff" detected={usingDigital ? accio : detectedCards.accio} />{' '}
-              que serveixi per a{' '}
+              serveixi per{' '}
               <Blank label="REPTE" color="#ea580c" bg="#fff7ed" detected={usingDigital ? repte : detectedCards.repte} />,{' '}
+              a través de{' '}
+              <Blank label="ACCIÓ" color="#2563eb" bg="#eff6ff" detected={usingDigital ? accio : detectedCards.accio} />,{' '}
               amb un estil{' '}
               <Blank label="ESTIL" color="#be185d" bg="#fdf2f8" detected={usingDigital ? estil : detectedCards.estil} />,{' '}
-              que sigui coherent i fàcil d&apos;usar.&rdquo;
+              que resulti coherent i fàcil d&apos;usar.&rdquo;
             </p>
             {extraContext && <p className="mt-2 text-sm border-t pt-2" style={{ color: 'var(--muted)', borderColor: 'var(--border)' }}>+ {extraContext}</p>}
           </div>
@@ -370,17 +370,17 @@ export default function CreatePage() {
         <div className="rounded-2xl p-6" style={{ background: '#f7f4f7', border: '1.5px solid var(--border)' }}>
           <div className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--muted)' }}>Llegeix aquest prompt en veu alta</div>
           <p className="text-base leading-[2.6]" style={{ color: 'var(--body)' }}>
-            &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de{' '}
+            &ldquo;Crea una aplicació web emmarcada dins de l&apos;eix de{' '}
             <Blank label="EIX" color="#0d9488" bg="#f0fdfb" detected={detectedCards.eix} />,{' '}
-            pensada perquè la faci servir{' '}
+            pensada perquè la utilitzi{' '}
             <Blank label="USUARI" color="#7c3aed" bg="#f5f3ff" detected={detectedCards.usuari} />,{' '}
-            a través de{' '}
-            <Blank label="ACCIÓ" color="#2563eb" bg="#eff6ff" detected={detectedCards.accio} />{' '}
-            que serveixi per a{' '}
+            serveixi per{' '}
             <Blank label="REPTE" color="#ea580c" bg="#fff7ed" detected={detectedCards.repte} />,{' '}
+            a través de{' '}
+            <Blank label="ACCIÓ" color="#2563eb" bg="#eff6ff" detected={detectedCards.accio} />,{' '}
             amb un estil{' '}
             <Blank label="ESTIL" color="#be185d" bg="#fdf2f8" detected={detectedCards.estil} />,{' '}
-            que sigui coherent i fàcil d&apos;usar.&rdquo;
+            que resulti coherent i fàcil d&apos;usar.&rdquo;
           </p>
         </div>
 
@@ -538,7 +538,7 @@ export default function CreatePage() {
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 function promptPreviewText(eix: string, usuari: string, accio: string, repte: string, estil: string) {
-  return `Crea una aplicació web emmarcada dins l'eix de ${eix}, pensada perquè la faci servir ${usuari}, a través de ${accio} que serveixi per a ${repte}, amb un estil ${estil}, que sigui coherent i fàcil d'usar.`;
+  return `Crea una aplicació web emmarcada dins de l'eix de ${eix}, pensada perquè la utilitzi ${usuari}, serveixi per ${repte}, a través de ${accio}, amb un estil ${estil}, que resulti coherent i fàcil d'usar.`;
 }
 
 // ── Sub-components ─────────────────────────────────────────────────────────────

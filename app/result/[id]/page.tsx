@@ -382,17 +382,17 @@ function PromptSentence({ tasca }: { tasca: string }) {
   }
   return (
     <p className="text-sm leading-[2.4]" style={{ color: 'var(--body)' }}>
-      &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de{' '}
+      &ldquo;Crea una aplicació web emmarcada dins de l&apos;eix de{' '}
       <Badge v={eix} label="EIX" color="#0d9488" bg="#f0fdfb" />,{' '}
-      pensada perquè la faci servir{' '}
+      pensada perquè la utilitzi{' '}
       <Badge v={usuari} label="USUARI" color="#7c3aed" bg="#f5f3ff" />,{' '}
-      a través de{' '}
-      <Badge v={accio} label="ACCIÓ" color="#2563eb" bg="#eff6ff" />{' '}
-      que serveixi per a{' '}
+      serveixi per{' '}
       <Badge v={repte} label="REPTE" color="#ea580c" bg="#fff7ed" />,{' '}
+      a través de{' '}
+      <Badge v={accio} label="ACCIÓ" color="#2563eb" bg="#eff6ff" />,{' '}
       amb un estil{' '}
       <Badge v={estil} label="ESTIL" color="#be185d" bg="#fdf2f8" />,{' '}
-      que sigui coherent i fàcil d&apos;usar.&rdquo;
+      que resulti coherent i fàcil d&apos;usar.&rdquo;
     </p>
   );
 }
