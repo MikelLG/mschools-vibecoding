@@ -126,11 +126,6 @@ Contextos habituals: trivials, jocs de rol educatiu, reptes per temps, escape ro
 Ha d'incloure elements de joc reals: punts, nivells, reptes, retroalimentació positiva.
 L'objectiu educatiu ha d'estar integrat en la mecànica del joc, no com a afegit.`,
 
-  'Jugar per a aprendre': `L'alumne necessita aprendre a través d'una experiència lúdica i motivadora.
-Contextos habituals: trivials, jocs de rol educatiu, reptes per temps, escape rooms temàtics, jocs de memòria, simulacions.
-Ha d'incloure elements de joc reals: punts, nivells, reptes, retroalimentació positiva.
-L'objectiu educatiu ha d'estar integrat en la mecànica del joc, no com a afegit.`,
-
   // Reptes Docents — key variants
   'Planificació de situacions d\'aprenentatge': `El docent necessita preparar materials, activitats o recursos per a una sessió concreta.
 Contextos habituals: generar exercicis, crear fitxes, dissenyar activitats interactives, preparar preguntes de debat, adaptar contingut per a nivells diferents.
@@ -155,9 +150,12 @@ Pot incloure preguntes freqüents, espai per anotar temes a tractar, recordatori
   'Comprendre rutines': `La família necessita entendre els horaris, protocols i rutines del centre.
 Ha de ser molt visual: calendaris, icones, codis de color. Evitar text llarg.`,
 
-  'Acompanyar benestar': `La família necessita eines per acompanyar el benestar emocional del seu fill/a des de casa.
+  'Cuidar el benestar': `La família necessita eines per acompanyar el benestar emocional del seu fill/a des de casa.
 Ha de ser càlida, senzilla i pràctica. Pot incloure activitats per fer junts.`,
 
+  // Legacy aliases
+  'Acompanyar benestar': `La família necessita eines per acompanyar el benestar emocional del seu fill/a des de casa.
+Ha de ser càlida, senzilla i pràctica. Pot incloure activitats per fer junts.`,
   'Acompanyar el benestar': `La família necessita eines per acompanyar el benestar emocional del seu fill/a des de casa.
 Ha de ser càlida, senzilla i pràctica. Pot incloure activitats per fer junts.`,
 
@@ -200,12 +198,12 @@ L'usuari arrossega, ordena o etiqueta elements en categories.
 Ha d'incloure retroalimentació visual i un resum de la classificació al final.
 Pot incloure mecàniques d'arrossegar i deixar anar (drag & drop).`,
 
-  'Recol·lectar dades i mostrar-los a l\'instant': `L'app recull informació a través d'un formulari i la mostra visualment en temps real.
+  'Recollir dades i mostrar-les a l\'instant': `L'app recull informació a través d'un formulari i la mostra visualment en temps real.
 Ha de permetre entrada múltiple i actualitzar els gràfics o resum automàticament.
 Presentar els resultats amb visualitzacions clares: barres, pastís, xifres destacades.
 En mode demo (sense backend): guardar les dades en memòria del navegador.`,
 
-  'Suggerències automàtiques': `L'app genera suggerències personalitzades basant-se en les opcions triades per l'usuari.
+  'Suggeriments automàtics': `L'app genera suggeriments personalitzats basant-se en les opcions triades per l'usuari.
 L'usuari introdueix el seu context o preferències i l'app proposa recursos, activitats o estratègies.
 Les suggerències han de ser concretes, accionables i rellevants per al context educatiu.`,
 
@@ -305,7 +303,7 @@ Colors vius i contrastats. Tipografia bold i enèrgica.
 Animacions de recompensa en cada acció correcta (simulats amb CSS/JS).
 El disseny ha de transmetre emoció i motivació des del primer moment.`,
 
-  'Interactiu (botons, sliders, arrossegar)': `Disseny centrat en la interacció física directa: botons grans, sliders, elements arrossegables.
+  'Interactiu (botons, controls lliscants i elements per arrossegar)': `Disseny centrat en la interacció física directa: botons grans, sliders, elements arrossegables.
 Cada acció ha de tenir resposta visual immediata (canvi de color, animació, so).
 La interfície ha de ser intuïtiva: l'usuari sap què fer sense llegir instruccions.
 Prioritzar elements tàctils pensats per a pantalla tàctil (mòbil i tauleta).`,
@@ -319,6 +317,10 @@ Cada pas ha d'incloure context suficient per seguir sense perdre el fil.`,
   'Amb dibuixos': `Disseny que usa il·lustracions simples o icones estil sketch/doodle.
 Estètica handmade o artesanal. Línies irregulars, colors plans.
 Adequat per a activitats creatives o de primària.`,
+  'Interactiu (botons, sliders, arrossegar)': `Disseny centrat en la interacció física directa: botons grans, sliders, elements arrossegables.
+Cada acció ha de tenir resposta visual immediata (canvi de color, animació, so).
+La interfície ha de ser intuïtiva: l'usuari sap què fer sense llegir instruccions.
+Prioritzar elements tàctils pensats per a pantalla tàctil (mòbil i tauleta).`,
   'Interactiva / gamificada': `Disseny que incorpora mecàniques de joc visuals: barres de progrés, estrelles, nivells, medalles.
 Colors vius i contrastats. Tipografia bold i enèrgica.`,
   'Estil fitxa / sobri': `Disseny estructurat com una fitxa o document formal.
