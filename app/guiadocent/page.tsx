@@ -195,6 +195,33 @@ export default function GuiaDocentPage() {
           </div>
         </section>
 
+        {/* Més recursos */}
+        <section style={{ marginBottom: 64 }}>
+          <h2 style={{ fontSize: 28, fontWeight: 800, color: '#5e2440', marginBottom: 6 }}>Més recursos</h2>
+          <p style={{ color: '#666', marginBottom: 24 }}>Informació i comunitat per aprofundir en el Vibe Coding educatiu.</p>
+          <a
+            href="https://vibe-coding-educativo.github.io/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: 'block', textDecoration: 'none' }}
+          >
+            <div style={{ border: '2px solid #00e08240', borderRadius: 14, padding: '24px 28px', background: '#f0fdf8', display: 'flex', gap: 24, alignItems: 'flex-start', transition: 'box-shadow 0.15s' }}>
+              <span style={{ fontSize: 36, lineHeight: 1, flexShrink: 0 }}>🌐</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 800, fontSize: 17, color: '#5e2440', marginBottom: 4 }}>
+                  Vibe Coding Educatiu — Comunitat i metodologia
+                </div>
+                <div style={{ fontSize: 14, color: '#444', lineHeight: 1.65, marginBottom: 12 }}>
+                  Espai obert per a docents que volen crear eines educatives interactives amb IA sense necessitat de programar. Inclou galeria d'aplicacions, butlletí setmanal, grup de Telegram i guies per integrar IA en plataformes com Moodle o Google Sites.
+                </div>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#00e082', color: 'white', fontWeight: 700, fontSize: 13, padding: '6px 16px', borderRadius: 999 }}>
+                  vibe-coding-educativo.github.io →
+                </span>
+              </div>
+            </div>
+          </a>
+        </section>
+
         {/* CTA */}
         <div style={{ border: '1.5px solid #e8dfe6', borderRadius: 16, padding: '40px 32px', textAlign: 'center', background: 'white' }}>
           <h2 style={{ fontSize: 26, fontWeight: 800, color: '#5e2440', marginBottom: 10 }}>Preparada per començar?</h2>
