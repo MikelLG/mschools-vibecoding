@@ -27,35 +27,36 @@ function LoginGate({ onAuth }: { onAuth: () => void }) {
 
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: '#fff' }}>
-      <form onSubmit={handleSubmit} className="bg-white w-full max-w-md flex flex-col gap-5"
-        style={{ border: '1.5px solid #d4bfc8', borderRadius: 16, padding: '40px 40px 36px' }}>
+      <form onSubmit={handleSubmit} className="bg-white w-full flex flex-col gap-6"
+        style={{ maxWidth: 480, border: '1.5px solid #c9b0bc', borderRadius: 16, padding: '52px 48px 44px' }}>
 
         {/* Logo */}
-        <div className="flex justify-center mb-1">
-          <MSchoolsLogo size="lg" />
+        <div className="flex justify-center">
+          <img src="/mschools-ia-lab.png" alt="mSchools IA Lab" style={{ height: 46, width: 'auto' }} />
         </div>
 
-        <h1 className="text-center text-xl font-black" style={{ color: '#5e2440' }}>Vibe Coding</h1>
+        <h1 className="text-center font-black" style={{ fontSize: 22, color: '#5e2440', marginTop: 4 }}>Vibe Coding</h1>
 
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1.5">
           <label className="text-sm font-semibold" style={{ color: '#9e6070' }}>Contrasenya</label>
           <input
             type="password"
             value={password}
             onChange={e => { setPassword(e.target.value); setError(false); }}
             autoFocus
-            className="rounded-lg px-4 py-3 text-sm focus:outline-none"
+            className="rounded-lg px-4 text-sm focus:outline-none"
             style={{
-              border: error ? '1.5px solid #dc2626' : '1.5px solid #d4bfc8',
-              background: '#f5f0f4',
+              height: 48,
+              border: error ? '1.5px solid #dc2626' : '1.5px solid #c9b0bc',
+              background: '#f3edf1',
             }}
           />
           {error && <p className="text-xs mt-1" style={{ color: '#dc2626' }}>Contrasenya incorrecta</p>}
         </div>
 
         <button type="submit"
-          className="w-full rounded-lg py-3 font-bold text-white text-base transition-all hover:opacity-90"
-          style={{ background: '#5cb87a' }}>
+          className="w-full rounded-lg font-bold text-white text-base transition-all hover:opacity-90"
+          style={{ height: 48, background: '#5cb87a' }}>
           Entrar
         </button>
       </form>
