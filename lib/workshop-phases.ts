@@ -34,7 +34,7 @@ export const WORKSHOP_PHASES: Phase[] = [
   },
   {
     id: 4,
-    label: 'Publica i imprimeix',
+    label: 'Finalitza i comparteix',
     instruction: "Imprimeix el tiquet del grup i comparteix l'app",
     defaultMinutes: 2,
     color: '#dc2626',

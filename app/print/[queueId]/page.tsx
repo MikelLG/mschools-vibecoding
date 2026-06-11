@@ -88,8 +88,16 @@ export default function PrintPage() {
                 </tbody>
               </table>
               <div style={{ borderTop: '1px dashed #ccc', paddingTop: 6, fontSize: 9, lineHeight: 1.6, fontStyle: 'italic', color: '#333' }}>
-                &ldquo;Crea una app dins l&apos;eix de <strong>{parts[0]}</strong>, per a <strong>{parts[1]}</strong>, a través de <strong>{parts[2]}</strong> per a <strong>{parts[3]}</strong>, estil <strong>{parts[4]}</strong>.&rdquo;
+                &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de <strong>{parts[0]}</strong>, pensada perquè la faci servir <strong>{parts[1]}</strong>, a través de <strong>{parts[2]}</strong> que serveixi per a <strong>{parts[3]}</strong>, amb un estil <strong>{parts[4]}</strong>, que sigui coherent i fàcil d&apos;usar.&rdquo;
               </div>
+              {item.refinements && item.refinements.length > 0 && (
+                <div style={{ borderTop: '1px dashed #ccc', marginTop: 6, paddingTop: 6, fontSize: 9 }}>
+                  <div style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 3 }}>Millores aplicades</div>
+                  {item.refinements.map((r, i) => (
+                    <div key={i} style={{ lineHeight: 1.5 }}>{i + 1}. {r}</div>
+                  ))}
+                </div>
+              )}
             </>
           ) : (
             <div style={{ fontSize: 10, fontStyle: 'italic', lineHeight: 1.5 }}>{item.tasca}</div>

@@ -22,6 +22,7 @@ export interface PrintQueueItem {
   status: 'pending' | 'printing' | 'printed' | 'error';
   retryCount: number;
   printedAt?: number;
+  refinements?: string[];
 }
 
 export interface Submission {

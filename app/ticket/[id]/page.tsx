@@ -46,6 +46,7 @@ export default function TicketPage() {
         createdAt: Date.now(),
         status: 'pending',
         retryCount: 0,
+        refinements: submission.refinements ?? [],
       });
       setQueued(true);
     } catch {
@@ -155,9 +156,9 @@ export default function TicketPage() {
           {/* Left sidebar — instructions */}
           <div className="flex flex-col px-6 py-6 gap-5" style={{ width: 280, minWidth: 260, flexShrink: 0, borderRight: '1.5px solid var(--border)', position: 'sticky', top: 40, maxHeight: 'calc(100vh - 40px)', overflowY: 'auto' }}>
             <div>
-              <h1 className="text-xl font-black mb-1" style={{ color: 'var(--heading)' }}>Publicació i tiquet</h1>
+              <h1 className="text-xl font-black mb-1" style={{ color: 'var(--heading)' }}>Finalitza i comparteix</h1>
               <p className="text-sm leading-relaxed" style={{ color: 'var(--muted)' }}>
-                Últim pas — identifica el recurs i imprimeix el tiquet físic.
+                Últim pas — posa el nom al grup i envia el tiquet a la impressora.
               </p>
             </div>
             <div className="rounded-xl p-4 flex flex-col gap-2" style={{ background: '#f0fdfb', border: '1.5px solid #0d948825' }}>
@@ -201,6 +202,9 @@ export default function TicketPage() {
                   <div className="text-4xl">🎉</div>
                   <div className="text-xl font-black">Has acabat el workshop!</div>
                   <div className="text-sm opacity-80">El facilitador imprimirà el tiquet en breus.</div>
+                  <a href="/gallery" className="text-sm font-bold underline opacity-90 hover:opacity-100">
+                    Mireu la galeria per veure tots els recursos →
+                  </a>
                   <div className="text-xs opacity-60 pt-1 border-t" style={{ borderColor: 'rgba(255,255,255,0.2)' }}>Escaneja el QR del tiquet per accedir a la teva webapp</div>
                 </div>
               )}
@@ -267,8 +271,18 @@ export default function TicketPage() {
                 {hasCards && (
                   <div className="mt-3 pt-3 border-t" style={{ borderColor: 'var(--border)' }}>
                     <p className="text-xs italic leading-relaxed" style={{ color: 'var(--muted)' }}>
-                      &ldquo;...dins l&apos;eix de <strong>{parts[0]}</strong>, per a <strong>{parts[1]}</strong>, a través de <strong>{parts[2]}</strong>, per a <strong>{parts[3]}</strong>, estil <strong>{parts[4]}</strong>.&rdquo;
+                      &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de <strong>{parts[0]}</strong>, pensada perquè la faci servir <strong>{parts[1]}</strong>, a través de <strong>{parts[2]}</strong> que serveixi per a <strong>{parts[3]}</strong>, amb un estil <strong>{parts[4]}</strong>, que sigui coherent i fàcil d&apos;usar.&rdquo;
                     </p>
+                  </div>
+                )}
+                {submission.refinements && submission.refinements.length > 0 && (
+                  <div className="mt-2 pt-2 border-t flex flex-col gap-1" style={{ borderColor: 'var(--border)' }}>
+                    <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Millores aplicades</div>
+                    {submission.refinements.map((r, i) => (
+                      <div key={i} className="text-xs flex gap-1.5" style={{ color: 'var(--body)' }}>
+                        <span style={{ color: 'var(--muted)' }}>{i + 1}.</span><span>{r}</span>
+                      </div>
+                    ))}
                   </div>
                 )}
                 <div className="mt-3 pt-2 border-t flex items-center justify-between" style={{ borderColor: 'var(--border)' }}>
@@ -316,7 +330,7 @@ export default function TicketPage() {
                         </tbody>
                       </table>
                       <div style={{ borderTop: '1px dashed #ccc', paddingTop: 3, fontSize: 7, lineHeight: 1.5, fontStyle: 'italic', color: '#333' }}>
-                        &ldquo;...de <strong>{parts[0]}</strong>, per a <strong>{parts[1]}</strong>, via <strong>{parts[2]}</strong>, per a <strong>{parts[3]}</strong>, estil <strong>{parts[4]}</strong>.&rdquo;
+                        &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de <strong>{parts[0]}</strong>, pensada perquè la faci servir <strong>{parts[1]}</strong>, a través de <strong>{parts[2]}</strong> que serveixi per a <strong>{parts[3]}</strong>, amb un estil <strong>{parts[4]}</strong>, que sigui coherent i fàcil d&apos;usar.&rdquo;
                       </div>
                       {submission.refinements && submission.refinements.length > 0 && (
                         <div style={{ borderTop: '1px dashed #ccc', marginTop: 3, paddingTop: 3, fontSize: 7 }}>
