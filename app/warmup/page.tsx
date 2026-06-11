@@ -87,7 +87,7 @@ export default function WarmupPage() {
             ) : (
               <div>
                 <div className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--heading)' }}>
-                  El prompt que vam usar
+                  El pre-prompt que vam usar
                 </div>
                 <p className="text-sm leading-[2.4]" style={{ color: 'var(--body)' }}>
                   &ldquo;Crea una aplicació web emmarcada dins de l&apos;eix de{' '}

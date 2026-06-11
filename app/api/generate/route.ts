@@ -195,7 +195,7 @@ ${ESTIL_CONTEXT[estil] ?? estil}${extraContext ? `\n\n## CONTEXT ADDICIONAL DEL 
         const accio = selectedCards.find(c => c.group === 'Acció principal')?.value ?? '';
         const repte = selectedCards.find(c => c.group === 'Repte')?.value ?? '';
         const estil = selectedCards.find(c => c.group === 'Estil')?.value ?? '';
-        return `"Crea una aplicació web emmarcada dins l'eix de ${eix}, pensada perquè la faci servir ${usuari}, a través de ${accio} que serveixi per a ${repte}, amb un estil ${estil}, que sigui coherent i fàcil d'usar."`;
+        return `"Crea una aplicació web emmarcada dins de l'eix de ${eix}, pensada perquè la utilitzi ${usuari}, serveixi per ${repte}, a través de ${accio}, amb un estil ${estil}, que resulti coherent i fàcil d'usar."`;
       })();
 
   return `Ets un expert en disseny d'aplicacions educatives web per a l'escola catalana. La teva especialitat és crear eines digitals interactives, visualment atractives i 100% funcionals per a docents.

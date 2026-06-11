@@ -535,12 +535,6 @@ export default function CreatePage() {
   );
 }
 
-// ── Helpers ────────────────────────────────────────────────────────────────────
-
-function promptPreviewText(eix: string, usuari: string, accio: string, repte: string, estil: string) {
-  return `Crea una aplicació web emmarcada dins de l'eix de ${eix}, pensada perquè la utilitzi ${usuari}, serveixi per ${repte}, a través de ${accio}, amb un estil ${estil}, que resulti coherent i fàcil d'usar.`;
-}
-
 // ── Sub-components ─────────────────────────────────────────────────────────────
 
 function Blank({ label, color, bg, detected }: { label: string; color: string; bg: string; detected?: string }) {
