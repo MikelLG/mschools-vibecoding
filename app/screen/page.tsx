@@ -170,6 +170,29 @@ function ScreenContent() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const printingRef = useRef<Set<string>>(new Set());
 
+  // Print server detection — pings localhost:3131 every 30s
+  const [printServerActive, setPrintServerActive] = useState(false);
+  const [printServerPrinter, setPrintServerPrinter] = useState<string | null>(null);
+
+  useEffect(() => {
+    const check = async () => {
+      try {
+        const res = await fetch('http://localhost:3131/health', { signal: AbortSignal.timeout(2000) });
+        if (res.ok) {
+          const data = await res.json();
+          setPrintServerActive(true);
+          setPrintServerPrinter(data.printer ?? null);
+        } else throw new Error();
+      } catch {
+        setPrintServerActive(false);
+        setPrintServerPrinter(null);
+      }
+    };
+    check();
+    const id = setInterval(check, 30_000);
+    return () => clearInterval(id);
+  }, []);
+
   const openPrintWindow = (queueId: string) => {
     window.open(`/print/${queueId}`, `print_${queueId}`, 'width=480,height=700,popup=1');
   };
@@ -181,15 +204,15 @@ function ScreenContent() {
     return () => unsub();
   }, []);
 
-  // Auto-print: fire for each new pending item
+  // Auto-print: skip if print server is active (it handles printing directly)
   useEffect(() => {
-    if (!autoPrint) return;
+    if (!autoPrint || printServerActive) return;
     const pending = printQueue.filter(i => i.status === 'pending' && !printingRef.current.has(i.id));
     for (const item of pending) {
       printingRef.current.add(item.id);
       openPrintWindow(item.id);
     }
-  }, [printQueue, autoPrint]);
+  }, [printQueue, autoPrint, printServerActive]);
 
   const toggleAutoPrint = (val: boolean) => {
     setAutoPrint(val);
@@ -567,6 +590,14 @@ function ScreenContent() {
           <div className="flex items-center justify-between px-5 py-3 border-b" style={{ borderColor: 'var(--border)', background: '#f7f4f7' }}>
             <div className="flex items-center gap-3">
               <span className="font-bold text-sm" style={{ color: 'var(--heading)' }}>🖨️ Impressora</span>
+              {printServerActive
+                ? <span className="rounded-full px-2.5 py-0.5 text-xs font-bold" style={{ background: '#dcfce7', color: '#16a34a' }}>
+                    ● Servidor actiu{printServerPrinter ? ` · ${printServerPrinter}` : ''}
+                  </span>
+                : <span className="rounded-full px-2.5 py-0.5 text-xs font-bold" style={{ background: '#fff7ed', color: '#ea580c' }}>
+                    ○ Mode manual
+                  </span>
+              }
               {pendingCount > 0 && <span className="rounded-full px-2 py-0.5 text-xs font-black text-white" style={{ background: '#ea580c' }}>{pendingCount}</span>}
               {errorCount > 0 && <span className="rounded-full px-2 py-0.5 text-xs font-black text-white" style={{ background: '#dc2626' }}>⚠️ {errorCount} error{errorCount > 1 ? 's' : ''}</span>}
             </div>

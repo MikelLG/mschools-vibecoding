@@ -44,3 +44,6 @@ next-env.d.ts
 cards-context.md
 todo.md
 wip.md
+
+# print server — machine-specific config, never commit
+scripts/print-server.config.json
