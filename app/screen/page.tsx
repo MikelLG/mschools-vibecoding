@@ -232,6 +232,19 @@ function ScreenContent() {
     setSelectedIds(new Set());
   };
 
+  const resetSelected = async () => {
+    for (const id of selectedIds) {
+      await updatePrintQueueItem(id, { status: 'pending' });
+      printingRef.current.delete(id);
+    }
+    setSelectedIds(new Set());
+  };
+
+  const discardSelected = async () => {
+    for (const id of selectedIds) await updatePrintQueueItem(id, { status: 'error' });
+    setSelectedIds(new Set());
+  };
+
   const pendingCount = printQueue.filter(i => i.status === 'pending' || i.status === 'printing').length;
   const errorCount = printQueue.filter(i => i.status === 'error').length;
 
@@ -603,10 +616,20 @@ function ScreenContent() {
             </div>
             <div className="flex items-center gap-4">
               {selectedIds.size > 0 && (
-                <button onClick={reprintSelected} className="text-xs font-bold px-3 py-1.5 rounded-lg"
-                  style={{ background: 'var(--heading)', color: 'white' }}>
-                  Reimprimir {selectedIds.size} seleccionats
-                </button>
+                <div className="flex items-center gap-2">
+                  <button onClick={reprintSelected} className="text-xs font-bold px-3 py-1.5 rounded-lg"
+                    style={{ background: 'var(--heading)', color: 'white' }}>
+                    🖨 Reimprimir {selectedIds.size}
+                  </button>
+                  <button onClick={resetSelected} className="text-xs font-bold px-3 py-1.5 rounded-lg"
+                    style={{ background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe' }}>
+                    ↺ Reintentar {selectedIds.size}
+                  </button>
+                  <button onClick={discardSelected} className="text-xs font-bold px-3 py-1.5 rounded-lg"
+                    style={{ background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca' }}>
+                    ✕ Descarta {selectedIds.size}
+                  </button>
+                </div>
               )}
               <div className="flex items-center gap-2">
                 <span className="text-xs" style={{ color: 'var(--muted)' }}>Auto-impressió</span>
@@ -648,6 +671,18 @@ function ScreenContent() {
                     {new Date(item.createdAt).toLocaleTimeString('ca-ES', { hour: '2-digit', minute: '2-digit' })}
                   </span>
                   <span className="text-xs font-bold" style={{ color: statusColor }}>{statusLabel}</span>
+                  {item.status === 'printing' && <>
+                    <button onClick={() => { updatePrintQueueItem(item.id, { status: 'pending' }); printingRef.current.delete(item.id); }}
+                      className="text-xs px-2 py-1 rounded-lg font-bold"
+                      style={{ background: '#eff6ff', border: '1px solid #bfdbfe', color: '#2563eb' }}>
+                      ↺ Reintentar
+                    </button>
+                    <button onClick={() => updatePrintQueueItem(item.id, { status: 'error' })}
+                      className="text-xs px-2 py-1 rounded-lg font-bold"
+                      style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626' }}>
+                      ✕ Descarta
+                    </button>
+                  </>}
                   <button onClick={() => openPrintWindow(item.id)}
                     className="text-xs px-2 py-1 rounded-lg font-bold transition-all"
                     style={{ background: '#f7f4f7', border: '1px solid var(--border)', color: 'var(--muted)' }}>

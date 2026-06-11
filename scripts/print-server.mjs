@@ -64,7 +64,9 @@ const puppeteer              = (await import('puppeteer')).default;
 const { print: silentPrint } = await import('pdf-to-printer');
 
 // ── State ─────────────────────────────────────────────────────────────────────
-const processing = new Set();
+const processing = new Set();   // IDs already enqueued (avoid duplicates)
+const jobQueue   = [];          // sequential FIFO print queue
+let   isRunning  = false;       // true while a ticket is being printed
 let   pendingCount = 0;
 
 // ── Health server ─────────────────────────────────────────────────────────────
@@ -102,14 +104,26 @@ onSnapshot(
   snapshot => {
     snapshot.docChanges().forEach(change => {
       if (change.type === 'added' && !processing.has(change.doc.id)) {
-        pendingCount++;
         processing.add(change.doc.id);
-        printTicket(change.doc.id, change.doc.data());
+        pendingCount++;
+        jobQueue.push({ queueId: change.doc.id, item: change.doc.data() });
+        drain();
       }
     });
   },
   err => console.error('⚠️  Firestore error:', err.message)
 );
+
+// Process jobs one at a time in FIFO order
+function drain() {
+  if (isRunning || jobQueue.length === 0) return;
+  isRunning = true;
+  const { queueId, item } = jobQueue.shift();
+  printTicket(queueId, item).finally(() => {
+    isRunning = false;
+    drain(); // next job
+  });
+}
 
 // ── Print ─────────────────────────────────────────────────────────────────────
 async function printTicket(queueId, item) {
