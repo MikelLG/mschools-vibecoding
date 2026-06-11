@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { subscribeSubmissions, subscribeWorkshopTimer, updateWorkshopTimer, DEFAULT_TIMER, subscribePrintQueue, updatePrintQueueItem } from '@/lib/firebase';
 import type { Submission, WorkshopTimer, PrintQueueItem } from '@/lib/types';
 import { WORKSHOP_PHASES, getSecondsLeft } from '@/lib/workshop-phases';
+import { MSchoolsLogo } from '@/components/MSchoolsLogo';
 
 const SESSION_ID = process.env.NEXT_PUBLIC_SESSION_ID ?? 'mschools-2026';
 const FACILITATOR_PASSWORD = process.env.NEXT_PUBLIC_FACILITATOR_PASSWORD ?? 'mschools2026';
@@ -30,13 +31,8 @@ function LoginGate({ onAuth }: { onAuth: () => void }) {
         style={{ border: '1.5px solid #e5e0e5', boxShadow: '0 4px 32px rgba(94,36,64,0.08)' }}>
 
         {/* Logo */}
-        <div className="flex items-center justify-center gap-3 mb-2">
-          <div className="flex items-center gap-1">
-            <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 24, height: 24, background: '#00e082', borderRadius: 4, color: 'white', fontWeight: 900, fontSize: 14 }}>m</span>
-            <span style={{ fontWeight: 700, fontSize: 18, color: '#1a1a1a' }}>Schools</span>
-          </div>
-          <span style={{ color: '#d1c5d0', fontSize: 20 }}>|</span>
-          <span style={{ fontWeight: 700, fontSize: 18, color: '#5e2440' }}>Vibe Coding</span>
+        <div className="flex items-center justify-center mb-2">
+          <MSchoolsLogo size="lg" />
         </div>
 
         <div className="text-center">
@@ -338,7 +334,7 @@ function ScreenContent() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-lg font-black leading-none" style={{ color: 'var(--heading)' }}>
-                Vibe Coding · Pantalla
+                IA Lab · Pantalla
               </h1>
               <div className="flex items-center gap-2 mt-1">
                 <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--accent)' }} />

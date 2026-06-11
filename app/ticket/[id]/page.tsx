@@ -89,8 +89,6 @@ export default function TicketPage() {
             <button onClick={() => router.push(`/result/${id}`)} className="text-sm" style={{ color: 'var(--muted)' }}>← Tornar</button>
             <div className="flex items-center gap-2">
               <MSchoolsLogo size="sm" />
-              <span style={{ color: 'var(--border)', fontSize: 16 }}>·</span>
-              <span className="font-black text-sm" style={{ color: 'var(--heading)' }}>Vibe Coding</span>
             </div>
             <div className="w-16" />
           </header>
