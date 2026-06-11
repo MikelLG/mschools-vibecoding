@@ -193,7 +193,7 @@ export default function TicketPage() {
                   <button onClick={sendToQueue}
                     className="w-full rounded-xl py-4 text-lg font-black transition-all hover:opacity-90"
                     style={{ background: 'var(--heading)', color: 'white' }}>
-                    ✅ Finalitza i envia el tiquet
+                    ✅ Finalitza i comparteix
                   </button>
                   {queueError && <p className="text-xs text-center" style={{ color: '#dc2626' }}>⚠️ {queueError}</p>}
                 </>
@@ -202,10 +202,11 @@ export default function TicketPage() {
                   <div className="text-4xl">🎉</div>
                   <div className="text-xl font-black">Has acabat el workshop!</div>
                   <div className="text-sm opacity-80">El facilitador imprimirà el tiquet en breus.</div>
-                  <a href="/gallery" className="text-sm font-bold underline opacity-90 hover:opacity-100">
-                    Mireu la galeria per veure tots els recursos →
+                  <div className="text-sm opacity-90">Mireu la galeria per veure tots els recursos generats avui.</div>
+                  <a href="/gallery" className="text-sm font-black underline hover:opacity-80">
+                    → Obre la galeria
                   </a>
-                  <div className="text-xs opacity-60 pt-1 border-t" style={{ borderColor: 'rgba(255,255,255,0.2)' }}>Escaneja el QR del tiquet per accedir a la teva webapp</div>
+                  <div className="text-xs opacity-50 pt-1 border-t" style={{ borderColor: 'rgba(255,255,255,0.2)' }}>Escaneja el QR del tiquet per accedir a la teva webapp</div>
                 </div>
               )}
             </div>
