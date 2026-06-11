@@ -654,6 +654,24 @@ function ScreenContent() {
 
           {/* Queue / History list */}
           <div className="max-h-48 overflow-y-auto">
+            {(() => {
+              const visibleItems = printTab === 'cua'
+                ? printQueue.filter(i => i.status === 'pending' || i.status === 'printing')
+                : printQueue;
+              const allSelected = visibleItems.length > 0 && visibleItems.every(i => selectedIds.has(i.id));
+              const toggleAll = () => {
+                if (allSelected) setSelectedIds(new Set());
+                else setSelectedIds(new Set(visibleItems.map(i => i.id)));
+              };
+              return visibleItems.length > 0 && (
+                <div className="flex items-center gap-2 px-5 py-1.5 border-b" style={{ borderColor: '#f0eaf0', background: '#faf8fa' }}>
+                  <input type="checkbox" checked={allSelected} onChange={toggleAll} className="rounded" />
+                  <span className="text-xs" style={{ color: 'var(--muted)' }}>
+                    {allSelected ? 'Deselecciona tot' : `Selecciona tot (${visibleItems.length})`}
+                  </span>
+                </div>
+              );
+            })()}
             {(printTab === 'cua'
               ? printQueue.filter(i => i.status === 'pending' || i.status === 'printing')
               : printQueue
