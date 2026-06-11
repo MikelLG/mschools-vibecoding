@@ -26,35 +26,36 @@ function LoginGate({ onAuth }: { onAuth: () => void }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: '#f7f4f7' }}>
-      <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-10 w-full max-w-md flex flex-col gap-6"
-        style={{ border: '1.5px solid #e5e0e5', boxShadow: '0 4px 32px rgba(94,36,64,0.08)' }}>
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#fff' }}>
+      <form onSubmit={handleSubmit} className="bg-white w-full max-w-md flex flex-col gap-5"
+        style={{ border: '1.5px solid #d4bfc8', borderRadius: 16, padding: '40px 40px 36px' }}>
 
         {/* Logo */}
-        <div className="flex items-center justify-center mb-2">
+        <div className="flex justify-center mb-1">
           <MSchoolsLogo size="lg" />
         </div>
 
-        <div className="text-center">
-          <h1 className="text-xl font-black" style={{ color: '#5e2440' }}>Tauler del facilitador</h1>
-        </div>
+        <h1 className="text-center text-xl font-black" style={{ color: '#5e2440' }}>Vibe Coding</h1>
 
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-semibold" style={{ color: '#5e2440' }}>Contrasenya</label>
+        <div className="flex flex-col gap-1">
+          <label className="text-sm font-semibold" style={{ color: '#9e6070' }}>Contrasenya</label>
           <input
             type="password"
             value={password}
             onChange={e => { setPassword(e.target.value); setError(false); }}
             autoFocus
-            className="rounded-xl px-4 py-3 text-sm focus:outline-none"
-            style={{ border: error ? '1.5px solid #dc2626' : '1.5px solid #e5e0e5', background: '#fafafa' }}
+            className="rounded-lg px-4 py-3 text-sm focus:outline-none"
+            style={{
+              border: error ? '1.5px solid #dc2626' : '1.5px solid #d4bfc8',
+              background: '#f5f0f4',
+            }}
           />
-          {error && <p className="text-xs" style={{ color: '#dc2626' }}>Contrasenya incorrecta</p>}
+          {error && <p className="text-xs mt-1" style={{ color: '#dc2626' }}>Contrasenya incorrecta</p>}
         </div>
 
         <button type="submit"
-          className="w-full rounded-xl py-3 font-bold text-white text-base transition-all hover:opacity-90"
-          style={{ background: '#00e082', color: 'white' }}>
+          className="w-full rounded-lg py-3 font-bold text-white text-base transition-all hover:opacity-90"
+          style={{ background: '#5cb87a' }}>
           Entrar
         </button>
       </form>
