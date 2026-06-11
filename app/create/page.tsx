@@ -307,7 +307,7 @@ export default function CreatePage() {
             </>
           )}
           <div className="w-full rounded-2xl p-5" style={{ background: '#f7f4f7', border: '1px solid var(--border)' }}>
-            <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--muted)' }}>El teu prompt</div>
+            <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--muted)' }}>El teu pre-prompt</div>
             <p className="text-sm leading-[2.6]" style={{ color: 'var(--body)' }}>
               &ldquo;Crea una aplicació web emmarcada dins l&apos;eix de{' '}
               <Blank label="EIX" color="#0d9488" bg="#f0fdfb" detected={usingDigital ? eix : detectedCards.eix} />,{' '}
