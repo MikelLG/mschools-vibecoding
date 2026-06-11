@@ -260,12 +260,6 @@ export default function ResultPage() {
                 className="text-xs rounded-xl p-4 whitespace-pre-wrap leading-relaxed resize-y focus:outline-none"
                 style={{ background: 'white', border: `1px solid ${promptEdited ? '#0d9488' : 'var(--border)'}`, color: 'var(--body)', fontFamily: 'monospace' }}
               />
-              {promptEdited && (
-                <button onClick={handleRegenerate} disabled={regenerating} className="rounded-xl py-2.5 text-sm font-bold transition-all"
-                  style={regenerating ? { background: '#e8e2e8', color: 'var(--muted)', cursor: 'not-allowed' } : { background: '#0d9488', color: 'white' }}>
-                  {regenerating ? '⏳ Generant...' : '🔄 Regenerar amb aquest prompt'}
-                </button>
-              )}
             </div>
           )}
 
@@ -290,11 +284,25 @@ export default function ResultPage() {
             </div>
             {refineListening && <p className="text-xs animate-pulse" style={{ color: 'var(--accent)' }}>🔴 Escoltant...</p>}
             {refineError && <p className="text-xs" style={{ color: 'var(--accent)' }}>⚠️ {refineError}</p>}
-            <button onClick={handleRefine} disabled={!refineText.trim() || refining}
-              className="rounded-xl py-3 text-sm font-bold transition-all"
-              style={refineText.trim() && !refining ? { background: 'var(--heading)', color: 'white' } : { background: '#e8e2e8', color: 'var(--muted)', cursor: 'not-allowed' }}>
-              {refining ? <span>⏳ Millorant… <span className="font-normal text-xs opacity-70">Espera uns segons</span></span> : '✨ Aplicar millores'}
-            </button>
+            {(() => {
+              const busy = refining || regenerating;
+              const hasRefine = !!refineText.trim();
+              const canAct = !busy && (hasRefine || promptEdited);
+              const label = busy
+                ? <span>{hasRefine ? '⏳ Millorant…' : '⏳ Regenerant…'} <span className="font-normal text-xs opacity-70">Espera uns segons</span></span>
+                : hasRefine ? '✨ Aplica les millores'
+                : promptEdited ? '🔄 Regenera amb el prompt editat'
+                : '✨ Millora o regenera';
+              return (
+                <button
+                  onClick={() => { if (hasRefine) handleRefine(); else if (promptEdited) handleRegenerate(); }}
+                  disabled={!canAct}
+                  className="rounded-xl py-3 text-sm font-bold transition-all"
+                  style={canAct ? { background: 'var(--heading)', color: 'white' } : { background: '#e8e2e8', color: 'var(--muted)', cursor: 'not-allowed' }}>
+                  {label}
+                </button>
+              );
+            })()}
           </div>
         </div>
 
