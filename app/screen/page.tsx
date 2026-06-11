@@ -27,17 +27,17 @@ function LoginGate({ onAuth }: { onAuth: () => void }) {
 
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: '#fff' }}>
-      <form onSubmit={handleSubmit} className="bg-white w-full flex flex-col gap-5"
-        style={{ maxWidth: 420, border: '1.5px solid #c9a0b0', borderRadius: 12, padding: '44px 40px 40px' }}>
+      <form onSubmit={handleSubmit} className="bg-white w-full flex flex-col"
+        style={{ maxWidth: 380, border: '1.5px solid #c9a0b0', borderRadius: 12, padding: '48px 36px 44px', gap: 20 }}>
 
         {/* Logo */}
-        <div className="flex justify-center mb-2">
-          <img src="/mschools-ia-lab.png" alt="mSchools IA Lab" style={{ height: 40, width: 'auto' }} />
+        <div className="flex justify-center" style={{ marginBottom: 8 }}>
+          <img src="/mschools-ia-lab.png" alt="mSchools IA Lab" style={{ height: 44, width: 'auto' }} />
         </div>
 
-        <h1 className="text-center font-black" style={{ fontSize: 24, color: '#5e2440' }}>Vibe Coding</h1>
+        <h1 className="text-center font-black" style={{ fontSize: 26, color: '#5e2440', marginBottom: 4 }}>Vibe Coding</h1>
 
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col" style={{ gap: 6 }}>
           <label className="text-sm font-semibold" style={{ color: '#9e6070' }}>Contrasenya</label>
           <input
             type="password"
@@ -46,7 +46,7 @@ function LoginGate({ onAuth }: { onAuth: () => void }) {
             autoFocus
             className="rounded-lg px-4 text-sm focus:outline-none"
             style={{
-              height: 50,
+              height: 52,
               border: error ? '1.5px solid #dc2626' : '1.5px solid #c4cadc',
               background: '#eef1f8',
             }}
@@ -56,7 +56,7 @@ function LoginGate({ onAuth }: { onAuth: () => void }) {
 
         <button type="submit"
           className="w-full rounded-lg font-bold text-white text-base transition-all hover:opacity-90"
-          style={{ height: 50, background: '#5cb87a' }}>
+          style={{ height: 52, background: '#5cb87a', marginTop: 4 }}>
           Entrar
         </button>
       </form>
