@@ -100,11 +100,14 @@ export default function ResultPage() {
         throw new Error(errData.error || 'Error regenerant');
       }
       const { submission: newSub } = await res.json() as { submission: Submission };
-      const { saveSubmission } = await import('@/lib/firebase');
-      await saveSubmission(newSub);
-      router.push(`/result/${newSub.id}`);
+      // Update the existing submission in place — no new entry, no redirect
+      await updateSubmission(submission.id, { htmlOutput: newSub.htmlOutput, prompt: editablePrompt });
+      setSubmission(prev => prev ? { ...prev, htmlOutput: newSub.htmlOutput, prompt: editablePrompt } : prev);
+      setEditablePrompt(editablePrompt);
+      setPromptEdited(false);
     } catch (err) {
       setRefineError((err as Error).message || 'Error inesperat');
+    } finally {
       setRegenerating(false);
     }
   };
