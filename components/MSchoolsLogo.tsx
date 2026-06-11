@@ -1,21 +1,16 @@
 export function MSchoolsLogo({ size = 'md', subBrand = 'IA Lab' }: { size?: 'sm' | 'md' | 'lg'; subBrand?: string | null }) {
-  const s = size === 'sm' ? { box: 16, font: 11, gap: 4, text: 14, divH: 16 }
-    : size === 'lg' ? { box: 28, font: 18, gap: 8, text: 22, divH: 28 }
-    : { box: 20, font: 13, gap: 6, text: 16, divH: 20 };
+  const h = size === 'sm' ? 20 : size === 'lg' ? 36 : 26;
+
+  if (subBrand === 'IA Lab') {
+    return <img src="/mschools-ia-lab.png" alt="mSchools IA Lab" style={{ height: h, width: 'auto' }} />;
+  }
 
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: s.gap }}>
-      <span style={{
-        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        width: s.box, height: s.box,
-        background: '#00e082', borderRadius: 3,
-        color: 'white', fontWeight: 900, fontSize: s.font, lineHeight: 1,
-        fontFamily: 'inherit',
-      }}>m</span>
-      <span style={{ fontWeight: 700, fontSize: s.text, color: '#5e2440', letterSpacing: -0.3 }}>Schools</span>
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+      <img src="/mschools.png" alt="mSchools" style={{ height: h, width: 'auto' }} />
       {subBrand && <>
-        <span style={{ width: 1, height: s.divH, background: '#c9b8c5', display: 'inline-block', flexShrink: 0 }} />
-        <span style={{ fontWeight: 700, fontSize: s.text, color: '#5e2440', letterSpacing: -0.3 }}>{subBrand}</span>
+        <span style={{ width: 1, height: h, background: '#c9b8c5', display: 'inline-block', flexShrink: 0 }} />
+        <span style={{ fontWeight: 700, fontSize: h * 0.65, color: '#5e2440', letterSpacing: -0.3 }}>{subBrand}</span>
       </>}
     </span>
   );
