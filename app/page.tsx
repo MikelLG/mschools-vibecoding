@@ -54,10 +54,11 @@ export default function Home() {
     <main className="min-h-screen" style={{ background: 'var(--bg)' }}>
 
       {/* Nav */}
-      <nav className="flex items-center justify-between px-8 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
+      <nav className="relative flex items-center justify-between px-8 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
         <div className="flex items-center gap-3">
           <MSchoolsLogo />
         </div>
+        <span className="absolute left-1/2 -translate-x-1/2 font-black text-base tracking-tight" style={{ color: 'var(--heading)' }}>Vibe Coding</span>
         <div className="flex items-center gap-3">
           <Link href="/guiadocent" className="text-sm font-medium px-4 py-2 rounded-lg" style={{ color: 'var(--muted)' }}>
             Guia docent

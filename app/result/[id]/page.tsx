@@ -162,7 +162,7 @@ export default function ResultPage() {
         <button onClick={() => router.push('/')} className="text-sm transition-colors" style={{ color: 'var(--muted)' }}>
           ← Inici
         </button>
-        <div className="flex items-center gap-2"><MSchoolsLogo size="sm" /></div>
+        <div className="flex items-center gap-2"><MSchoolsLogo size="sm" /><span style={{ color: 'var(--border)', fontSize: 14 }}>·</span><span className="font-black text-sm" style={{ color: 'var(--heading)' }}>Vibe Coding</span></div>
         <button
           onClick={() => router.push('/create')}
           className="text-sm rounded-lg px-3 py-1.5 transition-all"

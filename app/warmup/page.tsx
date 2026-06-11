@@ -38,6 +38,8 @@ export default function WarmupPage() {
         <button onClick={() => router.push('/')} className="text-sm" style={{ color: 'var(--muted)' }}>← Inici</button>
         <div className="flex items-center gap-2">
           <MSchoolsLogo size="sm" />
+          <span style={{ color: 'var(--border)', fontSize: 14 }}>·</span>
+          <span className="font-black text-sm" style={{ color: 'var(--heading)' }}>Vibe Coding</span>
         </div>
         <div className="w-16" />
       </header>
