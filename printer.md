@@ -39,7 +39,10 @@ cd mschools-vibecoding
 npm install
 ```
 
-> `npm install` descarrega Chromium (~150 MB) per a Puppeteer — pot trigar uns minuts.
+> `npm install` descarrega Puppeteer però no sempre baixa Chrome automàticament. Si veus un error "Could not find Chrome", executa:
+> ```
+> npx puppeteer browsers install chrome
+> ```
 
 ### 3. Copiar el fitxer d'entorn
 

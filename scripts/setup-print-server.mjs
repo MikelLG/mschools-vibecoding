@@ -131,6 +131,17 @@ async function main() {
     }
   }
 
+  // ── Ensure Puppeteer's bundled Chrome is downloaded ───────────────────────
+  console.log('\n🌐  Checking Puppeteer Chrome download...');
+  try {
+    run('npx puppeteer browsers install chrome', { stdio: 'inherit' });
+    console.log('✅  Chrome ready.');
+  } catch (e) {
+    console.error('❌  Could not download Chrome:', e.message);
+    console.error('    Run manually: npx puppeteer browsers install chrome');
+    rl.close(); process.exit(1);
+  }
+
   // ── 5. Detect printers ────────────────────────────────────────────────────
   console.log('\n🖨️   Detecting system printers...');
   let printers = [];
