@@ -100,7 +100,7 @@ export default function TicketPage() {
         {/* ── Thermal receipt — only visible when printing ─────────────────── */}
         <div className="thermal-print" style={{ fontFamily: "'Arial', sans-serif", fontSize: 11, color: '#000', background: '#fff', width: '100%' }}>
           <div style={{ textAlign: 'center', padding: '6px 0 10px' }}>
-            <div style={{ marginBottom: 4 }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 4 }}>
               <img src="/mschools-ia-lab.png" alt="mSchools IA Lab" style={{ height: 22, width: 'auto' }} />
             </div>
             <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: 2, textTransform: 'uppercase' }}>Vibe Coding · mSchools 2026</div>
@@ -301,7 +301,7 @@ export default function TicketPage() {
                 border: '1px solid #ddd',
               }}>
                 <div style={{ textAlign: 'center', paddingBottom: 6 }}>
-                  <div style={{ marginBottom: 2 }}>
+                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 2 }}>
                     <img src="/mschools-ia-lab.png" alt="mSchools IA Lab" style={{ height: 16, width: 'auto' }} />
                   </div>
                   <div style={{ fontSize: 7, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase' }}>Vibe Coding · mSchools 2026</div>
