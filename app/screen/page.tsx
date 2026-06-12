@@ -661,9 +661,9 @@ function ScreenContent() {
           {/* Queue / History list */}
           <div className="max-h-48 overflow-y-auto">
             {(() => {
-              const visibleItems = printTab === 'cua'
+              const visibleItems = (printTab === 'cua'
                 ? printQueue.filter(i => i.status === 'pending' || i.status === 'printing')
-                : printQueue;
+                : printQueue).slice().reverse();
               const allSelected = visibleItems.length > 0 && visibleItems.every(i => selectedIds.has(i.id));
               const toggleAll = () => {
                 if (allSelected) setSelectedIds(new Set());
@@ -681,7 +681,7 @@ function ScreenContent() {
             {(printTab === 'cua'
               ? printQueue.filter(i => i.status === 'pending' || i.status === 'printing')
               : printQueue
-            ).map(item => {
+            ).slice().reverse().map(item => {
               const statusColor = { pending: '#ea580c', printing: '#2563eb', printed: '#16a34a', error: '#dc2626' }[item.status];
               const statusLabel = { pending: '🟡 Pendent', printing: '🔵 Imprimint...', printed: '✓ Imprès', error: '❌ Error' }[item.status];
               return (
