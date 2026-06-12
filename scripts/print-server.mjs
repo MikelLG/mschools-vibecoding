@@ -11,8 +11,7 @@
 
 import { createServer }           from 'http';
 import { existsSync, readFileSync } from 'fs';
-import { unlink }                 from 'fs/promises';
-import { tmpdir }                 from 'os';
+import { spawn }                  from 'child_process';
 import { join, dirname }          from 'path';
 import { fileURLToPath }          from 'url';
 
@@ -59,9 +58,8 @@ const db = getFirestore(initializeApp({
   appId:             env.NEXT_PUBLIC_FIREBASE_APP_ID,
 }));
 
-// ── Puppeteer + pdf-to-printer ────────────────────────────────────────────────
-const puppeteer              = (await import('puppeteer')).default;
-const { print: silentPrint } = await import('pdf-to-printer');
+// ── Python ESC/POS script path ────────────────────────────────────────────────
+const ESCPOS_SCRIPT = join(__DIR, 'escpos_ticket.py');
 
 // ── State ─────────────────────────────────────────────────────────────────────
 const processing = new Set();   // IDs already enqueued (avoid duplicates)
@@ -130,7 +128,7 @@ async function printTicket(queueId, item) {
   const label = item.pairName || `#${queueId.slice(0, 8)}`;
   const ts = () => new Date().toLocaleTimeString('ca-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
-  console.log(`⏳ [${ts()}] Rebut: "${label}" — renderitzant...`);
+  console.log(`⏳ [${ts()}] Rebut: "${label}" — imprimint via ESC/POS...`);
 
   try {
     // Atomic claim — if another server instance already picked this up, skip it
@@ -146,27 +144,26 @@ async function printTicket(queueId, item) {
       return;
     }
 
-    // Render the existing /print/[queueId] page with headless Chromium
-    const browser = await puppeteer.launch({ headless: true });
-    const page    = await browser.newPage();
-    await page.goto(`${config.serverUrl}/print/${queueId}`, {
-      waitUntil: 'networkidle0',
-      timeout:   30_000,
+    // Send ESC/POS ticket via Python script (bypasses PDF/driver issues)
+    const ticketData = JSON.stringify({
+      printerName: config.printerName,
+      pairName:    item.pairName || '',
+      tasca:       item.tasca   || '',
+      appUrl:      item.appUrl  || `${config.serverUrl}/app/${item.submissionId || queueId}`,
     });
 
-    // Generate PDF at thermal receipt width (80mm)
-    const pdfPath = join(tmpdir(), `vibe-ticket-${queueId}.pdf`);
-    await page.pdf({
-      path:            pdfPath,
-      width:           '80mm',
-      printBackground: true,
-      margin:          { top: 0, right: 0, bottom: '4mm', left: 0 },
+    await new Promise((resolve, reject) => {
+      const proc = spawn('python', [ESCPOS_SCRIPT]);
+      let stderr = '';
+      proc.stderr.on('data', d => { stderr += d; });
+      proc.on('close', code => {
+        if (code === 0) resolve();
+        else reject(new Error(stderr.trim() || `Python exited with code ${code}`));
+      });
+      proc.on('error', err => reject(new Error(`Cannot run Python: ${err.message}`)));
+      proc.stdin.write(ticketData);
+      proc.stdin.end();
     });
-    await browser.close();
-
-    // Print silently (pdf-to-printer uses SumatraPDF on Windows, lp on Mac/Linux)
-    await silentPrint(pdfPath, { printer: config.printerName, silent: true });
-    await unlink(pdfPath).catch(() => {});
 
     await updateDoc(doc(db, 'printQueue', queueId), { status: 'printed', printedAt: Date.now() });
     console.log(`✅ [${ts()}] Imprès: "${label}"`);
