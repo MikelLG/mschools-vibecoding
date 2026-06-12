@@ -106,7 +106,8 @@ function keyWords(s: string): string[] {
 }
 
 function matchScore(cardValue: string, t: string): number {
-  const kw = keyWords(cardValue);
+  // Strip parenthetical annotations so "(botons, controls...)" doesn't dilute the score
+  const kw = keyWords(cardValue.replace(/\([^)]*\)/g, ''));
   if (!kw.length) return 0;
   return kw.filter(w => t.includes(w)).length / kw.length;
 }
