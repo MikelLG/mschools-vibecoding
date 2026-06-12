@@ -371,9 +371,11 @@ function ScreenContent() {
           {/* Top row: title + workshop total + live */}
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-lg font-black leading-none" style={{ color: 'var(--heading)' }}>
-                IA Lab · Pantalla
-              </h1>
+              <div className="flex items-center gap-2">
+                <MSchoolsLogo size="sm" subBrand="IA Lab" />
+                <span className="font-black text-sm" style={{ color: 'var(--muted)' }}>·</span>
+                <span className="font-black text-sm" style={{ color: 'var(--heading)' }}>Vibe Coding</span>
+              </div>
               <div className="flex items-center gap-2 mt-1">
                 <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--accent)' }} />
                 <span className="text-xs font-mono" style={{ color: 'var(--muted)' }}>

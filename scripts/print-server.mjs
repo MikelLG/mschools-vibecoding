@@ -47,7 +47,7 @@ const config = JSON.parse(readFileSync(configPath, 'utf8'));
 // ── Firebase ──────────────────────────────────────────────────────────────────
 const { initializeApp }    = await import('firebase/app');
 const {
-  getFirestore, collection, query, where, onSnapshot, updateDoc, doc,
+  getFirestore, collection, query, where, onSnapshot, updateDoc, doc, runTransaction,
 } = await import('firebase/firestore');
 
 const db = getFirestore(initializeApp({
@@ -133,7 +133,18 @@ async function printTicket(queueId, item) {
   console.log(`⏳ [${ts()}] Rebut: "${label}" — renderitzant...`);
 
   try {
-    await updateDoc(doc(db, 'printQueue', queueId), { status: 'printing' });
+    // Atomic claim — if another server instance already picked this up, skip it
+    const docRef = doc(db, 'printQueue', queueId);
+    const claimed = await runTransaction(db, async (tx) => {
+      const snap = await tx.get(docRef);
+      if (snap.data()?.status !== 'pending') return false;
+      tx.update(docRef, { status: 'printing' });
+      return true;
+    });
+    if (!claimed) {
+      console.log(`⏭️  [${ts()}] Saltat: "${label}" (ja en procés)`);
+      return;
+    }
 
     // Render the existing /print/[queueId] page with headless Chromium
     const browser = await puppeteer.launch({ headless: true });
