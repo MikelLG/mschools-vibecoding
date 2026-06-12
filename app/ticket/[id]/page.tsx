@@ -310,8 +310,8 @@ export default function TicketPage() {
                   <div style={{ fontSize: 6, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 1 }}>Grup</div>
                   <div style={{ fontWeight: 900, fontSize: 15, letterSpacing: 0.5 }}>{displayName || <span style={{ color: '#aaa' }}>—</span>}</div>
                 </div>
-                <div style={{ textAlign: 'center', margin: '0 0 3px' }}>
-                  {appUrl && <QRCode value={appUrl} size={150} style={{ maxWidth: '100%' }} />}
+                <div style={{ display: 'flex', justifyContent: 'center', margin: '0 0 3px' }}>
+                  {appUrl && <QRCode value={appUrl} size={150} />}
                 </div>
                 <div style={{ textAlign: 'center', fontSize: 6, marginBottom: 6, color: '#555', wordBreak: 'break-all', padding: '0 2px' }}>{appUrl}</div>
                 <div style={{ borderTop: '2px solid #000', paddingTop: 5 }}>

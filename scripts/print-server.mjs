@@ -9,11 +9,12 @@
  * Every day:  npm run print-server
  */
 
-import { createServer }           from 'http';
+import { createServer }             from 'http';
 import { existsSync, readFileSync } from 'fs';
-import { spawn }                  from 'child_process';
-import { join, dirname }          from 'path';
-import { fileURLToPath }          from 'url';
+import { unlink }                   from 'fs/promises';
+import { tmpdir }                   from 'os';
+import { join, dirname }            from 'path';
+import { fileURLToPath }            from 'url';
 
 const __DIR = dirname(fileURLToPath(import.meta.url));
 const ROOT  = join(__DIR, '..');
@@ -58,8 +59,8 @@ const db = getFirestore(initializeApp({
   appId:             env.NEXT_PUBLIC_FIREBASE_APP_ID,
 }));
 
-// ── Python ESC/POS script path ────────────────────────────────────────────────
-const ESCPOS_SCRIPT = join(__DIR, 'escpos_ticket.py');
+// ── Puppeteer ─────────────────────────────────────────────────────────────────
+const puppeteer = (await import('puppeteer')).default;
 
 // ── State ─────────────────────────────────────────────────────────────────────
 const processing = new Set();   // IDs already enqueued (avoid duplicates)
@@ -128,7 +129,7 @@ async function printTicket(queueId, item) {
   const label = item.pairName || `#${queueId.slice(0, 8)}`;
   const ts = () => new Date().toLocaleTimeString('ca-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
-  console.log(`⏳ [${ts()}] Rebut: "${label}" — imprimint via ESC/POS...`);
+  console.log(`⏳ [${ts()}] Rebut: "${label}" — renderitzant...`);
 
   try {
     // Atomic claim — if another server instance already picked this up, skip it
@@ -144,26 +145,27 @@ async function printTicket(queueId, item) {
       return;
     }
 
-    // Send ESC/POS ticket via Python script (bypasses PDF/driver issues)
-    const ticketData = JSON.stringify({
-      printerName: config.printerName,
-      pairName:    item.pairName || '',
-      tasca:       item.tasca   || '',
-      appUrl:      item.appUrl  || `${config.serverUrl}/app/${item.submissionId || queueId}`,
+    // Open print page in Chrome with --kiosk-printing: window.print() fires silently
+    // to the Windows default printer — make sure CK710 Printer (2) is set as default
+    const browser = await puppeteer.launch({
+      headless: false,
+      args: [
+        '--kiosk-printing',
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--window-size=480,700',
+        '--window-position=-10000,0',
+      ],
     });
-
-    await new Promise((resolve, reject) => {
-      const proc = spawn('python', [ESCPOS_SCRIPT]);
-      let stderr = '';
-      proc.stderr.on('data', d => { stderr += d; });
-      proc.on('close', code => {
-        if (code === 0) resolve();
-        else reject(new Error(stderr.trim() || `Python exited with code ${code}`));
-      });
-      proc.on('error', err => reject(new Error(`Cannot run Python: ${err.message}`)));
-      proc.stdin.write(ticketData);
-      proc.stdin.end();
+    const page = await browser.newPage();
+    await page.goto(`${config.serverUrl}/print/${queueId}`, {
+      waitUntil: 'load',
+      timeout:   30_000,
     });
+    // Page calls window.print() after 300ms — kiosk mode prints silently
+    // Wait for print job to be submitted to spooler
+    await new Promise(r => setTimeout(r, 5000));
+    await browser.close().catch(() => {});
 
     await updateDoc(doc(db, 'printQueue', queueId), { status: 'printed', printedAt: Date.now() });
     console.log(`✅ [${ts()}] Imprès: "${label}"`);

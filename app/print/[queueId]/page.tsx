@@ -51,9 +51,9 @@ export default function PrintPage() {
 
         {/* Header */}
         <div style={{ textAlign: 'center', paddingBottom: 10, marginBottom: 8, borderBottom: '3px solid #000' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22, background: '#000', borderRadius: 3, color: '#fff', fontWeight: 900, fontSize: 13 }}>m</span>
-            <span style={{ fontWeight: 800, fontSize: 16 }}>Schools</span>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 4 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/mschools-ia-lab.png" alt="mSchools IA Lab" style={{ height: 20, width: 'auto' }} />
           </div>
           <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: 2, textTransform: 'uppercase' }}>Vibe Coding · mSchools 2026</div>
         </div>
@@ -65,8 +65,8 @@ export default function PrintPage() {
         </div>
 
         {/* QR */}
-        <div style={{ textAlign: 'center', marginBottom: 6 }}>
-          <QRCode value={item.appUrl} size={200} style={{ maxWidth: '100%' }} />
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6 }}>
+          <QRCode value={item.appUrl} size={200} />
         </div>
         <div style={{ textAlign: 'center', fontSize: 8, marginBottom: 10, color: '#444', wordBreak: 'break-all' }}>
           {item.appUrl}
