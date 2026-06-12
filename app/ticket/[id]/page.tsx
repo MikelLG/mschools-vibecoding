@@ -100,9 +100,8 @@ export default function TicketPage() {
         {/* ── Thermal receipt — only visible when printing ─────────────────── */}
         <div className="thermal-print" style={{ fontFamily: "'Arial', sans-serif", fontSize: 11, color: '#000', background: '#fff', width: '100%' }}>
           <div style={{ textAlign: 'center', padding: '6px 0 10px' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22, background: '#000', borderRadius: 3, color: '#fff', fontWeight: 900, fontSize: 13 }}>m</span>
-              <span style={{ fontWeight: 800, fontSize: 16, letterSpacing: -0.5 }}>Schools</span>
+            <div style={{ marginBottom: 4 }}>
+              <img src="/mschools-ia-lab.png" alt="mSchools IA Lab" style={{ height: 22, width: 'auto' }} />
             </div>
             <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: 2, textTransform: 'uppercase' }}>Vibe Coding · mSchools 2026</div>
           </div>
@@ -302,9 +301,8 @@ export default function TicketPage() {
                 border: '1px solid #ddd',
               }}>
                 <div style={{ textAlign: 'center', paddingBottom: 6 }}>
-                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 3, marginBottom: 2 }}>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 16, height: 16, background: '#000', borderRadius: 2, color: '#fff', fontWeight: 900, fontSize: 10 }}>m</span>
-                    <span style={{ fontWeight: 800, fontSize: 12, letterSpacing: -0.5 }}>Schools</span>
+                  <div style={{ marginBottom: 2 }}>
+                    <img src="/mschools-ia-lab.png" alt="mSchools IA Lab" style={{ height: 16, width: 'auto' }} />
                   </div>
                   <div style={{ fontSize: 7, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase' }}>Vibe Coding · mSchools 2026</div>
                 </div>
