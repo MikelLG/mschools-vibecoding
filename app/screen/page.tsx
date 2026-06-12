@@ -450,7 +450,7 @@ function ScreenContent() {
 
             <div className="px-6 py-4 flex items-center justify-between gap-6">
               {/* Time */}
-              <div className="flex flex-col">
+              <div className="flex flex-col flex-shrink-0">
                 <div
                   className="font-mono font-black tabular-nums leading-none"
                   style={{ fontSize: '5rem', color: timerColor }}
@@ -463,12 +463,16 @@ function ScreenContent() {
                     : `Fase ${timer.phase} · ${timer.phaseLabel}`
                   }
                 </div>
-                {timer.instruction && !notStarted && (
-                  <div className="text-xs mt-0.5" style={{ color: timerColor, opacity: 0.65 }}>
-                    {timer.instruction}
-                  </div>
-                )}
               </div>
+
+              {/* Centered instruction */}
+              {timer.instruction && !notStarted && (
+                <div className="flex-1 text-center px-4">
+                  <span className="text-xl font-semibold" style={{ color: timerColor, opacity: 0.75 }}>
+                    {timer.instruction}
+                  </span>
+                </div>
+              )}
 
               {/* Controls */}
               <div className="flex flex-col gap-3 flex-shrink-0">

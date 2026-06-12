@@ -125,8 +125,8 @@ export default function WarmupPage() {
           </div>
           <iframe
             key={example.id}
-            srcDoc={example.html}
-            style={{ width: '100%', height: '85vh', border: 'none', display: 'block' }}
+            srcDoc={example.html.replace('</head>', '<style>body{overflow:auto!important;height:auto!important;min-height:100%}</style></head>')}
+            style={{ width: '100%', height: 'calc(100vh - 120px)', border: 'none', display: 'block' }}
             sandbox="allow-scripts allow-forms"
             title={example.title}
           />

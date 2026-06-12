@@ -47,24 +47,26 @@ export default function AppRunnerPage() {
     <div className="h-screen w-screen overflow-hidden bg-white relative" onMouseMove={() => setShowBar(true)}>
       {/* Hover bar */}
       <div
-        className={`absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-2 bg-[#0a0a0a]/90 backdrop-blur border-b border-[#1a1a1a] transition-all duration-300 ${
+        className={`absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-2 bg-white/95 backdrop-blur border-b transition-all duration-300 ${
           showBar ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
         }`}
+        style={{ borderColor: 'var(--border)' }}
       >
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.back()}
-            className="text-xs text-[#888] hover:text-white transition-colors"
+            className="text-xs transition-colors"
+            style={{ color: 'var(--muted)' }}
           >
             ← Enrere
           </button>
-          <span className="text-xs text-[#555]">|</span>
-          <span className="text-xs text-[#555] max-w-xs truncate">{submission.tasca || submission.formatLabel}</span>
+          <span className="text-xs" style={{ color: 'var(--border)' }}>|</span>
+          <span className="text-xs max-w-xs truncate" style={{ color: 'var(--muted)' }}>{submission.tasca || submission.formatLabel}</span>
         </div>
         <div className="flex items-center gap-2">
           <MSchoolsLogo size="sm" />
           {submission.pairName && (
-            <span className="text-xs text-[#888]">— {submission.pairName}</span>
+            <span className="text-xs" style={{ color: 'var(--muted)' }}>— {submission.pairName}</span>
           )}
         </div>
       </div>
