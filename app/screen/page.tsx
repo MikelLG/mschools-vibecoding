@@ -128,6 +128,7 @@ function ScreenContent() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [showNew, setShowNew] = useState(false);
   const [latestId, setLatestId] = useState<string | null>(null);
+  const [previewSub, setPreviewSub] = useState<Submission | null>(null);
 
   // Firestore-backed phase timer
   const [timer, setTimer] = useState<WorkshopTimer>(DEFAULT_TIMER);
@@ -729,20 +730,97 @@ function ScreenContent() {
         <div className="flex-1 p-6">
           <div className={`grid gap-5 ${cols}`}>
             {submissions.map(s => (
-              <ScreenCard key={s.id} submission={s} isNew={s.id === latestId && showNew} />
+              <ScreenCard key={s.id} submission={s} isNew={s.id === latestId && showNew} onOpen={() => setPreviewSub(s)} />
             ))}
           </div>
         </div>
+      )}
+
+      {/* App preview modal */}
+      {previewSub && (
+        <AppPreviewModal submission={previewSub} onClose={() => setPreviewSub(null)} />
       )}
     </main>
   );
 }
 
-function ScreenCard({ submission: s, isNew }: { submission: Submission; isNew: boolean }) {
+function AppPreviewModal({ submission: s, onClose }: { submission: Submission; onClose: () => void }) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [onClose]);
+
+  const eix = EIXOS.find(e => e.value === s.contextTheme || e.value === s.contextThemeLabel);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}
+      onClick={onClose}
+    >
+      <div
+        className="relative flex flex-col rounded-2xl overflow-hidden"
+        style={{ width: '90vw', height: '90vh', background: 'white', boxShadow: '0 24px 80px rgba(0,0,0,0.4)' }}
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Modal header */}
+        <div className="flex items-center justify-between px-5 py-3 flex-shrink-0 border-b" style={{ borderColor: 'var(--border)', background: '#f7f4f7' }}>
+          <div className="flex items-center gap-3 min-w-0">
+            {eix && (
+              <span className="rounded-full px-2.5 py-0.5 text-xs font-bold flex-shrink-0"
+                style={{ background: eix.bg, color: eix.color }}>
+                {eix.emoji} {eix.value}
+              </span>
+            )}
+            <span className="font-bold text-sm truncate" style={{ color: 'var(--heading)' }}>
+              {s.formatLabel || 'Recurs educatiu'}
+            </span>
+            {s.pairName && (
+              <span className="text-xs font-bold flex-shrink-0" style={{ color: 'var(--accent)' }}>{s.pairName}</span>
+            )}
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0 ml-4">
+            <span className="text-xs" style={{ color: 'var(--muted)' }}>Esc per tancar</span>
+            <a
+              href={`/app/${s.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg px-3 py-1.5 text-xs font-bold transition-all hover:opacity-80"
+              style={{ background: 'var(--heading)', color: 'white' }}
+            >
+              ↗ Obrir
+            </a>
+            <button
+              onClick={onClose}
+              className="rounded-lg px-3 py-1.5 text-xs font-bold transition-all hover:opacity-80"
+              style={{ background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca' }}
+            >
+              ✕ Tancar
+            </button>
+          </div>
+        </div>
+        {/* Full app iframe */}
+        <iframe
+          srcDoc={s.htmlOutput}
+          className="flex-1 w-full"
+          sandbox="allow-scripts allow-forms"
+          title={s.formatLabel}
+        />
+      </div>
+    </div>
+  );
+}
+
+function ScreenCard({ submission: s, isNew, onOpen }: { submission: Submission; isNew: boolean; onOpen: () => void }) {
   const eix = EIXOS.find(e => e.value === s.contextTheme || e.value === s.contextThemeLabel);
   return (
-    <a href={`/app/${s.id}`} target="_blank" rel="noopener noreferrer"
-      className="flex flex-col rounded-2xl overflow-hidden transition-all hover:scale-[1.02]"
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={onOpen}
+      onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') onOpen(); }}
+      className="flex flex-col rounded-2xl overflow-hidden transition-all hover:scale-[1.02] cursor-pointer"
       style={{
         border: isNew ? `2px solid var(--accent)` : '1.5px solid var(--border)',
         background: 'var(--bg)',
@@ -771,6 +849,6 @@ function ScreenCard({ submission: s, isNew }: { submission: Submission; isNew: b
         <p className="text-xs line-clamp-2" style={{ color: 'var(--muted)' }}>{s.tasca}</p>
         {s.pairName && <div className="mt-1 text-xs font-bold" style={{ color: 'var(--accent)' }}>{s.pairName}</div>}
       </div>
-    </a>
+    </div>
   );
 }

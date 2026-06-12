@@ -47,7 +47,7 @@ const REPTES_PER_USUARI: Record<string, { value: string; emoji: string }[]> = {
     { value: 'Emplenar formularis', emoji: '📋' },
     { value: 'Preparar entrevistes', emoji: '🗣️' },
     { value: 'Comprendre rutines', emoji: '🗓️' },
-    { value: 'Cuidar el benestar', emoji: '💙' },
+    { value: 'Acompanyar benestar', emoji: '💙' },
     { value: 'Seguiment del procés d\'aprenentatge', emoji: '📈' },
     { value: 'Complementar l\'aprenentatge des de casa', emoji: '🏠' },
   ],
@@ -156,6 +156,9 @@ export default function CreatePage() {
   const [accio, setAccio] = useState('');
   const [estil, setEstil] = useState('');
 
+  const [listeningExtra, setListeningExtra] = useState(false);
+  const extraRecRef = useRef<SpeechRecognition | null>(null);
+
   // Generation state
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState('');
@@ -195,17 +198,35 @@ export default function CreatePage() {
   }, [listening]);
 
   const startExtraVoice = useCallback(() => {
+    if (listeningExtra) {
+      extraRecRef.current?.stop();
+      return;
+    }
     const SR = (window as unknown as { SpeechRecognition?: typeof SpeechRecognition; webkitSpeechRecognition?: typeof SpeechRecognition }).SpeechRecognition
       || (window as unknown as { webkitSpeechRecognition?: typeof SpeechRecognition }).webkitSpeechRecognition;
     if (!SR) return;
     const rec = new SR();
     rec.lang = 'ca-ES';
-    rec.continuous = false;
-    rec.interimResults = false;
-    rec.onresult = (e: SpeechRecognitionEvent) => setExtraContext(prev => prev ? prev + ' ' + e.results[0][0].transcript : e.results[0][0].transcript);
-    rec.onend = () => {};
+    rec.continuous = true;
+    rec.interimResults = true;
+    let accumulated = '';
+    rec.onresult = (e: SpeechRecognitionEvent) => {
+      let interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        if (e.results[i].isFinal) accumulated += e.results[i][0].transcript + ' ';
+        else interim = e.results[i][0].transcript;
+      }
+      setExtraContext(prev => {
+        const base = prev.replace(/\s+$/, '');
+        const newText = (accumulated + interim).trim();
+        return base ? `${base} ${newText}` : newText;
+      });
+    };
+    rec.onend = () => setListeningExtra(false);
     rec.start();
-  }, []);
+    extraRecRef.current = rec;
+    setListeningExtra(true);
+  }, [listeningExtra]);
 
   const generate = async () => {
     setGenerating(true);
@@ -438,15 +459,30 @@ export default function CreatePage() {
               onChange={e => setExtraContext(e.target.value)}
               rows={3}
               className="w-full rounded-xl px-4 py-3 pr-14 text-sm focus:outline-none resize-none"
-              style={{ background: '#f7f4f7', border: '1.5px solid var(--border)', color: 'var(--body)' }}
+              style={{
+                background: listeningExtra ? '#fff5f5' : '#f7f4f7',
+                border: listeningExtra ? '1.5px solid #dc2626' : '1.5px solid var(--border)',
+                color: 'var(--body)',
+                transition: 'border-color 0.2s, background 0.2s',
+              }}
             />
             <button
               type="button"
               onClick={startExtraVoice}
-              className="absolute right-3 bottom-3 w-10 h-10 rounded-full flex items-center justify-center text-xl"
-              style={{ background: 'white', border: '1.5px solid var(--border)' }}
-            >🎤</button>
+              className="absolute right-3 bottom-3 w-10 h-10 rounded-full flex items-center justify-center text-xl transition-all"
+              style={listeningExtra
+                ? { background: '#dc2626', border: 'none', boxShadow: '0 0 0 4px #dc262620' }
+                : { background: 'white', border: '1.5px solid var(--border)' }
+              }
+            >
+              {listeningExtra ? '⏹' : '🎤'}
+            </button>
           </div>
+          {listeningExtra && (
+            <p className="text-xs font-bold mt-2 animate-pulse" style={{ color: '#dc2626' }}>
+              🔴 Escoltant... Prem ⏹ per aturar
+            </p>
+          )}
         </section>
 
         {/* Error */}
