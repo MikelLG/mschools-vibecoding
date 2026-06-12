@@ -210,14 +210,14 @@ export default function CreatePage() {
     rec.continuous = true;
     rec.interimResults = true;
     const baseText = extraContext.trimEnd();
-    let accumulated = '';
     rec.onresult = (e: SpeechRecognitionEvent) => {
+      let finals = '';
       let interim = '';
-      for (let i = e.resultIndex; i < e.results.length; i++) {
-        if (e.results[i].isFinal) accumulated += e.results[i][0].transcript + ' ';
+      for (let i = 0; i < e.results.length; i++) {
+        if (e.results[i].isFinal) finals += e.results[i][0].transcript + ' ';
         else interim = e.results[i][0].transcript;
       }
-      const newText = (accumulated + interim).trim();
+      const newText = (finals + interim).trim();
       setExtraContext(baseText ? `${baseText} ${newText}` : newText);
     };
     rec.onend = () => setListeningExtra(false);
