@@ -209,6 +209,7 @@ export default function CreatePage() {
     rec.lang = 'ca-ES';
     rec.continuous = true;
     rec.interimResults = true;
+    const baseText = extraContext.trimEnd();
     let accumulated = '';
     rec.onresult = (e: SpeechRecognitionEvent) => {
       let interim = '';
@@ -216,17 +217,14 @@ export default function CreatePage() {
         if (e.results[i].isFinal) accumulated += e.results[i][0].transcript + ' ';
         else interim = e.results[i][0].transcript;
       }
-      setExtraContext(prev => {
-        const base = prev.replace(/\s+$/, '');
-        const newText = (accumulated + interim).trim();
-        return base ? `${base} ${newText}` : newText;
-      });
+      const newText = (accumulated + interim).trim();
+      setExtraContext(baseText ? `${baseText} ${newText}` : newText);
     };
     rec.onend = () => setListeningExtra(false);
     rec.start();
     extraRecRef.current = rec;
     setListeningExtra(true);
-  }, [listeningExtra]);
+  }, [listeningExtra, extraContext]);
 
   const generate = async () => {
     setGenerating(true);
