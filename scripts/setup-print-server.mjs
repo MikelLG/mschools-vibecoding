@@ -111,7 +111,7 @@ async function main() {
   // ── 4. Install packages ───────────────────────────────────────────────────
   console.log('\n📦  Checking required packages...');
   const missing = [];
-  for (const pkg of ['puppeteer', 'pdf-to-printer']) {
+  for (const pkg of ['puppeteer']) {
     const ok = await checkPkg(pkg);
     console.log(`  ${ok ? '✅' : '⬇️ '}  ${pkg}${ok ? '' : ' — will install'}`);
     if (!ok) missing.push(pkg);

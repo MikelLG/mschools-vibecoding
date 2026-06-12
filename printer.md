@@ -14,17 +14,19 @@ Guia per configurar la impressió automàtica de tiquets en qualsevol ordinador 
 
 ## Configuració inicial (primera vegada)
 
-### 1. Instal·lar Node.js
+### 1. Instal·lar Git i Node.js
 
 Obre PowerShell com a **Administrador** i executa:
 
 ```powershell
+winget install Git.Git
 winget install OpenJS.NodeJS.LTS
 ```
 
 Tanca i torna a obrir el terminal. Verifica:
 
 ```
+git --version
 node --version
 npm --version
 ```
@@ -36,6 +38,8 @@ git clone https://github.com/MikelLG/mschools-vibecoding.git
 cd mschools-vibecoding
 npm install
 ```
+
+> `npm install` descarrega Chromium (~150 MB) per a Puppeteer — pot trigar uns minuts.
 
 ### 3. Copiar el fitxer d'entorn
 
